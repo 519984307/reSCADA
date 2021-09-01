@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>rsrc/indicator_check.png</file>
+        <file>rsrc/indicator_empty.png</file>
+        <file>rsrc/indicator_false.png</file>
+        <file>rsrc/indicator_true.png</file>
+        <file>rsrc/indicator_unknown.png</file>
+        <file>rsrc/type_float.png</file>
+        <file>rsrc/type_int.png</file>
+        <file>rsrc/access_ro.png</file>
+        <file>rsrc/access_rw.png</file>
+        <file>rsrc/access_wo.png</file>
+        <file>rsrc/driver_mbrtu.png</file>
+        <file>rsrc/driver_mbtcp.png</file>
+        <file>rsrc/driver_simatic.png</file>
+        <file>rsrc/access_na.png</file>
+        <file>rsrc/driver_error.png</file>
+        <file>rsrc/indicator_error.png</file>
+        <file>rsrc/type_error.png</file>
+    </qresource>
+</RCC>

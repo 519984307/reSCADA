@@ -1,0 +1,36 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Aspiration.qml</file>
+        <file>AspirationGroup.qml</file>
+        <file>Dryier.qml</file>
+        <file>DryierEmpty.qml</file>
+        <file>Elevator.qml</file>
+        <file>Fan.qml</file>
+        <file>Filter.qml</file>
+        <file>Gate.qml</file>
+        <file>HyperText.qml</file>
+        <file>Indicator.qml</file>
+        <file>Indicator2.qml</file>
+        <file>Machine.qml</file>
+        <file>Pipe.qml</file>
+        <file>PropertyWindow2.qml</file>
+        <file>RouteWindow.qml</file>
+        <file>Silo.qml</file>
+        <file>TestObject.qml</file>
+        <file>Transporter.qml</file>
+        <file>Valve.qml</file>
+        <file>fap.js</file>
+        <file>Dryier3VSM.qml</file>
+        <file>MFUnit.qml</file>
+        <file>Dryier3VSMTB.qml</file>
+        <file>Log.qml</file>
+        <file>Dryier1VSM.qml</file>
+        <file>TransporterFC.qml</file>
+        <file>Dryier1VSM_Rostok.qml</file>
+        <file>1br1sec2cf.png</file>
+        <file>../clipart276790.png</file>
+        <file>Dryier2VSM.qml</file>
+        <file>Gt.qml</file>
+        <file>Test.qml</file>
+    </qresource>
+</RCC>
