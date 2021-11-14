@@ -183,3 +183,9 @@ Item {
             buttonsType: 0
         }
 }
+
+/*##^##
+Designer {
+    D{i:0;height:55;width:56}D{i:1}D{i:3}D{i:2}D{i:5}D{i:6}
+}
+##^##*/

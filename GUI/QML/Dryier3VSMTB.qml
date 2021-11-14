@@ -3,7 +3,6 @@ import QtQuick.Controls 2.12
 //import ETag 1.0
 //import ElevatitUnits 1.0
 import "fap.js" as Fap
-//test 1
 
 Item {
     id: root
