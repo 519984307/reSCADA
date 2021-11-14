@@ -16,10 +16,9 @@
         <file>PropertyWindow2.qml</file>
         <file>RouteWindow.qml</file>
         <file>Silo.qml</file>
-        <file>TestObject.qml</file>
         <file>Transporter.qml</file>
         <file>Valve.qml</file>
-        <file>fap.js</file>
+        <file alias="fap.js">fap.js</file>
         <file>Dryier3VSM.qml</file>
         <file>MFUnit.qml</file>
         <file>Dryier3VSMTB.qml</file>

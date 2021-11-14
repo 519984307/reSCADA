@@ -85,11 +85,11 @@ Item {
     onLinkedChanged: canvas.requestPaint()
     onManualChanged: canvas.requestPaint()
 
-    Timer {
-           id: timer
-           interval: Fap.blinkDelay; running: false; repeat: true
-           onTriggered: root.alarmBlink = !root.alarmBlink
-    }
+//    Timer {
+//           id: timer
+//           interval: Fap.blinkDelay; running: false; repeat: true
+//           onTriggered: root.alarmBlink = !root.alarmBlink
+//    }
 
     Canvas {
         MouseArea {
@@ -184,8 +184,10 @@ Item {
         }
 }
 
+
+
 /*##^##
 Designer {
-    D{i:0;height:55;width:56}D{i:1}D{i:3}D{i:2}D{i:5}D{i:6}
+    D{i:0;height:55;width:56}D{i:2}D{i:1}D{i:4}D{i:5}
 }
 ##^##*/

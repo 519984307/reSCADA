@@ -6,85 +6,86 @@ Item {
     property int counter: 0
 
     id: root
-    function addMessage(date, time, unit, action){
-        dataModel.append({"date": date, "time":time, "unit": unit, "action": action})
-        view.positionViewAtRow(dataModel.count -1, ListView.Contain)
-        if(dataModel.count > 200){
-            dataModel.remove(dataModel.count -1, 1)
-            //counter ++
-        }
-    }
-
-    ListModel {
-        id: dataModel
-//        ListElement {
-//            date: "13.12.14"
-//            time: "12:46:16"
-//            unit: "T33.1"
-//            action: "Авария датчик подпора"
+//    function addMessage(date, time, unit, action){
+//        dataModel.append({"date": date, "time":time, "unit": unit, "action": action})
+//        view.positionViewAtRow(dataModel.count -1, ListView.Contain)
+//        if(dataModel.count > 200){
+//            dataModel.remove(dataModel.count -1, 1)
+//            //counter ++
 //        }
-    }
+//    }
 
-    TableView {
-        id: view
-        selectionMode: SelectionMode.NoSelection
-        anchors.fill: parent
-        model: dataModel
-        clip: true
+//    ListModel {
+//        id: dataModel
+////        ListElement {
+////            date: "13.12.14"
+////            time: "12:46:16"
+////            unit: "T33.1"
+////            action: "Авария датчик подпора"
+////        }
+//    }
 
-        TableViewColumn {
-            width: 70
-            title: "Дата"
-            role: "date"
-            resizable: true
-            horizontalAlignment: Text.AlignHCenter
-        }
-        TableViewColumn {
-            width: 70
-            title: "Время"
-            role: "time"
-            resizable: true
-            horizontalAlignment: Text.AlignHCenter
-        }
-        TableViewColumn {
-            width: 90
-            title: "Объект"
-            role: "unit"
-            resizable: true
-            horizontalAlignment: Text.AlignHCenter
-        }
-        TableViewColumn {
-            width: view.width-70*3
-            title: "Событие"
-            role: "action"
-            resizable: true
-            horizontalAlignment: Text.AlignHCenter
-        }
+//    TableView {
+//        id: view
+//        selectionMode: SelectionMode.NoSelection
+//        anchors.fill: parent
+//        model: dataModel
+//        clip: true
 
-        itemDelegate: Item {
-            Text {
-                anchors.left: parent.left
-                renderType: Text.NativeRendering
-                text: styleData.value
-                color: "red"
+//        TableViewColumn {
+//            width: 70
+//            title: "Дата"
+//            role: "date"
+//            resizable: true
+//            horizontalAlignment: Text.AlignHCenter
+//        }
+//        TableViewColumn {
+//            width: 70
+//            title: "Время"
+//            role: "time"
+//            resizable: true
+//            horizontalAlignment: Text.AlignHCenter
+//        }
+//        TableViewColumn {
+//            width: 90
+//            title: "Объект"
+//            role: "unit"
+//            resizable: true
+//            horizontalAlignment: Text.AlignHCenter
+//        }
+//        TableViewColumn {
+//            width: view.width-70*3
+//            title: "Событие"
+//            role: "action"
+//            resizable: true
+//            horizontalAlignment: Text.AlignHCenter
+//        }
 
-            }
-        }
-    }
-    Button{
-        height: 20
-        width: 60
-        anchors.margins: 2
-        anchors.right: parent.right
-        anchors.top: parent.top
-        text: "Очистить"
-        tooltip: "Очистить журнал"
-        onClicked: dataModel.clear()
-    }
+//        itemDelegate: Item {
+//            Text {
+//                anchors.left: parent.left
+//                renderType: Text.NativeRendering
+//                text: styleData.value
+//                color: "red"
+
+//            }
+//        }
+//    }
+//    Button{
+//        height: 20
+//        width: 60
+//        anchors.margins: 2
+//        anchors.right: parent.right
+//        anchors.top: parent.top
+//        text: "Очистить"
+//        tooltip: "Очистить журнал"
+//        onClicked: dataModel.clear()
+//    }
 }
+
 
 /*##^##
 Designer {
-    D{i:0;autoSize:true;height:480;width:640}
+    D{i:0;height:100;width:1450}
 }
 ##^##*/

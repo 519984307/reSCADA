@@ -331,6 +331,13 @@ Item {
                 prop.show()
             }
         }
+
+        CheckBox {
+            id: checkBox
+            x: 98
+            y: 530
+            text: qsTr("Check Box")
+        }
     }
 
 
