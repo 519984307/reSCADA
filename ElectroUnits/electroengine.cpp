@@ -28,8 +28,8 @@ ElectroEngine::ElectroEngine(Unit *Owner, std::vector<QString> SensorsNames, QSt
                     MultiEnginePrefix + SensorsNames[2].section('|', 1, 1),
                     true, false, SensorsNames[2].section('|', 2, 2).toInt()); //
 
-            connect(startForward, &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSTART1KM,      Qt::QueuedConnection);
-            connect(KMforward,    &InDiscretETag::s_valueChd,  this,      &ElectroEngine::CheckStateSTART1KM,      Qt::QueuedConnection);
+            connect(startForward, &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSTART1KM,     Qt::QueuedConnection);
+            connect(KMforward,    &InDiscretETag::s_valueChd,  this,      &ElectroEngine::CheckStateSTART1KM,     Qt::QueuedConnection);
             connect(startForward, &OutDiscretETag::s_on,      KMforward, &InDiscretETag::needBeDetectedAlarm,     Qt::QueuedConnection);
             connect(startForward, &OutDiscretETag::s_off,     KMforward, &InDiscretETag::needBeUndetectedNoAlarm, Qt::QueuedConnection);
             connect(_owner,       &Unit::s_connected,         this,      &ElectroEngine::CheckStateSTART1KM,      Qt::QueuedConnection);
@@ -54,7 +54,7 @@ ElectroEngine::ElectroEngine(Unit *Owner, std::vector<QString> SensorsNames, QSt
                         MultiEnginePrefix + SensorsNames[1].section('|', 1, 1)); //,
                 connect(startForward, &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSartStop,   Qt::QueuedConnection);
                 connect(stop,         &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSartStop,   Qt::QueuedConnection);
-                connect(_owner,       &Unit::s_connected,         this,      &ElectroEngine::CheckStateSartStop,   Qt::QueuedConnection);
+                connect(_owner,       &Unit::s_connected,          this,      &ElectroEngine::CheckStateSartStop,   Qt::QueuedConnection);
             }
             else{
                 stop = new OutDiscretETag(_owner, Prom::PreSet,
@@ -67,7 +67,7 @@ ElectroEngine::ElectroEngine(Unit *Owner, std::vector<QString> SensorsNames, QSt
                 connect(startForward, &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSartStop1KM,   Qt::QueuedConnection);
                 connect(stop,         &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSartStop1KM,   Qt::QueuedConnection);
                 connect(KMforward,    &InDiscretETag::s_valueChd,  this,      &ElectroEngine::CheckStateSartStop1KM,   Qt::QueuedConnection);
-                connect(startForward, &OutDiscretETag::s_on,      KMforward, &InDiscretETag::needBeDetectedAlarm,     Qt::QueuedConnection);
+                connect(startForward, &OutDiscretETag::s_on,       KMforward, &InDiscretETag::needBeDetectedAlarm,     Qt::QueuedConnection);
                 if(startForward->tunableImpulseTime)
                     connect(stop, &OutDiscretETag::s_on, KMforward, &InDiscretETag::needBeUndetectedNoAlarm, Qt::QueuedConnection);
                 else

@@ -1,10 +1,9 @@
 #ifndef QMLLINE_H
 #define QMLLINE_H
 
-#include "QObject"
-#include "QtQml"
 #include "QPainter"
 #include "QQuickPaintedItem"
+#include <QtQuick/QQuickItem>
 
 class QmlLine : public QQuickPaintedItem
 {
@@ -113,9 +112,5 @@ protected:
     QColor m_color;
     int m_penWidth;
 
-public:
-    static void declare() {
-        qmlRegisterType<QmlLine>("LineComponent", 1, 0, "Line");
-    }
 };
 #endif // QMLLINE_H
