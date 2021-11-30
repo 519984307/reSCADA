@@ -66,9 +66,9 @@ void InETag::_acceptValue(QVariant Value)
 void InETag::reInitialise()
 {
     ETag::reInitialise();
-    emit ChangeDelectLewel(_detectLevel);
-    if(_detect) emit Detected();
-    else emit Undetected();
+    emit s_changeDelectLewel(_detectLevel);
+    if(_detect) emit s_detected();
+    else emit s_undetected();
 }
 
 //------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ void InETag::setDetectLevel(QVariant detectLevel)
     //        qDebug()<<".QK";
     //_detect = _Detect();
     _checkVal();
-    emit ChangeDelectLewel(_detectLevel);
+    emit s_changeDelectLewel(_detectLevel);
 }
 
 //------------------------------------------------------------------------------
@@ -325,6 +325,11 @@ void InETag::_checkVal()
             _timeMax->stop();
         }
     }
+// переделка на будущее
+//    if( value().toDouble() > _timeMaxValue.toDouble() ){
+//        _timeMaxValue = value() ;
+//        emit s_maxValueChd(_timeMaxValue);
+//    }
 
     static quint8 ChDt;//чтобы emit s_valueChd и detrct/undetect шли после логов и т.п.
 
@@ -391,13 +396,13 @@ void InETag::_checkVal()
         emit s_valueChd(value());
         break;
     case 2:
-        if(_detect)emit Detected();
-        else emit Undetected();
+        if(_detect)emit s_detected();
+        else emit s_undetected();
         break;
     case 3:
         emit s_valueChd(value());
-        if(_detect)emit Detected();
-        else emit Undetected();
+        if(_detect)emit s_detected();
+        else emit s_undetected();
         break;
     }
 }
@@ -460,7 +465,7 @@ void InETag::_customConnectToGUI(QObject *, QObject *engRow)
         tmpSgSt = qvariant_cast< QObject* >(ret);//получаю указатель на уровень срабатывания
         //подключаю сигналы к уровням срабатывания
         connect(tmpSgSt, SIGNAL(changedVal(QVariant)),        this,    SLOT(setDetectLevel(QVariant)), Qt::QueuedConnection);
-        connect(this,    SIGNAL(ChangeDelectLewel(QVariant)), tmpSgSt, SLOT(changeVal(QVariant)),      Qt::QueuedConnection);
+        connect(this,    SIGNAL(s_changeDelectLewel(QVariant)), tmpSgSt, SLOT(changeVal(QVariant)),      Qt::QueuedConnection);
         //подключаю сигналы к уровням срабатывания
     }
 }

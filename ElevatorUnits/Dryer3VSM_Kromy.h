@@ -91,6 +91,8 @@ protected:
     QTimerExt * _startBrDelay;
     QTimerExt * _stopBrDelay;
     QTimerExt * _coolingTimer;
+    QTimerExt * _humIn0StopTimer;
+    QTimerExt * _humOut0StopTimer;
 
     int lastStartCF { -1};
     QVector <Unit *> CFs;
@@ -142,6 +144,7 @@ private:
     //PID *_UTSpeedHumPID;
     bool _autoHumidity{false};
     bool _autoTemp{false};
+    bool _auto0Stop{false};
 
 signals:
     void s_test(QString);
@@ -185,6 +188,7 @@ signals:
 
     void s_autoHumidityChd            (QVariant);
     void s_autoTempChd                (QVariant);
+    void s_auto0StopChd               (QVariant);
 
 public slots:
     void AddToCurrentRoteStarted() { _AddToCurrentRoute(Prom::UnMdStart);}
@@ -243,8 +247,13 @@ protected slots:
 //    void setUTSpeedHumPID_MaxU      (QVariant MaxU);
 //    void setUTSpeedHumPID_MinU      (QVariant MinU);
 
-    void setAutoHumidity(bool);
-    void setAutoTemp(bool);
+    void _setAutoHumidity(bool);
+    void _setAutoTemp(bool);
+    void _setHumAuto0Stop(bool);
+
+    void _humInAuto0Stop();
+    void _humOutAuto0Stop();
+
 
     void _conditiontHumPID();
     void _conditionAllTempPid();

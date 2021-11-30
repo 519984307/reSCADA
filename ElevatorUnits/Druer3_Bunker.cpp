@@ -16,58 +16,58 @@ Druer3_Bunker::Druer3_Bunker(int ID,
     _HL1 = new InDiscretETag(this, "Датчик верхнего уровня 1", ".HL1", true, false, true, false);
     _HL1->onlyChange();
     connect(_HL1, &InDiscretETag::s_valueChd,    this, &Druer3_Bunker::updateState,  Qt::QueuedConnection);
-    connect(_HL1, &InDiscretETag::Detected,   this, &Druer3_Bunker::ActivateHL1,   Qt::QueuedConnection);
-    connect(_HL1, &InDiscretETag::Undetected, this, &Druer3_Bunker::DeactivateHL1, Qt::QueuedConnection);
+    connect(_HL1, &InDiscretETag::s_detected,   this, &Druer3_Bunker::ActivateHL1,   Qt::QueuedConnection);
+    connect(_HL1, &InDiscretETag::s_undetected, this, &Druer3_Bunker::DeactivateHL1, Qt::QueuedConnection);
 
     _ML1 = new InDiscretETag(this, "Датчик среднего уровня 1", ".ML1", true, false, true, false);
     _ML1->onlyChange();
     connect(_ML1, &InDiscretETag::s_valueChd,    this, &Druer3_Bunker::updateState,  Qt::QueuedConnection);
-    connect(_ML1, &InDiscretETag::Detected,   this, &Druer3_Bunker::ActivateML1,   Qt::QueuedConnection);
-    connect(_ML1, &InDiscretETag::Undetected, this, &Druer3_Bunker::DeactivateML1, Qt::QueuedConnection);
+    connect(_ML1, &InDiscretETag::s_detected,   this, &Druer3_Bunker::ActivateML1,   Qt::QueuedConnection);
+    connect(_ML1, &InDiscretETag::s_undetected, this, &Druer3_Bunker::DeactivateML1, Qt::QueuedConnection);
 
     _LL1 = new InDiscretETag(this, "Датчик нижнего уровня 1", ".LL1", true, false, true, false);
     _LL1->onlyChange();
     connect(_LL1, &InDiscretETag::s_valueChd,    this, &Druer3_Bunker::updateState,  Qt::QueuedConnection);
-    connect(_LL1, &InDiscretETag::Detected,   this, &Druer3_Bunker::ActivateLL1,   Qt::QueuedConnection);
-    connect(_LL1, &InDiscretETag::Undetected, this, &Druer3_Bunker::DeactivateLL1, Qt::QueuedConnection);
+    connect(_LL1, &InDiscretETag::s_detected,   this, &Druer3_Bunker::ActivateLL1,   Qt::QueuedConnection);
+    connect(_LL1, &InDiscretETag::s_undetected, this, &Druer3_Bunker::DeactivateLL1, Qt::QueuedConnection);
 
     //----
     _HL2 = new InDiscretETag(this, "Датчик верхнего уровня 2", ".HL2", true, false, true, false);
     _HL2->onlyChange();
     connect(_HL2, &InDiscretETag::s_valueChd,    this, &Druer3_Bunker::updateState,  Qt::QueuedConnection);
-    connect(_HL2, &InDiscretETag::Detected,   this, &Druer3_Bunker::ActivateHL2,   Qt::QueuedConnection);
-    connect(_HL2, &InDiscretETag::Undetected, this, &Druer3_Bunker::DeactivateHL2, Qt::QueuedConnection);
+    connect(_HL2, &InDiscretETag::s_detected,   this, &Druer3_Bunker::ActivateHL2,   Qt::QueuedConnection);
+    connect(_HL2, &InDiscretETag::s_undetected, this, &Druer3_Bunker::DeactivateHL2, Qt::QueuedConnection);
 
     _ML2 = new InDiscretETag(this, "Датчик среднего уровня 2", ".ML2", true, false, true, false);
     _ML2->onlyChange();
     connect(_ML2, &InDiscretETag::s_valueChd,    this, &Druer3_Bunker::updateState,  Qt::QueuedConnection);
-    connect(_ML2, &InDiscretETag::Detected,   this, &Druer3_Bunker::ActivateML2,   Qt::QueuedConnection);
-    connect(_ML2, &InDiscretETag::Undetected, this, &Druer3_Bunker::DeactivateML2, Qt::QueuedConnection);
+    connect(_ML2, &InDiscretETag::s_detected,   this, &Druer3_Bunker::ActivateML2,   Qt::QueuedConnection);
+    connect(_ML2, &InDiscretETag::s_undetected, this, &Druer3_Bunker::DeactivateML2, Qt::QueuedConnection);
 
     _LL2 = new InDiscretETag(this, "Датчик нижнего уровня 2", ".LL2", true, false, true, false);
     _LL2->onlyChange();
     connect(_LL2, &InDiscretETag::s_valueChd,    this, &Druer3_Bunker::updateState,  Qt::QueuedConnection);
-    connect(_LL2, &InDiscretETag::Detected,   this, &Druer3_Bunker::ActivateLL2,   Qt::QueuedConnection);
-    connect(_LL2, &InDiscretETag::Undetected, this, &Druer3_Bunker::DeactivateLL2, Qt::QueuedConnection);
+    connect(_LL2, &InDiscretETag::s_detected,   this, &Druer3_Bunker::ActivateLL2,   Qt::QueuedConnection);
+    connect(_LL2, &InDiscretETag::s_undetected, this, &Druer3_Bunker::DeactivateLL2, Qt::QueuedConnection);
 
     //----
     _HL3 = new InDiscretETag(this, "Датчик верхнего уровня 3", ".HL3", true, false, true, false);
     _HL3->onlyChange();
     connect(_HL3, &InDiscretETag::s_valueChd,    this, &Druer3_Bunker::updateState,  Qt::QueuedConnection);
-    connect(_HL3, &InDiscretETag::Detected,   this, &Druer3_Bunker::ActivateHL3,   Qt::QueuedConnection);
-    connect(_HL3, &InDiscretETag::Undetected, this, &Druer3_Bunker::DeactivateHL3, Qt::QueuedConnection);
+    connect(_HL3, &InDiscretETag::s_detected,   this, &Druer3_Bunker::ActivateHL3,   Qt::QueuedConnection);
+    connect(_HL3, &InDiscretETag::s_undetected, this, &Druer3_Bunker::DeactivateHL3, Qt::QueuedConnection);
 
     _ML3 = new InDiscretETag(this, "Датчик среднего уровня 3", ".ML3", true, false, true, false);
     _ML3->onlyChange();
     connect(_ML3, &InDiscretETag::s_valueChd,    this, &Druer3_Bunker::updateState,  Qt::QueuedConnection);
-    connect(_ML3, &InDiscretETag::Detected,   this, &Druer3_Bunker::ActivateML3,   Qt::QueuedConnection);
-    connect(_ML3, &InDiscretETag::Undetected, this, &Druer3_Bunker::DeactivateML3, Qt::QueuedConnection);
+    connect(_ML3, &InDiscretETag::s_detected,   this, &Druer3_Bunker::ActivateML3,   Qt::QueuedConnection);
+    connect(_ML3, &InDiscretETag::s_undetected, this, &Druer3_Bunker::DeactivateML3, Qt::QueuedConnection);
 
     _LL3 = new InDiscretETag(this, "Датчик нижнего уровня 3", ".LL3", true, false, true, false);
     _LL3->onlyChange();
     connect(_LL3, &InDiscretETag::s_valueChd,    this, &Druer3_Bunker::updateState,  Qt::QueuedConnection);
-    connect(_LL3, &InDiscretETag::Detected,   this, &Druer3_Bunker::ActivateLL3,   Qt::QueuedConnection);
-    connect(_LL3, &InDiscretETag::Undetected, this, &Druer3_Bunker::DeactivateLL3, Qt::QueuedConnection);
+    connect(_LL3, &InDiscretETag::s_detected,   this, &Druer3_Bunker::ActivateLL3,   Qt::QueuedConnection);
+    connect(_LL3, &InDiscretETag::s_undetected, this, &Druer3_Bunker::DeactivateLL3, Qt::QueuedConnection);
 }
 //------------------------------------------------------------------------------
 void Druer3_Bunker::_updateStateAndMode()

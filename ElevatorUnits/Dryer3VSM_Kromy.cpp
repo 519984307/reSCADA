@@ -33,9 +33,21 @@ Dryer3VSM_Kromy::Dryer3VSM_Kromy(int ID,
     _coolingTimer->setSingleShot(true);
     connect(_coolingTimer, &QTimer::timeout, this, &Dryer3VSM_Kromy::_coolingTimerEnd);
 
+    _humIn0StopTimer = new QTimerExt(this);
+    _humIn0StopTimer->setSingleShot(true);
+    _humIn0StopTimer->setInterval(10000);
+    connect(_humIn0StopTimer, &QTimer::timeout, this, &Dryer3VSM_Kromy::_humInAuto0Stop);
+
+    _humOut0StopTimer = new QTimerExt(this);
+    _humOut0StopTimer->setSingleShot(true);
+    _humOut0StopTimer->setInterval(10000);
+    connect(_humOut0StopTimer, &QTimer::timeout, this, &Dryer3VSM_Kromy::_humOutAuto0Stop);
+
     addTimer(_startCFDelay);
     addTimer(_startBrDelay);
     addTimer(_coolingTimer);
+    addTimer( _humIn0StopTimer);
+    addTimer( _humOut0StopTimer);
 
     _vsAlarm   = new OutDiscretETag(this, PreSet, "Сирена аварии", ".vsAlarm");
     _vsWarning = new OutDiscretETag(this, PreSet, "Сирена предупреждения", ".vsWarning");
@@ -70,8 +82,8 @@ Dryer3VSM_Kromy::Dryer3VSM_Kromy(int ID,
     //connect( _needCircul, &OutDiscretETag::s_valueChd, this, &Dryer3VSM_Kromy::_loadUnloadCireculManag, Qt::QueuedConnection );
 
 
-    _inHumidity   = new InETag(this, TpIn, "Вх. влагомер", ".hrIn", false, 1000, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _outHumidity  = new InETag(this, TpIn, "Вых. влагомер", ".hrOut", false, 1000, 5, false, false, false, false, true, VCFloatInIntToDouble, 120);
+    _inHumidity   = new InETag(this, TpIn, "Вх. влагомер", ".hrIn", false, 1000, 5, false, false, false, false, true, VCFloatInIntToDouble, 60);
+    _outHumidity  = new InETag(this, TpIn, "Вых. влагомер", ".hrOut", false, 1000, 5, false, false, false, false, true, VCFloatInIntToDouble, 60);
 
     connect( _outHumidity, &InETag::s_valueChd, this, &Dryer3VSM_Kromy::_loadUnloadCireculManag, Qt::QueuedConnection );
 
@@ -219,8 +231,8 @@ bool Dryer3VSM_Kromy::addSubUnit(Unit *unit)
         }
         if(unit->unitType == TypeDryerUnloadTable){
             _unloadTable = unit;
-            connect(_unload, SIGNAL(Undetected()), _unloadTable, SLOT(notMayStart()), Qt::QueuedConnection);
-            connect(_unload, SIGNAL(Detected()),   _unloadTable, SLOT(mayStart()),    Qt::QueuedConnection);
+            connect(_unload, SIGNAL(s_undetected()), _unloadTable, SLOT(notMayStart()), Qt::QueuedConnection);
+            connect(_unload, SIGNAL(s_detected()),   _unloadTable, SLOT(mayStart()),    Qt::QueuedConnection);
             //        connect( _UTSpeedHumPID, SIGNAL(s_uChdQVar(QVariant)),
             //                 _unloadTable, SLOT(setSpeed(QVariant)), Qt::QueuedConnection);
         }
@@ -281,21 +293,21 @@ void Dryer3VSM_Kromy::setShHum(  Unit *ShHum, bool InOrOut )
         shnekOld = _shHumIn;
         _shHumIn = ShHum;
         shnekNew = ShHum;
-        disconnect( _load, SIGNAL( Detected() ),   shnekOld, SLOT( Start() ) );
-        disconnect( _load, SIGNAL( Undetected() ), shnekOld, SLOT( Stop() ) );
+        disconnect( _load, SIGNAL( s_detected() ),   shnekOld, SLOT( Start() ) );
+        disconnect( _load, SIGNAL( s_undetected() ), shnekOld, SLOT( Stop() ) );
         if( _shHumIn != nullptr ){
-            connect( _load, SIGNAL( Detected() ),   shnekNew, SLOT( Start() ), Qt::QueuedConnection );
-            connect( _load, SIGNAL( Undetected() ), shnekNew, SLOT( Stop() ) , Qt::QueuedConnection );
+            connect( _load, SIGNAL( s_detected() ),   shnekNew, SLOT( Start() ), Qt::QueuedConnection );
+            connect( _load, SIGNAL( s_undetected() ), shnekNew, SLOT( Stop() ) , Qt::QueuedConnection );
         }
     } else {
         shnekOld = _shHumOut;
         _shHumOut = ShHum;
         shnekNew = ShHum;
-        disconnect( _unload, SIGNAL( Detected() ),   shnekOld, SLOT( Start() ) );
-        disconnect( _unload, SIGNAL( Undetected() ), shnekOld, SLOT( Stop() ) );
+        disconnect( _unload, SIGNAL( s_detected() ),   shnekOld, SLOT( Start() ) );
+        disconnect( _unload, SIGNAL( s_undetected() ), shnekOld, SLOT( Stop() ) );
         if( _shHumOut != nullptr ){
-            connect( _unload, SIGNAL( Detected() ),   shnekNew, SLOT( Start() ), Qt::QueuedConnection );
-            connect( _unload, SIGNAL( Undetected() ), shnekNew, SLOT( Stop() ) , Qt::QueuedConnection );
+            connect( _unload, SIGNAL( s_detected() ),   shnekNew, SLOT( Start() ), Qt::QueuedConnection );
+            connect( _unload, SIGNAL( s_undetected() ), shnekNew, SLOT( Stop() ) , Qt::QueuedConnection );
         }
     }
     addSubUnit( ShHum );
@@ -309,7 +321,7 @@ void Dryer3VSM_Kromy::setCircule(bool circule)
         _needCircul->on();
     }
     else {
-         _needCircul->off();
+        _needCircul->off();
     }
     if(_bunker){
         _updateSubUnitMode(_bunker);
@@ -367,12 +379,12 @@ void Dryer3VSM_Kromy::_bunkerBelowLL()
     _vsWarning->singleImpulse( 10000, 0);
 }
 //------------------------------------------------------------------------------
-void Dryer3VSM_Kromy::setAutoHumidity(bool AutoHumidity)
+void Dryer3VSM_Kromy::_setAutoHumidity(bool AutoHumidity)
 {
     _autoHumidity = AutoHumidity;
     if( _autoHumidity){
         _conditiontHumPID();
-        setAutoTemp( true );
+        _setAutoTemp( true );
         _loadUnloadCireculManag();
     }
     else{
@@ -382,16 +394,86 @@ void Dryer3VSM_Kromy::setAutoHumidity(bool AutoHumidity)
 }
 
 //------------------------------------------------------------------------------
-void Dryer3VSM_Kromy::setAutoTemp(bool AutoTemp)
+void Dryer3VSM_Kromy::_setAutoTemp(bool AutoTemp)
 {
     _autoTemp = AutoTemp;
     if( _autoTemp ){
         _conditionAllTempPid();
     }
     else{
-        setAutoHumidity( false );
+        _setAutoHumidity( false );
     }
     emit s_autoTempChd( _autoTemp );
+}
+
+//------------------------------------------------------------------------------
+void Dryer3VSM_Kromy::_setHumAuto0Stop(bool Auto0Stop)
+{
+    if( Auto0Stop != _auto0Stop ){
+        _auto0Stop = Auto0Stop;
+        if( _auto0Stop ){
+            disconnect( _load, SIGNAL( s_detected() ),   _shHumIn, SLOT( Start() ) );
+            disconnect( _load, SIGNAL( s_undetected() ), _shHumIn, SLOT( Stop() ) );
+            disconnect( _unload, SIGNAL( s_detected() ),   _shHumOut, SLOT( Start() ) );
+            disconnect( _unload, SIGNAL( s_undetected() ), _shHumOut, SLOT( Stop() ) );
+
+            connect( _inHumidity,  SIGNAL(s_valueChd),  _humIn0StopTimer,  SLOT(start), Qt::QueuedConnection );
+            connect( _outHumidity, SIGNAL(s_valueChd),  _humOut0StopTimer, SLOT(start), Qt::QueuedConnection );
+            _humInAuto0Stop();
+            _humOutAuto0Stop();
+        }
+        else{
+            connect( _load, SIGNAL( s_detected() ),   _shHumIn, SLOT( Start() ), Qt::QueuedConnection );
+            connect( _load, SIGNAL( s_undetected() ), _shHumIn, SLOT( Stop() ) , Qt::QueuedConnection );
+            connect( _unload, SIGNAL( s_detected() ),   _shHumOut, SLOT( Start() ), Qt::QueuedConnection );
+            connect( _unload, SIGNAL( s_undetected() ), _shHumOut, SLOT( Stop() ) , Qt::QueuedConnection );
+
+            disconnect( _inHumidity,  SIGNAL(s_valueChd),  _humIn0StopTimer,  SLOT(start) );
+            disconnect( _outHumidity, SIGNAL(s_valueChd),  _humOut0StopTimer, SLOT(start) );
+
+            if( _unload->isDetected() ){
+                _shHumOut->setMode( Prom::UnMdStart, false );
+            }
+            else{
+                _shHumOut->setMode( Prom::UnMdStop, false );
+            }
+            if( _load->isDetected() ){
+                _shHumIn->setMode( Prom::UnMdStart, false );
+            }
+            else{
+                _shHumIn->setMode( Prom::UnMdStop, false );
+            }
+
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+void Dryer3VSM_Kromy::_humOutAuto0Stop()
+{
+    if( _auto0Stop ){
+
+        if( _outHumidity->value().toDouble() == 0 ){
+            _shHumOut->setMode( Prom::UnMdStop, false );
+        }
+        else{
+            _shHumOut->setMode( Prom::UnMdStart, false );
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+void Dryer3VSM_Kromy::_humInAuto0Stop()
+{
+    if( _auto0Stop ){
+
+        if( _inHumidity->value().toDouble() == 0 ){
+            _shHumIn->setMode( Prom::UnMdStop, false );
+        }
+        else{
+            _shHumIn->setMode( Prom::UnMdStart, false );
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -961,6 +1043,7 @@ void Dryer3VSM_Kromy::reInitialise()
 
     emit s_autoHumidityChd( _autoHumidity );
     emit s_autoTempChd( _autoTemp );
+    emit s_auto0StopChd( _auto0Stop );
 
     Unit::reInitialise();
 }
@@ -1016,6 +1099,7 @@ void Dryer3VSM_Kromy::saveParam()
 
     ini->setValue(tagPrefix + "/autoHumidity", _autoHumidity);
     ini->setValue(tagPrefix + "/autoTemp", _autoTemp);
+    ini->setValue(tagPrefix + "/auto0Stop", _auto0Stop);
 
     Unit::saveParam();
 }
@@ -1068,9 +1152,9 @@ void Dryer3VSM_Kromy::loadParam()
     //_UTSpeedHumPID->setMaxU(ini->value(tagPrefix + "/UTSpeedHumPID->MaxU", 50).toDouble());
     //_UTSpeedHumPID->setMinU(ini->value(tagPrefix + "/UTSpeedHumPID->MinU", 10).toDouble());
 
-    setAutoTemp    ( ini->value(tagPrefix + "/autoTemp",     false).toBool());
-    setAutoHumidity( ini->value(tagPrefix + "/autoHumidity", false).toBool());
-
+    _setAutoTemp    ( ini->value(tagPrefix + "/autoTemp",     false).toBool());
+    _setAutoHumidity( ini->value(tagPrefix + "/autoHumidity", false).toBool());
+    _setHumAuto0Stop   ( ini->value(tagPrefix + "/auto0Stop", false).toBool());
 
     Unit::loadParam();
 }
@@ -1382,7 +1466,7 @@ void Dryer3VSM_Kromy::_customConnectToGUI(QObject *guiItem,  QObject *propWin)
 
     connect(_needUnload, SIGNAL(s_valueChd(QVariant)), guiItem,  SLOT(setUnload(QVariant) ), Qt::QueuedConnection);
     connect(_needCircul, SIGNAL(s_valueChd(QVariant)), guiItem,  SLOT(setCircule(QVariant)), Qt::QueuedConnection);
-    connect(this,        SIGNAL(s_passLoad(QVariant)), guiItem,  SLOT(setAutoLoad(QVariant)   ), Qt::QueuedConnection);
+    connect(this,        SIGNAL(s_passLoad(QVariant)), guiItem,  SLOT(setLoad(QVariant)   ), Qt::QueuedConnection);
 
     connect(guiItem, SIGNAL(passUnload(bool)  ), this,     SLOT(setUnload(bool)  ), Qt::QueuedConnection);
     connect(guiItem, SIGNAL(passCircule(bool) ), this,     SLOT(setCircule(bool) ), Qt::QueuedConnection);
@@ -1449,11 +1533,14 @@ void Dryer3VSM_Kromy::_customConnectToGUI(QObject *guiItem,  QObject *propWin)
     connect(this,    SIGNAL(s_targetLowTempChd(QVariant)), guiItem, SLOT(setTargetTempLow(QVariant)), Qt::QueuedConnection);
     connect(guiItem, SIGNAL(s_targetTempLowChd(QVariant)), this,    SLOT(setTargetLowTemp(QVariant)), Qt::QueuedConnection);
 
-    connect(this,    SIGNAL(s_autoHumidityChd(QVariant)), guiItem, SLOT(setAutoHumidity(QVariant)), Qt::QueuedConnection);
-    connect(guiItem, SIGNAL(s_autoHumidityChd(bool)), this,    SLOT(setAutoHumidity(bool)), Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_autoHumidityChd(QVariant)), guiItem, SLOT(_setAutoHumidity(QVariant)), Qt::QueuedConnection);
+    connect(guiItem, SIGNAL(s_autoHumidityChd(bool)), this,    SLOT(_setAutoHumidity(bool)), Qt::QueuedConnection);
 
-    connect(this,    SIGNAL(s_autoTempChd(QVariant)),     guiItem, SLOT(setAutoTemp(QVariant)), Qt::QueuedConnection);
-    connect(guiItem, SIGNAL(s_autoTempChd(bool)),     this,    SLOT(setAutoTemp(bool)), Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_autoTempChd(QVariant)),     guiItem, SLOT(_setAutoTemp(QVariant)), Qt::QueuedConnection);
+    connect(guiItem, SIGNAL(s_autoTempChd(bool)),     this,    SLOT(_setAutoTemp(bool)), Qt::QueuedConnection);
+
+    connect(this,    SIGNAL(s_auto0StopChd(QVariant)), guiItem, SLOT(_setHumAuto0Stop(QVariant)), Qt::QueuedConnection);
+    connect(guiItem, SIGNAL(s_auto0StopChd(bool)),     this,    SLOT(_setHumAuto0Stop(bool)), Qt::QueuedConnection);
 }
 
 //------------------------------------------------------------------------------

@@ -308,6 +308,9 @@ Item {
     signal s_autoTempChd(bool value);
     function setAutoTemp(value){ checkBoxAutoTemp.checked = value }
 
+    signal s_auto0StopChd(bool value);
+    function set0Stop(value){ checkBox0Stop.checked = value }
+
     Rectangle {
         id: rectangleFill
         x: 6
@@ -330,13 +333,6 @@ Item {
                 prop.setY(absolutePos.y + mouseY)
                 prop.show()
             }
-        }
-
-        CheckBox {
-            id: checkBox
-            x: 98
-            y: 530
-            text: qsTr("Check Box")
         }
     }
 
@@ -483,7 +479,7 @@ Item {
         anchors.left: parent.left
         anchors.top: clBr.bottom
         anchors.leftMargin: 5
-        anchors.topMargin: 5
+        anchors.topMargin: -10
         spacing: 0
         Fan {
             id: b1
@@ -3005,10 +3001,10 @@ Item {
     Column {
         id: clHm
         width: 128
-        height: 144
+        height: 193
         anchors.top: rowUt.top
         anchors.horizontalCenter: clBr.horizontalCenter
-        anchors.topMargin: 0
+        anchors.topMargin: -15
         spacing: 9
         visible: root.humidity
         Column {
@@ -3033,13 +3029,15 @@ Item {
             MFUnit {
                 id: hrIn
                 name: "ВХ. ВЛАЖНОСТЬ"
-                width: parent.width
+                width: 132
                 height: parent.height
                 blinkColor: "#ff0000"
                 transformOrigin: Item.Center
                 mantissa:1
                 regexp: floatreg
                 text: "12"
+                anchors.left: parent.left
+                anchors.leftMargin: -2
                 valueFontSize.family: "DSEG7 Classic"
                 valueFontSize.bold: false
                 valueFontSize.pointSize: 12
@@ -3084,13 +3082,15 @@ Item {
             MFUnit {
                 id: hrOut
                 name: "ВЫХ. ВЛАЖНОСТЬ"
-                width: parent.width
+                width: 132
                 height: parent.height
                 blinkColor: "#ff0000"
                 transformOrigin: Item.Center
                 mantissa:1
                 regexp: floatreg
                 text: "12.3"
+                anchors.left: parent.left
+                anchors.leftMargin: -2
                 valueFontSize.family: "DSEG7 Classic"
                 valueFontSize.bold: false
                 valueFontSize.pointSize: 12
@@ -3116,6 +3116,21 @@ Item {
             }
         }
 
+        CheckBox {
+            id: checkBox0Stop
+            y: 0
+            width: 128
+            height: 32
+            text: qsTr("автостоп при 0")
+            anchors.left: parent.left
+            anchors.leftMargin: 0
+            ToolTip.visible: hovered
+            ToolTip.delay: 1000
+            ToolTip.text: qsTr("Автоматически останавливать шнек,\nесли влагомер пустеет и фиксирует влажность 0%.")
+            onCheckStateChanged:
+                root.s_auto0StopChd(checkState == Qt.Checked)
+        }
+
     }
 
     Button {
@@ -3133,12 +3148,11 @@ Item {
         font.bold: true
         onClicked: root.stop()
     }
-
-
-
-
-
 }
 
 
-
+/*##^##
+Designer {
+    D{i:0;formeditorZoom:0.75;height:570;width:490}D{i:204}
+}
+##^##*/

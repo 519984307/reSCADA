@@ -16,6 +16,7 @@ struct message {
     QString m_source;
     QString m_text;
 };
+//wew
 
 class Log : public QObject
 {

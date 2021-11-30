@@ -35,6 +35,7 @@ public:
     void _customConnectToGUI(QObject *guiItem, QObject *engRow) override;
     void setTimeMax( int );
     int timeMax();
+    QVariant maxValue{0};
 
 protected:
     bool _onlyChange = true;
@@ -58,9 +59,10 @@ protected:
     virtual bool _checkDetect();
 
 signals:
-    void Detected();
-    void Undetected();
-    void ChangeDelectLewel(QVariant setVal);
+    void s_detected();
+    void s_undetected();
+    void s_changeDelectLewel(QVariant setVal);
+    void s_maxValueChd(QVariant);
 
 public slots:
     void writeImit(bool setImit)  override;
