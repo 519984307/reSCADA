@@ -1,131 +1,206 @@
-import QtQuick 2.15
-import QtQuick.Window 2.15
+import QtQuick 2.12
+import QtQuick.Window 2.12
 import QtQuick.Controls 2.15
+import QtGraphicalEffects 1.13
 import LineComponent 1.0
 
-
-Rectangle {
-    id: rectCol
-    width: 107
-    height: 360
-    radius: 40
-    border.width: 1
-
-    property alias name: name.text
-
-
-    gradient: Gradient {
-        orientation: Gradient.Horizontal
-        GradientStop {
-            position: 0
-            color: "#d3d3d3"
-        }
-
-        GradientStop {
-            position: 0.047
-            color: "#c7c7c7"
-        }
-
-        GradientStop {
-            position: 0.46981
-            color: "#efefef"
-        }
-
-        GradientStop {
-            position: 0.91171
-            color: "#d3d3d3"
-        }
-
-        GradientStop {
-            position: 0.97623
-            color: "#bcbcbc"
-        }
-    }
-    ProgressBar {
-        id: progressBar
-        x: -19
-        y: 197
-        width: 220
-        height: 17
-        clip: false
-        rotation: 270
-        layer.enabled: true
-        value: 0.9
-    }
-    Text {
-        id: name
-        x: 8
-        y: 54
-        width: 66
-        height: 62
-        text: qsTr("name")
-        wrapMode: Text.Wrap
-        maximumLineCount: 2
-        font.bold: true
-        font.pointSize: 18
+Item{
+    id: root
+    width: 70
+    height: 350
+    property alias tank: tank
+    Tank {
+        id: tank
+        objectName: root.objectName + ".tank"
+        anchors.fill: parent
+        level: 0.9
+        levelRatio: 0.2
+        borderWidth: 2
     }
 
-    Rectangle {
-        id: rectangle
-        width: parent.width + parent.width*0.05
-        height: parent.height * 0.01
-        color: "#65379b"
-        border.width: 1
+    function setTempTop( value ) { tempTop.setLableSilent( value ) }
+    function setAlarmTempTop( value ) { alarmTempTop.setLableSilent( value ) }
+    signal alarmTempTopChanged( variant value )
+
+    function setPresTop( value ) { presTop.setLableSilent( value ) }
+    function setAlarmPresTop( value ) { alarmPresTop.setLableSilent( value ) }
+    signal alarmPresTopChanged( variant value )
+
+    function setTempButtom( value ) { tempButtom.setLableSilent( value ) }
+    function setAlarmTempButtom( value ) { alarmTempButtom.setLableSilent( value ) }
+    signal alarmTempButtomChanged( variant value )
+
+    function setPresButtom( value ) { presButtom.setLableSilent( value ) }
+    function setAlarmPresButtom( value ) { alarmPresButtom.setLableSilent( value ) }
+    signal alarmPresButtomChanged( variant value )
+
+    AnalogSignalVar1{
+        id:tempTop
+        objectName: root.objectName + ".tempTop"
+        width: 80
+        height: 20
+        anchors.left: parent.left
         anchors.top: parent.top
-        anchors.topMargin: parent.radius
+        anchors.leftMargin: -19
+        anchors.topMargin: parent.height/8
+        regexp: floatreg
+        backgroundColor: "white"
+        colorShortName: "green"
+        blinkColor: "yellow"
+        borderColor: "black"
+        nameText: "T"
+        valueText:"999.9"
+        tooltip:"Температура верха колонны"
 
-        anchors.horizontalCenterOffset: 0
-        anchors.horizontalCenter: parent.horizontalCenter
+        MFUnit {
+            id: alarmTempTop
+            objectName: root.objectName + ".alarmTempTop"
+            width: parent.width
+            height: parent.height
+            anchors.left: parent.right
 
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop {
-                position: 0
-                color: "#6c6c6c"
-            }
+            backgroundColor: "#f03e3e"
+            tooltip: "Температура перегрева верха колонны"
+            readOnly: false
+            visible: true
+            valueFontSize.bold: false
+            valueFontSize.family: "DSEG7 Classic"
+            disappear: true
+            valueFontSize.pointSize: 12
+            blinkColor: "#ff0000"
+            correctingButtons: true
+            regexp: floatreg
+            onValueChanged: root.alarmTempTopChanged(value)
+            checkLimit: true
+            downLimit: 20
+        }
+    }
+    AnalogSignalVar1{
+        id:presTop
+        width: 80
+        height: 20
+        anchors.left: parent.left
+        anchors.top: tempTop.bottom
+        anchors.leftMargin: -19
+        anchors.topMargin: 4
 
-            GradientStop {
-                position: 0.61413
-                color: "#bdbbc3"
-            }
+        backgroundColor: "white"
+        colorShortName: "orange"
+        blinkColor: "yellow"
+        borderColor: "black"
+        nameText: "P"
+        valueText:"999.9"
+        tooltip:"Давление верха колонны"
 
-            GradientStop {
-                position: 1
-                color: "#6c6c6c"
-            }
+
+        MFUnit {
+            id: alarmPresTop
+            objectName: root.objectName + ".alarmPresTop"
+            width: parent.width
+            height: parent.height
+            anchors.left: parent.right
+
+            backgroundColor: "#f03e3e"
+            tooltip: "Предельное давление верха колонны"
+            readOnly: false
+            visible: true
+            valueFontSize.bold: false
+            valueFontSize.family: "DSEG7 Classic"
+            disappear: true
+            valueFontSize.pointSize: 12
+            blinkColor: "#ff0000"
+            correctingButtons: true
+            regexp: floatreg
+            onValueChanged: root.alarmPresTopChanged(value)
+            checkLimit: true
+            downLimit: 20
         }
     }
 
-    Rectangle {
-        id: rectangle2
-        x: 0
-        width: parent.width + parent.width*0.05
-        height: parent.height * 0.01
-        color: "#6c6c6c"
-        border.width: 1
+    AnalogSignalVar1{
+        id:tempButtom
+        width: 80
+        height: 20
+        anchors.left: parent.left
+        anchors.bottom: presButtom.top
+        anchors.leftMargin: -19
+        anchors.bottomMargin: 4
+
+
+        backgroundColor: "white"
+        colorShortName: "green"
+        blinkColor: "yellow"
+        borderColor: "black"
+        nameText: "T"
+        valueText:"999.9"
+        tooltip:"Температура низа колонны"
+
+        MFUnit {
+            id: alarmTempButtom
+            objectName: root.objectName + ".alarmTempButtom"
+            width: parent.width
+            height: parent.height
+            anchors.left: parent.right
+
+            backgroundColor: "#f03e3e"
+            tooltip: "Температура перегрева верха колонны"
+            readOnly: false
+            visible: true
+            valueFontSize.bold: false
+            valueFontSize.family: "DSEG7 Classic"
+            disappear: true
+            valueFontSize.pointSize: 12
+            blinkColor: "#ff0000"
+            correctingButtons: true
+            regexp: floatreg
+            onValueChanged: root.alarmTempButtomChanged(value)
+            checkLimit: true
+            downLimit: 20
+        }
+    }
+    AnalogSignalVar1{
+        id:presButtom
+        width: 80
+        height: 20
+        anchors.left: parent.left
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: parent.radius
-        gradient: Gradient {
-            GradientStop {
-                position: 0
-                color: "#6c6c6c"
-            }
+        anchors.leftMargin: -19
+        anchors.bottomMargin: parent.height/8
 
-            GradientStop {
-                position: 0.61413
-                color: "#bdbbc3"
-            }
+        backgroundColor: "white"
+        colorShortName: "orange"
+        blinkColor: "yellow"
+        borderColor: "black"
+        nameText: "P"
+        valueText:"999.9"
+        tooltip:"Давление низа колонны"
 
-            GradientStop {
-                position: 1
-                color: "#6c6c6c"
-            }
-            orientation: Gradient.Horizontal
+        MFUnit {
+            id: alarmPresButtom
+            objectName: root.objectName + ".alarmPresButtom"
+            width: parent.width
+            height: parent.height
+            anchors.left: parent.right
+
+            backgroundColor: "#f03e3e"
+            valueText:"999.9"
+            tooltip: "Предельное давление низа колонны"
+            readOnly: false
+            visible: true
+            valueFontSize.bold: false
+            valueFontSize.family: "DSEG7 Classic"
+            disappear: true
+            valueFontSize.pointSize: 12
+            blinkColor: "#ff0000"
+            correctingButtons: true
+            regexp: floatreg
+            onValueChanged: root.alarmPresButtomChanged(value)
+            checkLimit: true
+            downLimit: 20
         }
-        anchors.horizontalCenter: parent.horizontalCenter
     }
-}
 
+}
 
 
 
@@ -134,6 +209,6 @@ Rectangle {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:1.1}D{i:9}D{i:14}
+    D{i:0;formeditorZoom:0.75}
 }
 ##^##*/
