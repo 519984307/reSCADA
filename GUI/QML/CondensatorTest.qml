@@ -5,15 +5,16 @@ import "fap.js" as Fap
 
 Item {
     id: root
-    width: 120
+    width: 180
     height: 40
     property color backgroundColor: "white"
+    property color colorShortName: "green"
     property color blinkColor: "yellow"
     property color borderColor: "black"
     property int borderWidth: 1
-    property int fontSize: 12
-    property alias name: nameLable.text
-    property alias text: valueLable.text
+    //property int fontSize: 12
+    property alias nameText: nameLable.text
+    property alias valueText: valueLable.text
     property string tooltip: ""
 
     property bool checkLimit: true
@@ -38,13 +39,13 @@ Item {
         running: false
         property color startColor: "green"
         ColorAnimation {
-            target: body
+            target: rectValue
             property: "color"
             to: blinkColor
             duration: 1000
         }
         ColorAnimation {
-            target: body
+            target: rectValue
             property: "color"
             to: backgroundColor
             duration: 1000
@@ -58,7 +59,7 @@ Item {
         }
         else{
             alarmFlah.running = false
-            body.color = alarmFlah.startColor
+            rectValue.color = alarmFlah.startColor
         }
     }
     onExtAlarmLevelChanged: alarmBlinckCheck()
@@ -77,7 +78,7 @@ Item {
     }
     function notified(){//прекр мигание
         timer.stop()
-        body.color = backgroundColor
+        rectValue.color = backgroundColor
     }
 
     function notify(){//вкл мигание
@@ -111,7 +112,7 @@ Item {
         id: timer
         interval: 500
         onTriggered: {
-            body.color = body.color == backgroundColor ? blinkColor : backgroundColor
+            rectValue.color = rectValue.color == backgroundColor ? blinkColor : backgroundColor
         }
     }
     MouseArea{
@@ -127,49 +128,62 @@ Item {
         onContainsMouseChanged: {
             if( disappear ){
                 if( containsMouse )
-                    body.visible = true;
+                    rectValue.visible = true;
                 else
-                    body.visible = false;
+                    rectValue.visible = false;
             }
         }
     }
-    Rectangle{
-        id: body
-        visible: ! root.disappear
-        anchors.fill: parent
-        color: backgroundColor
-        border.width: borderWidth
-        border.color: borderColor
-        ToolTip{
-            id: ttip
-            delay: 2000
-            timeout: 2000
-            visible: false
-            text: tooltip
-        }
 
+    ToolTip{
+        id: ttip
+        delay: 2000
+        timeout: 2000
+        visible: false
+        text: tooltip
+    }
+    Rectangle{
+        id: rectShortName
+        anchors.left: parent.left
+        anchors.leftMargin: 0
+        height: parent.height
+        width: parent.height
+        border.width: borderWidth
+        color: colorShortName
         Text{
             id: nameLable
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
+            text: qsTr("P")
+            anchors.fill: parent
+            font.pixelSize: parent.height
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
-            text: ""
-            font.pixelSize: fontSize
+            font.bold: true
         }
 
+    }
+
+    Rectangle{
+        id: rectValue
+        color: colorsigValue
+        border.width: borderWidth
+        anchors.left: rectShortName.right
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.topMargin: 0
+        anchors.bottomMargin: 0
+        anchors.leftMargin: 0
+        anchors.rightMargin: 0
         TextInput{
-            property bool
-            editing: false
-            text: "99"
+            property bool editing: false
+            text: "999.9"
             id: valueLable
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: nameLable.text == "" ? parent.top : nameLable.bottom
-            anchors.bottom: parent.bottom
+            anchors.fill: parent
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
+            font.pixelSize: parent.height * 0.8
+            font.bold: true
+            font.family: "DSEG7 Classic"
             font.italic: editing
             readOnly: true
             Keys.onPressed:{
@@ -191,49 +205,13 @@ Item {
                     editing = false;
                 }
             }
-
-            Text{
-                width: height / 3*2
-                visible: root.correctingButtons
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                text: "-"
-                font.bold: true
-                font.pixelSize: 0
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                anchors.bottomMargin: 0
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: root.changeLimited(-root.step);
-                }
-            }
-
-            Text{
-                width: height / 3*2
-                visible: root.correctingButtons
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                text: "+"
-                font.bold: true
-                font.pixelSize: fontSize
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                anchors.bottomMargin: 0
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: root.changeLimited(root.step);
-                }
-            }
-
         }
     }
+
 }
 
 /*##^##
 Designer {
-    D{i:0;height:35;width:102}D{i:10}D{i:12}
+    D{i:0;formeditorZoom:4;height:629;width:107}D{i:5;locked:true}
 }
 ##^##*/

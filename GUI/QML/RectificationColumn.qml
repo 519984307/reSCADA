@@ -4,36 +4,54 @@ import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.13
 import LineComponent 1.0
 
-Item{
+UnitItem{
     id: root
     width: 70
     height: 350
+
     property alias tank: tank
+
+    function setTempTop( value ) { tempTop.setValue( value ) }
+    function setAlarmTempTop( value ) { alarmTempTop.setLableSilent( value ) }
+    signal alarmTempTopChanged( variant value )
+
+    function setPresTop( value ) { presTop.setValue( value ) }
+    function setAlarmPresTop( value ) { alarmPresTop.setLableSilent( value ) }
+    signal alarmPresTopChanged( variant value )
+
+    function setTempButtom( value ) { tempButtom.setValue( value ) }
+    function setAlarmTempButtom( value ) { alarmTempButtom.setLableSilent( value ) }
+    signal alarmTempButtomChanged( variant value )
+
+    function setPresButtom( value ) { presButtom.setValue( value ) }
+    function setAlarmPresButtom( value ) { alarmPresButtom.setLableSilent( value ) }
+    signal alarmPresButtomChanged( variant value )
+    backgroundColor: "#d3d3d3"
+
+    linked: true
+    connected: true
+
+    //++++++++ Test +++++++
+//    mouseArea.onPressAndHold: {
+//        linked = true
+//        connected = true
+//        allovAlarmBlinck = true
+//        setQuitAlarm()
+//        var cl = tank.mainGradientColor
+//        cl = backgroundCurrentColor
+//    }
+    //------ Test ------
     Tank {
         id: tank
         objectName: root.objectName + ".tank"
         anchors.fill: parent
         level: 0.9
         levelRatio: 0.2
-        borderWidth: 2
+        mainGradientColor: backgroundCurrentColor
+        borderWidth: borderWidth
+        borderColor: borderCurrentColor
+        contentGradientColor: "#a65121"
     }
-
-    function setTempTop( value ) { tempTop.setLableSilent( value ) }
-    function setAlarmTempTop( value ) { alarmTempTop.setLableSilent( value ) }
-    signal alarmTempTopChanged( variant value )
-
-    function setPresTop( value ) { presTop.setLableSilent( value ) }
-    function setAlarmPresTop( value ) { alarmPresTop.setLableSilent( value ) }
-    signal alarmPresTopChanged( variant value )
-
-    function setTempButtom( value ) { tempButtom.setLableSilent( value ) }
-    function setAlarmTempButtom( value ) { alarmTempButtom.setLableSilent( value ) }
-    signal alarmTempButtomChanged( variant value )
-
-    function setPresButtom( value ) { presButtom.setLableSilent( value ) }
-    function setAlarmPresButtom( value ) { alarmPresButtom.setLableSilent( value ) }
-    signal alarmPresButtomChanged( variant value )
-
     AnalogSignalVar1{
         id:tempTop
         objectName: root.objectName + ".tempTop"
@@ -43,14 +61,12 @@ Item{
         anchors.top: parent.top
         anchors.leftMargin: -19
         anchors.topMargin: parent.height/8
-        regexp: floatreg
-        backgroundColor: "white"
+        backgroundColor: "transparent"
         colorShortName: "green"
-        blinkColor: "yellow"
-        borderColor: "black"
+        //blinkColor: "yellow"
         nameText: "T"
-        valueText:"999.9"
-        tooltip:"Температура верха колонны"
+        valueText: "999.9"
+        tooltipText:"Температура верха колонны"
 
         MFUnit {
             id: alarmTempTop
@@ -83,14 +99,11 @@ Item{
         anchors.top: tempTop.bottom
         anchors.leftMargin: -19
         anchors.topMargin: 4
-
-        backgroundColor: "white"
+        backgroundColor: "transparent"
         colorShortName: "orange"
-        blinkColor: "yellow"
-        borderColor: "black"
         nameText: "P"
         valueText:"999.9"
-        tooltip:"Давление верха колонны"
+        tooltipText:"Давление верха колонны"
 
 
         MFUnit {
@@ -125,15 +138,11 @@ Item{
         anchors.bottom: presButtom.top
         anchors.leftMargin: -19
         anchors.bottomMargin: 4
-
-
-        backgroundColor: "white"
+        backgroundColor: "transparent"
         colorShortName: "green"
-        blinkColor: "yellow"
-        borderColor: "black"
         nameText: "T"
         valueText:"999.9"
-        tooltip:"Температура низа колонны"
+        tooltipText:"Температура низа колонны"
 
         MFUnit {
             id: alarmTempButtom
@@ -166,14 +175,15 @@ Item{
         anchors.bottom: parent.bottom
         anchors.leftMargin: -19
         anchors.bottomMargin: parent.height/8
-
-        backgroundColor: "white"
+        backgroundColor: "transparent"
         colorShortName: "orange"
-        blinkColor: "yellow"
-        borderColor: "black"
         nameText: "P"
         valueText:"999.9"
-        tooltip:"Давление низа колонны"
+        tooltipText:"Давление низа колонны"
+        //Component.onCompleted: {renewColors()}
+
+        linked: true
+        connected: true
 
         MFUnit {
             id: alarmPresButtom

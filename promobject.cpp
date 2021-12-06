@@ -105,7 +105,7 @@ void PromObject::addSubUnit(Unit *Un)
 
 //------------------------------------------------------------------------------
 PromObject::~PromObject()
-{ 
+{
     _unitsThread->exit();
     _routeThread->exit();
     saveSettings();
@@ -115,12 +115,12 @@ PromObject::~PromObject()
     foreach(Unit * Un, _units){
         delete Un;
     }
-    delete iniUnit;  
+    delete iniUnit;
     delete iniRoute;
     delete _unitsThread;
     delete _routeThread;
     tsp->SaveJson();
-    tsp->Stop();  
+    tsp->Stop();
     _tspWin->close();
     delete tsp;
     delete _tspWin;
@@ -344,11 +344,11 @@ void PromObject::ShowTags()
 //------------------------------------------------------------------------------
 void PromObject::init()
 {
-    connect(_gui, SIGNAL(test()),             this, SLOT(  alarmDo()),      Qt::QueuedConnection);
-    connect(_gui, SIGNAL(stop()),             this, SLOT(  UserGlobalStop()),  Qt::QueuedConnection);
+    connect(_gui, SIGNAL(test()),             this, SLOT(  alarmDo()),           Qt::QueuedConnection);
+    connect(_gui, SIGNAL(stop()),             this, SLOT(  UserGlobalStop()),    Qt::QueuedConnection);
     connect(_gui, SIGNAL(globalResetAlarm()), this, SIGNAL(s_globalRestAlarm()), Qt::QueuedConnection);
-    connect(_gui, SIGNAL(showTags()),         this, SLOT(  ShowTags()),        Qt::QueuedConnection);
-    connect(this, SIGNAL(s_loaded()),           _gui, SLOT(  checkLoaded()),     Qt::QueuedConnection);
+    connect(_gui, SIGNAL(showTags()),         this, SLOT(  ShowTags()),          Qt::QueuedConnection);
+    connect(this, SIGNAL(s_loaded()),         _gui, SLOT(  checkLoaded()),       Qt::QueuedConnection);
 
     connect(this, &PromObject::s_setCurrentRouteSig, this,  &PromObject::SetCurrentRoute);
 
@@ -357,7 +357,7 @@ void PromObject::init()
     if(routeGui){
         connect(this, SIGNAL(s_routeCreated(QVariant)),routeGui, SLOT(appendRoute(QVariant)) ,  Qt::QueuedConnection);
         connect(this, SIGNAL(s_routeStarted(QVariant)),routeGui, SLOT(startedRoute(QVariant)) , Qt::QueuedConnection);
-        connect(this, SIGNAL(s_routeStoped(QVariant)),routeGui,  SLOT(stoppedRoute(QVariant)) ,  Qt::QueuedConnection);
+        connect(this, SIGNAL(s_routeStoped(QVariant)),routeGui,  SLOT(stoppedRoute(QVariant)) , Qt::QueuedConnection);
         //connect(this, SIGNAL(s_routeCleaning(QVariant)),routeGui,SLOT(cleanRoute(QVariant)) ,  Qt::QueuedConnection);
 
         connect(this, SIGNAL(s_routeUnitUpdate(QVariant, QVariant)),routeGui, SLOT(updateRoute(QVariant, QVariant)),  Qt::QueuedConnection);

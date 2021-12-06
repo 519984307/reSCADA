@@ -14,6 +14,12 @@ const notAvailable = "darkgray"
 const alarm = "red"
 const notAlarm = "black"
 
+//для UnitUtem
+const border = "black"
+const borderNotify = "yellow"
+const borderAlarm = "red"
+const borderAlarmNotify = "red"
+
 const tra = "#f1c40f"
 const trna = "#cfb53b"
 const aspa = "#3498db"
