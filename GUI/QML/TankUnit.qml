@@ -1,8 +1,4 @@
 import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.13
-import LineComponent 1.0
 
 UnitItem{
     id: root
@@ -48,7 +44,6 @@ UnitItem{
         width: 54
         objectName: root.objectName + ".alarmTopLevel"
         height: 20
-
         backgroundColor: "#f03e3e"
         tooltip: "Предельный верхний уровень"
         readOnly: false
@@ -58,12 +53,9 @@ UnitItem{
         anchors.leftMargin: 0
         anchors.topMargin: 0
         valueFontSize.bold: false
-        valueFontSize.family: "DSEG7 Classic"
         disappear: true
-        valueFontSize.pointSize: 12
         blinkColor: "#ff0000"
         correctingButtons: true
-        regexp: floatreg
         onValueChanged: root.alarmTopLevelChanged(value)
         checkLimit: true
         downLimit: 20
@@ -73,7 +65,6 @@ UnitItem{
         width: 54
         height: 20
         objectName: root.objectName + ".alarmButtomLevel"
-
         backgroundColor: "#f03e3e"
         tooltip: "Предельный нижний уровень"
         readOnly: false
@@ -83,12 +74,9 @@ UnitItem{
         anchors.leftMargin: 0
         anchors.bottomMargin: 0
         valueFontSize.bold: false
-        valueFontSize.family: "DSEG7 Classic"
         disappear: true
-        valueFontSize.pointSize: 12
         blinkColor: "#ff0000"
         correctingButtons: true
-        regexp: floatreg
         onValueChanged: root.alarmButtomLevelChanged(value)
         checkLimit: true
         downLimit: 20
@@ -103,6 +91,6 @@ UnitItem{
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.75}D{i:2}
+    D{i:0;formeditorZoom:0.66}
 }
 ##^##*/

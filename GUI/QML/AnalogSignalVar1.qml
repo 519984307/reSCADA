@@ -3,29 +3,23 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import "fap.js" as Fap
 
-UnitItem {
+Item {
     id: root
     width: 180
     height: 40
-    //backgroundColor: "white"
+    property alias mouseArea: mAr
+    property alias backgroundColor: rectValue.color
     property color colorShortName: "green"
-    borderColor: "black"
-    borderWidth: 1
-    //property int fontSize: 12
-    property alias nameText: nameLable.text
+    property alias borderColor: rectValue.border.color
+    property alias borderWidth: rectValue.border.width
+    property alias shortNameText: nameLable.text
     property alias valueText: valueLable.text
-    tooltipText:"Сигнал"
-    property int upLimit: 100
-    property int downLimit: 0
-    //property alias regexp: valueLable.validator
+    property alias tooltipText: tTip.text
     property int mantissa: 1
-    property real extAlarmLevel: 0
-    property real realValue: 0
-
 
     function setValue( value ){//уст значение
+        if( Fap.isString(value) ) value = Number( value )
         value = value.toFixed( mantissa )
-        realValue = Number( value )
         valueLable.text = value
     }
 
@@ -64,7 +58,6 @@ UnitItem {
         anchors.rightMargin: 0
         Text{
             id: valueLable
-            text: "999.9"
             anchors.fill: parent
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -72,6 +65,24 @@ UnitItem {
             font.bold: true
             font.family: "DSEG7 Classic"
             //readOnly: true
+        }
+        MouseArea{
+            id:mAr
+            anchors.fill: parent
+            hoverEnabled: true
+            onEntered: {
+                tTip.visible = true
+                setValue(556.36)
+            }
+            onExited: {
+                tTip.visible = false
+            }
+        }
+        ToolTip{
+            id: tTip
+            delay: 2000
+            timeout: 4000
+            visible: false
         }
     }
 

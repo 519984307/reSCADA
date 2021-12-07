@@ -4,21 +4,10 @@ import "fap.js" as Fap
 
 Item {
     id: unitItem
-    width: 100
-    height: 100
-    visible: true
-
-
-    //property int canvasOffset: 3
     property string name: "Unknown Unit"
     property string description: "Unknown Unit"
-    property alias tooltipText: ttip.text
 
     property alias rotate: unitItem.rotation
-    //property Font  font: ({})
-    property  alias mouseArea: mouseArea
-    property  alias intreg: intreg
-    property  alias floatreg: floatreg
 
     property bool alarm:            false
     property bool alarmNotify:      false
@@ -28,8 +17,6 @@ Item {
     property bool blocked:   false
     property bool linked:    false
     property bool connected: false
-    property bool disappear: false
-
 
     property color backgroundCurrentColor: Fap.defaultColor
     property color backgroundColor: Fap.ready
@@ -41,16 +28,6 @@ Item {
     property color borderColor: Fap.border
     property color borderAlarmColor: Fap.borderAlarm
     property color borderNotifyBlincColor: Fap.borderNotify
-
-    RegExpValidator {
-        id: intreg
-        regExp: /[0-9]+/
-    }
-
-    RegExpValidator {
-        id: floatreg
-        regExp: /[0-9]+[.][0-9]/
-    }
 
     Component.onCompleted: {
         renewColors()
@@ -113,7 +90,6 @@ Item {
         }
     }
 
-    signal resetAlarm()
     Timer {
         id: timer
         interval: Fap.blinkDelay
@@ -132,16 +108,6 @@ Item {
                 }
             }
         }
-    }
-
-    function openSettings(){
-        if(prop.visible==false){
-            var absolutePos = Fap.getAbsolutePosition(unitItem);
-            prop.setX(absolutePos.x)
-            prop.setY(absolutePos.y)
-            prop.show()
-        }
-        prop.requestActivate()
     }
 
     onAlarmChanged: renewColors();
@@ -164,65 +130,10 @@ Item {
     onBlockedChanged: renewColors()
     onLinkedChanged:renewColors()
     onConnectedChanged:renewColors()
-    onDisappearChanged:{ visible = disappear }
-
-
-    //    SequentialAnimation{
-    //        id: alarmFlah
-    //        loops: Animation.Infinite
-    //        running: false
-    //        property color startColor: "green"
-    //        ColorAnimation {
-    //            target: body
-    //            property: "color"
-    //            to: backgroundAlarmBlinkColor
-    //            duration: 1000
-    //        }
-    //        ColorAnimation {
-    //            target: body
-    //            property: "color"
-    //            to: backgroundColor
-    //            duration: 1000
-    //        }
-    //    }
-
-    PropertyWindow3 {
-        id: prop
-        objectName: "prop"
-        winTitle: name
-        onResetAlarm: unitItem.resetAlarm()
-    }
-    MouseArea {
-        id: mouseArea
-        anchors.fill: parent
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onClicked: {
-            if(mouse.button & Qt.RightButton) {
-                unitItem.openSettings()
-            }
-        }
-        onPressAndHold: {
-            renewColors()
-
-        }
-        onDoubleClicked: {
-            unitItem.openSettings()
-        }
-        onContainsMouseChanged: {
-            if( disappear ){
-                if( containsMouse )
-                    visible = true;
-                else
-                    visible = false;
-            }
-        }
-    }
-    ToolTip{
-        id: ttip
-        delay: 2000
-        timeout: 2000
-        visible: false
-        text: "Unknown Unit"
-    }
-
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

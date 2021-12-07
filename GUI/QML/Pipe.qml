@@ -2,7 +2,6 @@ import QtQuick 2.12
 import "fap.js" as Fap
 
 Item {
-    property int rotate: 0
     property bool active: false
     property int borderWidth: 2
     property int angle: 90
@@ -12,7 +11,6 @@ Item {
     width: 60
     height: 100
     visible: true
-    rotation: rotate
     antialiasing: false
     onActiveChanged: pipe.requestPaint()
     onAngleChanged: pipe.requestPaint()

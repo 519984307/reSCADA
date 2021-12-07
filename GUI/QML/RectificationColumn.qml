@@ -4,7 +4,7 @@ import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.13
 import LineComponent 1.0
 
-UnitItem{
+UnitPropItem{
     id: root
     width: 70
     height: 350
@@ -41,6 +41,17 @@ UnitItem{
 //        cl = backgroundCurrentColor
 //    }
     //------ Test ------
+
+    MouseArea{
+        id: mousAr
+        anchors.fill: parent
+        acceptedButtons: Qt.AllButtons
+        onClicked: {
+            if(mouse.button & Qt.RightButton) {
+                openSettings()
+            }
+        }
+    }
     Tank {
         id: tank
         objectName: root.objectName + ".tank"
@@ -52,7 +63,7 @@ UnitItem{
         borderColor: borderCurrentColor
         contentGradientColor: "#a65121"
     }
-    AnalogSignalVar1{
+    AnalogSignalVar2{
         id:tempTop
         objectName: root.objectName + ".tempTop"
         width: 80
@@ -63,35 +74,12 @@ UnitItem{
         anchors.topMargin: parent.height/8
         backgroundColor: "transparent"
         colorShortName: "green"
-        //blinkColor: "yellow"
-        nameText: "T"
+        shortNameText: "T"
         valueText: "999.9"
         tooltipText:"Температура верха колонны"
-
-        MFUnit {
-            id: alarmTempTop
-            objectName: root.objectName + ".alarmTempTop"
-            width: parent.width
-            height: parent.height
-            anchors.left: parent.right
-
-            backgroundColor: "#f03e3e"
-            tooltip: "Температура перегрева верха колонны"
-            readOnly: false
-            visible: true
-            valueFontSize.bold: false
-            valueFontSize.family: "DSEG7 Classic"
-            disappear: true
-            valueFontSize.pointSize: 12
-            blinkColor: "#ff0000"
-            correctingButtons: true
-            regexp: floatreg
-            onValueChanged: root.alarmTempTopChanged(value)
-            checkLimit: true
-            downLimit: 20
-        }
+        onAlarmMaxLvlChanged: root.alarmTempTopChanged(value)
     }
-    AnalogSignalVar1{
+    AnalogSignalVar2{
         id:presTop
         width: 80
         height: 20
@@ -101,36 +89,12 @@ UnitItem{
         anchors.topMargin: 4
         backgroundColor: "transparent"
         colorShortName: "orange"
-        nameText: "P"
+        shortNameText: "P"
         valueText:"999.9"
         tooltipText:"Давление верха колонны"
-
-
-        MFUnit {
-            id: alarmPresTop
-            objectName: root.objectName + ".alarmPresTop"
-            width: parent.width
-            height: parent.height
-            anchors.left: parent.right
-
-            backgroundColor: "#f03e3e"
-            tooltip: "Предельное давление верха колонны"
-            readOnly: false
-            visible: true
-            valueFontSize.bold: false
-            valueFontSize.family: "DSEG7 Classic"
-            disappear: true
-            valueFontSize.pointSize: 12
-            blinkColor: "#ff0000"
-            correctingButtons: true
-            regexp: floatreg
-            onValueChanged: root.alarmPresTopChanged(value)
-            checkLimit: true
-            downLimit: 20
-        }
+        onAlarmMaxLvlChanged: root.alarmPresTopChanged(value)
     }
-
-    AnalogSignalVar1{
+    AnalogSignalVar2{
         id:tempButtom
         width: 80
         height: 20
@@ -140,34 +104,12 @@ UnitItem{
         anchors.bottomMargin: 4
         backgroundColor: "transparent"
         colorShortName: "green"
-        nameText: "T"
+        shortNameText: "T"
         valueText:"999.9"
         tooltipText:"Температура низа колонны"
-
-        MFUnit {
-            id: alarmTempButtom
-            objectName: root.objectName + ".alarmTempButtom"
-            width: parent.width
-            height: parent.height
-            anchors.left: parent.right
-
-            backgroundColor: "#f03e3e"
-            tooltip: "Температура перегрева верха колонны"
-            readOnly: false
-            visible: true
-            valueFontSize.bold: false
-            valueFontSize.family: "DSEG7 Classic"
-            disappear: true
-            valueFontSize.pointSize: 12
-            blinkColor: "#ff0000"
-            correctingButtons: true
-            regexp: floatreg
-            onValueChanged: root.alarmTempButtomChanged(value)
-            checkLimit: true
-            downLimit: 20
-        }
+        onAlarmMaxLvlChanged:root.alarmTempButtomChanged(value)
     }
-    AnalogSignalVar1{
+    AnalogSignalVar2{
         id:presButtom
         width: 80
         height: 20
@@ -177,39 +119,11 @@ UnitItem{
         anchors.bottomMargin: parent.height/8
         backgroundColor: "transparent"
         colorShortName: "orange"
-        nameText: "P"
+        shortNameText: "P"
         valueText:"999.9"
         tooltipText:"Давление низа колонны"
-        //Component.onCompleted: {renewColors()}
-
-        linked: true
-        connected: true
-
-        MFUnit {
-            id: alarmPresButtom
-            objectName: root.objectName + ".alarmPresButtom"
-            width: parent.width
-            height: parent.height
-            anchors.left: parent.right
-
-            backgroundColor: "#f03e3e"
-            valueText:"999.9"
-            tooltip: "Предельное давление низа колонны"
-            readOnly: false
-            visible: true
-            valueFontSize.bold: false
-            valueFontSize.family: "DSEG7 Classic"
-            disappear: true
-            valueFontSize.pointSize: 12
-            blinkColor: "#ff0000"
-            correctingButtons: true
-            regexp: floatreg
-            onValueChanged: root.alarmPresButtomChanged(value)
-            checkLimit: true
-            downLimit: 20
-        }
+        onAlarmMaxLvlChanged:root.alarmPresButtomChanged(value)
     }
-
 }
 
 

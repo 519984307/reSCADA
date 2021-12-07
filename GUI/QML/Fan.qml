@@ -11,7 +11,7 @@ Item {
     property string name: "unknown fan"
     property bool mount: true
     property bool mirror: false
-    property int rotate:0
+    property int rotatePict: 0
     property alias fontSize: fanText.font.pointSize
     property alias textX: fanText.x
     property alias textY: fanText.y
@@ -91,39 +91,10 @@ Item {
            onTriggered: root.alarmBlink = !root.alarmBlink
     }
 
-    Canvas {
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onClicked: {
-                root.alarmNotify = false;
-                if(mouse.modifiers & Qt.ShiftModifier){
-                    root.addToCurrentRoteStoped()
-                }else if(mouse.modifiers & Qt.ControlModifier){
-                    root.addToCurrentRoteStarted()
-                }else if(mouse.button & Qt.RightButton) {
-                    root.openSettings()
-                }else{
-                    if (st){
-                        root.stop()
-                    }else{
-                        root.start()
-                    }
-                }
-            }
-            onPressAndHold: {
-               root.addToCurrentRoteStarted()
-            }
-            onDoubleClicked: {
-                root.openSettings()
-            }
-        }
-        rotation: rotate
+    Canvas {     
         id: canvas
-        width: parent.width
-        height: parent.height
-        x: 0
-        y: 0
+        anchors.fill: parent
+        rotation: rotatePict
         visible: parent.visible
         transform: Scale {origin.x: width / 2; xScale: root.mirror?-1:1; yScale: 1}
         onPaint: {
@@ -157,7 +128,32 @@ Item {
             context.fill();
 
         }
-
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: {
+                root.alarmNotify = false;
+                if(mouse.modifiers & Qt.ShiftModifier){
+                    root.addToCurrentRoteStoped()
+                }else if(mouse.modifiers & Qt.ControlModifier){
+                    root.addToCurrentRoteStarted()
+                }else if(mouse.button & Qt.RightButton) {
+                    root.openSettings()
+                }else{
+                    if (st){
+                        root.stop()
+                    }else{
+                        root.start()
+                    }
+                }
+            }
+            onPressAndHold: {
+               root.addToCurrentRoteStarted()
+            }
+            onDoubleClicked: {
+                root.openSettings()
+            }
+        }
     }
         Text{
             id: fanText

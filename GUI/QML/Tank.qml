@@ -1,14 +1,12 @@
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.13
-import LineComponent 1.0
+import QtQuick 2.15
+
+import QtGraphicalEffects 1.15
 
 Item{
     id: contItem
     property int radius: 30
     property real level: 0.8
-    property real levelRatio: 0.2
+    property real levelRatio: 0.8
     property alias nameText: nameText
     property alias nameTextPixSize: nameText.font.pixelSize
     property bool showSeam: true
@@ -17,6 +15,9 @@ Item{
     property color borderColor: "black"
     property color mainGradientColor: "#d3d3d3"
     property color contentGradientColor: "steelblue"
+    property int nameTopMargin: height *0.4
+    property int nameTextHeight: nameText.font.pixelSize
+
 
     width: 146
     height: 100
@@ -68,13 +69,13 @@ Item{
             }
             layer.enabled: true
             layer.effect: OpacityMask {
+                width: 0//parent.width
+                height: 0//parent.height
+                anchors.bottom: parent.bottom
                 maskSource:
                 Rectangle {
-                    width: rectColor.width
-                    height: rectColor.height
+                    anchors.fill: parent
                     radius: rectColor.radius - rectColumn.border.width
-                    anchors.bottom: rectColor.bottom
-                    anchors.bottomMargin: 0
                 }
             }
             Rectangle {
@@ -128,36 +129,32 @@ Item{
     }
     Text {
         id: nameText
+        height: nameTextHeight
         anchors.right: parent.right
         anchors.rightMargin: parent.width / 20
         anchors.left: parent.left
         anchors.leftMargin: parent.width / 20
         anchors.top: parent.top
+        anchors.topMargin: nameTopMargin
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        text: qsTr("Напорный бак")
-        maximumLineCount: 1
+        text: qsTr("ЁМКОСТЬ")
         font.bold: true
-        wrapMode: Text.NoWrap
-        fontSizeMode: Text.HorizontalFit
+        wrapMode: Text.WordWrap
         minimumPixelSize: 1
-        anchors.topMargin: parent.height *0.4
+
 
     }
     Text {
         id: levelDig
-        height: width * 0.5
         text: qsTr(contItem.level*100 + "%")
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: seam2.top
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
+        anchors.bottomMargin: 0
+        anchors.horizontalCenter: parent.horizontalCenter
         maximumLineCount: 0
         fontSizeMode: Text.Fit
-        anchors.leftMargin: rectColumn.radius
-        anchors.rightMargin: rectColumn.radius
-        anchors.bottomMargin: rectColumn.border.width
         visible: showLevel
     }
     Rectangle {
