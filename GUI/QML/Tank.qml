@@ -1,5 +1,4 @@
 import QtQuick 2.15
-
 import QtGraphicalEffects 1.15
 
 Item{
@@ -12,15 +11,14 @@ Item{
     property bool showSeam: true
     property bool showLevel: true
     property int borderWidth: 2
+
     property color borderColor: "black"
     property color mainGradientColor: "#d3d3d3"
     property color contentGradientColor: "steelblue"
     property int nameTopMargin: height *0.4
     property int nameTextHeight: nameText.font.pixelSize
-
-
-    width: 146
-    height: 100
+    width: 80
+    height: 200
 
     Rectangle {
         id: rectColumn
@@ -39,45 +37,43 @@ Item{
             anchors.leftMargin: parent.border.width
             anchors.topMargin: parent.border.width
             anchors.bottomMargin: parent.border.width
-            property color colorGrd2: Qt.hsla(mainGradientColor.hslHue, mainGradientColor.hslSaturation * 0.7, mainGradientColor.hslLightness *1.2,  mainGradientColor.a)
-            property color colorGrd3: Qt.hsla(mainGradientColor.hslHue, mainGradientColor.hslSaturation * 0.3, mainGradientColor.hslLightness *1.7,  mainGradientColor.a)
-
-
-            gradient: Gradient {
-                id: mainGradient
-                orientation: Gradient.Horizontal
-                GradientStop {
-                    position: 0
-                    color: mainGradientColor
-                }
-                GradientStop {
-                    position: 0.4
-                    color: rectColor.colorGrd2
-                }
-                GradientStop {
-                    position: 0.6
-                    color: rectColor.colorGrd3
-                }
-                GradientStop {
-                    position: 0.7
-                    color: rectColor.colorGrd2
-                }
-                GradientStop {
-                    position: 0.9
-                    color: mainGradientColor
+            property color colorMGrd2: Qt.hsla(mainGradientColor.hslHue, mainGradientColor.hslSaturation * 0.7, mainGradientColor.hslLightness *1.2,  mainGradientColor.a)
+            property color colorMGrd3: Qt.hsla(mainGradientColor.hslHue, mainGradientColor.hslSaturation * 0.3, mainGradientColor.hslLightness *1.7,  mainGradientColor.a)
+            Rectangle {
+                id: mSrc
+                anchors.fill: parent
+                anchors.bottom: rectColor.top
+                radius: rectColor.radius - rectColumn.border.width
+                gradient: Gradient {
+                    id: mainGradient
+                    orientation: Gradient.Horizontal
+                    GradientStop {
+                        position: 0
+                        color: mainGradientColor
+                    }
+                    GradientStop {
+                        position: 0.4
+                        color: rectColor.colorMGrd2
+                    }
+                    GradientStop {
+                        position: 0.6
+                        color: rectColor.colorMGrd3
+                    }
+                    GradientStop {
+                        position: 0.7
+                        color: rectColor.colorMGrd2
+                    }
+                    GradientStop {
+                        position: 0.9
+                        color: mainGradientColor
+                    }
                 }
             }
             layer.enabled: true
             layer.effect: OpacityMask {
-                width: 0//parent.width
-                height: 0//parent.height
-                anchors.bottom: parent.bottom
-                maskSource:
-                Rectangle {
-                    anchors.fill: parent
-                    radius: rectColor.radius - rectColumn.border.width
-                }
+                maskSource: mSrc
             }
+
             Rectangle {
                 id: rectLevel
                 width: parent.width
@@ -219,3 +215,9 @@ Item{
 
 
 
+
+/*##^##
+Designer {
+    D{i:0;formeditorZoom:0.9}
+}
+##^##*/

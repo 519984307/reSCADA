@@ -54,7 +54,6 @@ UnitItem{
         anchors.topMargin: 0
         valueFontSize.bold: false
         disappear: true
-        blinkColor: "#ff0000"
         correctingButtons: true
         onValueChanged: root.alarmTopLevelChanged(value)
         checkLimit: true
@@ -75,7 +74,6 @@ UnitItem{
         anchors.bottomMargin: 0
         valueFontSize.bold: false
         disappear: true
-        blinkColor: "#ff0000"
         correctingButtons: true
         onValueChanged: root.alarmButtomLevelChanged(value)
         checkLimit: true
@@ -89,8 +87,4 @@ UnitItem{
 
 
 
-/*##^##
-Designer {
-    D{i:0;formeditorZoom:0.66}
-}
-##^##*/
+

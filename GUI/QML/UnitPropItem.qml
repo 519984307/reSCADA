@@ -7,7 +7,7 @@ UnitItem {
     property alias propertyWindow3: proWindow
     signal resetAlarm()
     function openSettings(){
-        if(proWindow.visible==false){
+        if(proWindow.visible == false){
             var absolutePos = mapToGlobal(0,0);
             proWindow.x = absolutePos.x
             proWindow.y = absolutePos.y

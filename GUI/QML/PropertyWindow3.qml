@@ -24,7 +24,6 @@ Window {
         addEngRow("rty")
     }
 
-
     function addAlarm(objname, symname, ignorable){
         alarms.insert(alarms.index, propertyAlarm.createObject(alarms))
         alarms.get(alarms.index).objectName = objname;

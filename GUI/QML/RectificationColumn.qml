@@ -28,9 +28,6 @@ UnitPropItem{
     signal alarmPresButtomChanged( variant value )
     backgroundColor: "#d3d3d3"
 
-    linked: true
-    connected: true
-
     //++++++++ Test +++++++
 //    mouseArea.onPressAndHold: {
 //        linked = true
@@ -61,7 +58,6 @@ UnitPropItem{
         mainGradientColor: backgroundCurrentColor
         borderWidth: borderWidth
         borderColor: borderCurrentColor
-        contentGradientColor: "#a65121"
     }
     AnalogSignalVar2{
         id:tempTop
