@@ -15,8 +15,8 @@ Item {
     property bool allovAlarmBlinck: true
 
     property bool blocked:   false
-    property bool linked:    false
-    property bool connected: false
+    property bool linked:    true
+    property bool connected: true
 
     property color backgroundCurrentColor: Fap.defaultColor
     property color backgroundColor: Fap.ready

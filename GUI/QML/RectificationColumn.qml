@@ -11,21 +11,29 @@ UnitPropItem{
 
     property alias tank: tank
 
+    property int tempOutWtrVert: 5
+    property int tempOutWtrHor: -86
+
     function setTempTop( value ) { tempTop.setValue( value ) }
-    function setAlarmTempTop( value ) { alarmTempTop.setLableSilent( value ) }
+    function setAlarmTempTop( value ) { alarmTempTop.setAlarmMaxLvl( value ) }
     signal alarmTempTopChanged( variant value )
 
     function setPresTop( value ) { presTop.setValue( value ) }
-    function setAlarmPresTop( value ) { alarmPresTop.setLableSilent( value ) }
+    function setAlarmPresTop( value ) { presTop.setAlarmMaxLvl( value ) }
     signal alarmPresTopChanged( variant value )
 
     function setTempButtom( value ) { tempButtom.setValue( value ) }
-    function setAlarmTempButtom( value ) { alarmTempButtom.setLableSilent( value ) }
+    function setAlarmTempButtom( value ) { tempButtom.setAlarmMaxLvl( value ) }
     signal alarmTempButtomChanged( variant value )
 
     function setPresButtom( value ) { presButtom.setValue( value ) }
-    function setAlarmPresButtom( value ) { alarmPresButtom.setLableSilent( value ) }
+    function setAlarmPresButtom( value ) { presButtom.setAlarmMaxLvl( value ) }
     signal alarmPresButtomChanged( variant value )
+
+    function setOutWaterTemp( value ) { tempOutWater.setValue( value ) }
+    function setAlarmOutWaterTemp( value ) { tempOutWater.setAlarmMaxLvl( value ) }
+    signal alarmOutWaterTempChanged( variant value )
+
     backgroundColor: "#d3d3d3"
 
     //++++++++ Test +++++++
@@ -118,12 +126,25 @@ UnitPropItem{
         shortNameText: "P"
         valueText:"999.9"
         tooltipText:"Давление низа колонны"
-        onAlarmMaxLvlChanged:root.alarmPresButtomChanged(value)
+        onAlarmMaxLvlChanged:root.alarmPresButtomChanged( value )
+    }
+    AnalogSignalVar2 {
+        id: tempOutWater
+        y: -45
+        width: 80
+        height: 20
+        anchors.bottom: parent.top
+        anchors.bottomMargin: tempOutWtrVert
+        anchors.horizontalCenterOffset: tempOutWtrHor
+        anchors.horizontalCenter: parent.horizontalCenter
+        backgroundColor: "#ffffff"
+        colorShortName: "#008000"
+        tooltipText: "Температура отходящей воды"
+        valueText: "999.9"
+        shortNameText: "T"
+        onAlarmMaxLvlChanged: alarmOutWaterTempChanged( value )
     }
 }
-
-
-
 
 
 

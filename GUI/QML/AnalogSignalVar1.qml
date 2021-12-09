@@ -31,7 +31,7 @@ Item {
         width: parent.height
         border.width: borderWidth
         color: colorShortName
-        border.color: borderCurrentColor
+        border.color: borderColor
         Text{
             id: nameLable
             text: qsTr("P")
@@ -45,8 +45,6 @@ Item {
 
     Rectangle{
         id: rectValue
-        color: backgroundCurrentColor
-        border.color: borderCurrentColor
         border.width: borderWidth
         anchors.left: rectShortName.right
         anchors.right: parent.right

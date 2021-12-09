@@ -21,7 +21,7 @@ Item{
     height: 200
 
     Rectangle {
-        id: rectColumn
+        id: rectBody
         border.width: borderWidth
         border.color: borderColor
         anchors.fill: parent
@@ -42,8 +42,7 @@ Item{
             Rectangle {
                 id: mSrc
                 anchors.fill: parent
-                anchors.bottom: rectColor.top
-                radius: rectColor.radius - rectColumn.border.width
+                radius: rectColor.radius - rectBody.border.width
                 gradient: Gradient {
                     id: mainGradient
                     orientation: Gradient.Horizontal
@@ -160,7 +159,7 @@ Item{
         visible: showSeam
         border.width: 1
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: rectColumn.radius
+        anchors.bottomMargin: rectBody.radius
         gradient: Gradient {
             GradientStop {
                 position: 0
@@ -188,7 +187,7 @@ Item{
         visible: showSeam
         border.width: 1
         anchors.top: parent.top
-        anchors.topMargin: rectColumn.radius
+        anchors.topMargin: rectBody.radius
 
         anchors.horizontalCenterOffset: 0
         anchors.horizontalCenter: parent.horizontalCenter
