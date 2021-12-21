@@ -141,11 +141,17 @@ extern "C" {
 //                                   COMMON
 //******************************************************************************
 // Exact length types regardless of platform/processor
-typedef uint8_t    byte;
-typedef uint16_t   word;
-typedef uint32_t   longword;
-typedef byte       *pbyte;
-typedef word       *pword;
+  typedef uint8_t  byte;
+  typedef uint16_t   word;
+  typedef int16_t    smallint;
+  typedef uint32_t   longword;
+  typedef int32_t    longint;
+  typedef byte       *pbyte;
+  typedef word       *pword;
+  typedef longword   *plongword;
+  typedef smallint   *psmallint;
+  typedef longint    *plongint;
+  typedef float      *pfloat;
 typedef uintptr_t  S7Object; // multi platform/processor object reference
                              // DON'T CONFUSE IT WITH AN OLE OBJECT, IT'S SIMPLY
                              // AN INTEGER VALUE (32 OR 64 BIT) USED AS HANDLE.
@@ -206,9 +212,9 @@ typedef struct{
 //------------------------------------------------------------------------------
 //                                  PARAMS LIST            
 //------------------------------------------------------------------------------
-const int p_u16_LocalPort  	    = 1;
-const int p_u16_RemotePort 	    = 2;
-const int p_i32_PingTimeout	    = 3;
+const int p_u16_LocalPort  	= 1;
+const int p_u16_RemotePort 	= 2;
+const int p_i32_PingTimeout	= 3;
 const int p_i32_SendTimeout     = 4;
 const int p_i32_RecvTimeout     = 5;
 const int p_i32_WorkInterval    = 6;
@@ -278,12 +284,12 @@ const word CONNTYPE_OP                      = 0x0002;  // Connect to the PLC as 
 const word CONNTYPE_BASIC                   = 0x0003;  // Basic connection
 
 // Area ID
-const byte S7AreaPE   =	0x81;
-const byte S7AreaPA   =	0x82;
-const byte S7AreaMK   =	0x83;
-const byte S7AreaDB   =	0x84;
-const byte S7AreaCT   =	0x1C;
-const byte S7AreaTM   =	0x1D;
+const byte S7AreaPE   {0x81};
+const byte S7AreaPA   {0x82};
+const byte S7AreaMK   {0x83};
+const byte S7AreaDB   {0x84};
+const byte S7AreaCT   {0x1C};
+const byte S7AreaTM   {0x1D};
 
 // Word Length
 const int S7WLBit     = 0x01;
@@ -295,30 +301,30 @@ const int S7WLCounter = 0x1C;
 const int S7WLTimer   = 0x1D;
 
 // Block type
-const byte Block_OB   = 0x38;
-const byte Block_DB   = 0x41;
-const byte Block_SDB  = 0x42;
-const byte Block_FC   = 0x43;
-const byte Block_SFC  = 0x44;
-const byte Block_FB   = 0x45;
-const byte Block_SFB  = 0x46;
+const byte Block_OB   {0x38};
+const byte Block_DB   {0x41};
+const byte Block_SDB  {0x42};
+const byte Block_FC   {0x43};
+const byte Block_SFC  {0x44};
+const byte Block_FB   {0x45};
+const byte Block_SFB  {0x46};
 
 // Sub Block Type
-const byte SubBlk_OB  = 0x08;
-const byte SubBlk_DB  = 0x0A;
-const byte SubBlk_SDB = 0x0B;
-const byte SubBlk_FC  = 0x0C;
-const byte SubBlk_SFC = 0x0D;
-const byte SubBlk_FB  = 0x0E;
-const byte SubBlk_SFB = 0x0F;
+const byte SubBlk_OB  {0x08};
+const byte SubBlk_DB  {0x0A};
+const byte SubBlk_SDB {0x0B};
+const byte SubBlk_FC  {0x0C};
+const byte SubBlk_SFC {0x0D};
+const byte SubBlk_FB  {0x0E};
+const byte SubBlk_SFB {0x0F};
 
 // Block languages
-const byte BlockLangAWL       = 0x01;
-const byte BlockLangKOP       = 0x02;
-const byte BlockLangFUP       = 0x03;
-const byte BlockLangSCL       = 0x04;
-const byte BlockLangDB        = 0x05;
-const byte BlockLangGRAPH     = 0x06;
+const byte BlockLangAWL   {0x01};
+const byte BlockLangKOP   {0x02};
+const byte BlockLangFUP   {0x03};
+const byte BlockLangSCL   {0x04};
+const byte BlockLangDB    {0x05};
+const byte BlockLangGRAPH {0x06};
 
 // Read/Write Multivars
 typedef struct{
@@ -742,6 +748,28 @@ int S7API Par_GetStats(S7Object Partner, longword *BytesSent, longword *BytesRec
 int S7API Par_GetLastError(S7Object Partner, int *LastError);
 int S7API Par_GetStatus(S7Object Partner, int *Status);
 int S7API Par_ErrorText(int Error, char *Text, int TextLen);
+
+//******************************************************************************
+//                           HELPER DATA ACCESS FUNCTIONS
+//******************************************************************************
+// GET
+bool GetBitAt(void *Buffer, int Pos, int Bit);
+byte GetByteAt(void *Buffer, int Pos);
+word GetWordAt(void *Buffer, int Pos);
+smallint GetIntAt(void *Buffer, int Pos);
+longword GetDWordAt(void *Buffer, int Pos);
+longint GetDIntAt(void *Buffer, int Pos);
+float GetRealAt(void *Buffer, int Pos);
+struct tm GetDateTimeAt(void *Buffer, int Pos);
+// SET
+void SetBitAt(void *Buffer, int Pos, int Bit, bool Value);
+void SetByteAt(void *Buffer, int Pos, byte Value);
+void SetWordAt(void *Buffer, int Pos, word Value);
+void SetIntAt(void *Buffer, int Pos, smallint Value);
+void SetDWordAt(void *Buffer, int Pos, longword Value);
+void SetDIntAt(void *Buffer, int Pos, longint Value);
+void SetRealAt(void *Buffer, int Pos, float Value);
+void SetDateTimeAt(void *Buffer, int Pos, tm Value);
 
 
 #pragma pack()

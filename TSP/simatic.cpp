@@ -1,8 +1,7 @@
 #include "simatic.h"
 //------------------------------------------------------------------------------
-Simaticdriver::Simaticdriver(int id, QString name, QString address, int rack, int slot, QString comment)
+SimaticDriver::SimaticDriver(int id, QString name, QString address, int rack, int slot, QString comment)
 {
-    initThread();
     this->type = "simatic";
     this->Id = id;
     this->setObjectName(name);
@@ -10,11 +9,12 @@ Simaticdriver::Simaticdriver(int id, QString name, QString address, int rack, in
     this->rack = rack;
     this->slot = slot;
     this->Comment = comment;
+    initThread();
 }
 //------------------------------------------------------------------------------
-Simaticdriver::~Simaticdriver()
+SimaticDriver::~SimaticDriver()
 {
-    Disconnect();
+    disconnect();
 
     foreach (Task * task, listOfTasks){
         delete task;
@@ -23,29 +23,58 @@ Simaticdriver::~Simaticdriver()
     delete taskTimer;
 }
 //------------------------------------------------------------------------------
-void Simaticdriver::Connect()
+//Выделяет драйверу отдельный поток
+void SimaticDriver::initThread()
 {
-    if(!client) return;
-    if(!client->Connected() || !noError){
-        char charaddress[256];
-        memcpy(charaddress, address.toStdString().c_str(), address.size());
-        charaddress[address.size()] = '\0';
-        if(check(client->ConnectTo(charaddress, rack, slot), "connection")){
-            emit LoggingSig(MessInfo, QDateTime::currentDateTime(), false, this->objectName(), "Simatic driver connected");
+    thread = new QThread;
+    thread->start();
+    this->moveToThread(thread);
+    taskTimer = new QTimer();
+    taskTimer->moveToThread(thread);
+    client = new TS7Client();
+    client->moveToThread(thread);
+    QObject::connect(this, &Driver::connectDriver, this, &Driver::connect, Qt::QueuedConnection);
+    QObject::connect(this, &Driver::disconnectDriver, this, &Driver::disconnect, Qt::QueuedConnection);
+}
+//------------------------------------------------------------------------------
+//Проверяет соединение с ПЛК, если его нет - соединяет
+void SimaticDriver::connect()
+{
+    if( !client ) return;
+
+    if( !client->Connected() || !noError ){
+        char charAddress[ 256 ];
+        memcpy( charAddress, address.toStdString().c_str(), address.size() );
+        charAddress[ address.size() ] = '\0';
+
+        // Запрос на соединение
+        int res = client->ConnectTo(charAddress, rack, slot);
+
+        if( res == 0 ) {//Успешно соединился
+            emit LoggingSig(MessInfo, QDateTime::currentDateTime(), false,
+                this->objectName(), "Simatic driver connected");
             noError = true;
         }
-        if (!Started){
-            Started = true;
+        else {//Нет соединения. Сообщение об ошибке в лог.
+            noError = false;
+            emit LoggingSig(MessError, QDateTime::currentDateTime(),
+                false, this->objectName(),
+                std::string("Simatic driver connection error: "
+                    + ( res < 0 ? "libruary error" : CliErrorText(res)) ).c_str() );
+        }
+
+        if (!started){
+            started = true;
             emit onStartedChanged();
             scheduleHandler();
         }
     }
 }
 //------------------------------------------------------------------------------
-void Simaticdriver::Disconnect()
+void SimaticDriver::disconnect()
 {
     if(!client) return;
-    Started = false;
+    started = false;
     client->Disconnect();
     taskTimer->stop();
     emit LoggingSig(MessInfo, QDateTime::currentDateTime(), false, this->objectName(), "Simatic driver disconnected");
@@ -55,30 +84,21 @@ void Simaticdriver::Disconnect()
     }
     emit onStartedChanged();
 }
+
 //------------------------------------------------------------------------------
-void Simaticdriver::initThread()
-{
-    thread = new QThread;
-    thread->start();
-    this->moveToThread(thread);
-    taskTimer = new QTimer();
-    taskTimer->moveToThread(thread);
-    client = new TS7Client();
-    client->moveToThread(thread);
-    QObject::connect(this, &Driver::connectDriver, this, &Driver::Connect, Qt::QueuedConnection);
-    QObject::connect(this, &Driver::disconnectDriver, this, &Driver::Disconnect, Qt::QueuedConnection);
-}
-//------------------------------------------------------------------------------
-void Simaticdriver::handleNextTask()
+void SimaticDriver::handleNextTask()
 {
     if (listOfTasks.count() > 0){
         Task * task = listOfTasks.takeFirst();
         if (task->writeTask){
-            write(task, [this, task](){
-                delete task;
-                scheduleHandler();
-            });
-        }else{
+            write(task,
+                [this, task](){
+                    delete task;
+                    scheduleHandler();
+                }
+            );
+        }
+        else{
             read(task, [this, task](){
                 Group * group = getGroupById(task->groupId);
                 group->Update();
@@ -86,19 +106,22 @@ void Simaticdriver::handleNextTask()
                 scheduleHandler();
             });
         }
-    }else{
+    }
+    else{
         getTask();
         scheduleHandler();
     }
 
 }
 //------------------------------------------------------------------------------
-void Simaticdriver::getTask()
+void SimaticDriver::getTask()
 {
     SimAddress * address = new SimAddress;
     Task * task = nullptr;
     foreach (Group * group, listOfGroups) {
         if (group->LastUpdate.msecsTo(QDateTime::currentDateTime()) > group->Delay){
+            //! переработать. Нахрена повторять одно и тоже каждый раз?
+            //! ввести в группу параметр prepared
             QList<Tag *> newTagList = prepareTagsList(group->ListOfTags);
             int i = 0;
             while (i < newTagList.count()){
@@ -118,7 +141,7 @@ void Simaticdriver::getTask()
                     send = true;
                 }else{
                     if (task->area != address->area || task->type != address->type ||
-                            task->regAddr + task->quantity + group->OptimizerRangeInterval < address->regAddr){ //area or type or range interval exception
+                        task->regAddr + task->quantity + group->OptimizerRangeInterval < address->regAddr){ //area or type or range interval exception
                         send = true;
                     }else{
                         for(int i = 0; i < address->regAddr - task->regAddr - task->quantity ; i++){ //filler. Runs 0 times if current reg addr - prev reg addr = 1
@@ -146,18 +169,20 @@ void Simaticdriver::getTask()
     delete address;
 }
 //------------------------------------------------------------------------------
-void Simaticdriver::valueFiller(Simaticdriver::Task *task, uint8_t data[])
+void SimaticDriver::valueFiller(SimaticDriver::Task *task, byte * data[])
 {
     int start = task->regAddr / 8;
     for(int i = 0; i < task->listOfTags.count(); i++){
         if(task->listOfTags[i])
-            task->listOfTags[i]->setValue( ((data[(task->regAddr + i) / 8 - start]) & (1 << ((task->regAddr + i) % 8))) == 0 ? false : true);
+            task->listOfTags[i]->setValue(
+                ((data[(task->regAddr + i) / 8 - start])
+                    & (1 << ((task->regAddr + i) % 8))) == 0 ? false : true);
     }
 }
 //------------------------------------------------------------------------------
 //void Simaticdriver::valueFiller(QList<Tag *> listOfTags, uint8_t * data)
 template<typename Tarr>
-void Simaticdriver::valueFiller(QList<Tag *> listOfTags, Tarr data[])
+void SimaticDriver::valueFiller(QList<Tag *> listOfTags, Tarr data[])
 {
     for(int i = 0; i < listOfTags.count(); i++){
         if(listOfTags[i])
@@ -165,172 +190,130 @@ void Simaticdriver::valueFiller(QList<Tag *> listOfTags, Tarr data[])
     }
 }
 //------------------------------------------------------------------------------
-void Simaticdriver::read(Simaticdriver::Task *task            , const std::function<void ()> doNext)
+void SimaticDriver::read(SimaticDriver::Task *task, const std::function<void ()> doNext)
 {
     if(!client) {
         errorFiller(task->listOfTags, "driver read error: driver is null"); qualityFiller(task->listOfTags, Bad);
         //emit LoggingSystem(MessError, QDateTime::currentDateTime(), this->objectName(), "Simatic driver read error: driver is null");
         return;
     }
-    if (Started) Connect();
+    if (started) connect();
     if(!client->Connected()){
-        errorFiller(task->listOfTags, "driver read error: driver isn\'t connected"); qualityFiller(task->listOfTags, Bad); doNext();
+        errorFiller(task->listOfTags, "driver read error: driver isn\'t connected"); qualityFiller(task->listOfTags, Bad);
+        doNext();
         //emit LoggingSystem(MessError, QDateTime::currentDateTime(), this->objectName(), "Simatic driver read error: driver isn\'t connected");
         return;
     }
-    uint8_t data[task->quantity];
-    for(int i = 0; i < task->quantity; i++){
+
+    int typeLen{1};
+    switch (task->type) {
+    //case S7WLBit    : //убрал, т.к. typeLen по умолчанию = 1
+    //case S7WLByte   : typeLen = 1;
+    case S7WLWord   :
+    case S7WLCounter:
+    case S7WLTimer  : typeLen = 2;
+    case S7WLDWord  :
+    case S7WLReal   : typeLen = 4;
+    default:;
+    }
+    byte * data;
+    data = new byte[task->quantity * typeLen];
+    for(int i = 0; i < task->quantity * typeLen; i++){
         data[i] = 0;
     }
-    //        TS7DataItem Item;
-    //        Item.Area     = task->area;
-    //        Item.WordLen  = task->type;
-    //        Item.DBNumber = 1;
-    //        Item.Start    = task->regAddr;
-    //        Item.Amount   = task->quantity;
-    //        Item.pdata    = &data;
-    //        int res = client->ReadMultiVars(&Item, 1);
-    //        if(res == 0){
-    //            if (Item.Result == 0){
-    //                valueFiller(task->listOfTags, data);
-    //                errorFiller(task->listOfTags, "");
-    //                qualityFiller(task->listOfTags, Good);
-    //            }else{
-    //                errorFiller(task->listOfTags, "driver read error: " + QString(CliErrorText(Item.Result).c_str())); qualityFiller(task->listOfTags, Bad);
-    //            }
-    //        }else{
-    //            errorFiller(task->listOfTags, "driver read error: " + QString(CliErrorText(res).c_str())); qualityFiller(task->listOfTags, Bad);
-    //        }
-    //        doNext();
-    //        return;
-
-    if ((task->type==S7WLBit) && (task->quantity>1)){
+    int res = 0;
+    if ( task->quantity > 1 ){
         int start = task->regAddr / 8;
         int end = (task->regAddr + task->quantity) / 8;
-        int res = client->ReadArea(task->area, 1, start, end - start + 1, S7WLByte, &data);
+        res = client->ReadArea(task->area, task->DBNumb, start, end - start + 1, task->type, &data);
         if(res == 0){
-            valueFiller(task, data);
+            valueFiller(task, &data);
             errorFiller(task->listOfTags, "");
             qualityFiller(task->listOfTags, Good);
-        }else{
-            if (res == 589856)
-                noError = false;
-            errorFiller(task->listOfTags, "driver read error: " + QString(CliErrorText(res).c_str())); qualityFiller(task->listOfTags, Bad);
         }
-    }else{
-        int res = client->ReadArea(task->area, 1, task->regAddr, task->quantity, task->type, &data);
+    }
+    else{
+        res = client->ReadArea(task->area, task->DBNumb, task->regAddr, task->quantity, task->type, &data);
         if(res == 0){
             valueFiller(task->listOfTags, data);
             errorFiller(task->listOfTags, "");
             qualityFiller(task->listOfTags, Good);
-        }else{
-            if (res == 589856)
-                noError = false;
-            errorFiller(task->listOfTags, "driver read error: " + QString(CliErrorText(res).c_str())); qualityFiller(task->listOfTags, Bad);
         }
+    }
+    if( res != 0 ){
+        if (res == 589856)
+            noError = false;
+        errorFiller(task->listOfTags, "driver read error: " + QString(CliErrorText(res).c_str()));
+        qualityFiller(task->listOfTags, Bad);
     }
     doNext();
     return;
-
-
-
-
-
-    //    Callback * callback = new Callback();
-    //    QObject::connect(callback, &Callback::finished, callback, [this, doNext, task, &data](int res){
-    //        if(res == 0){
-    //            valueFiller(task->listOfTags, data);
-    //            errorFiller(task->listOfTags, "");
-    //            qualityFiller(task->listOfTags, Good);
-    //        }else{
-    //            errorFiller(task->listOfTags, "driver read error: " + QString(CliErrorText(res).c_str())); qualityFiller(task->listOfTags, Bad);
-    //        }
-
-    //        doNext();
-    //        return;
-    //    }, Qt::DirectConnection);
-
-    //    void* vptr = static_cast<void*>(callback);
-
-    //    client->SetAsCallback([](void *usrPtr, int opCode, int opResult){
-    //        Callback *callback = (Callback *) usrPtr;
-    //        emit callback->finished(opResult, opCode);
-    //        callback->deleteLater();
-    //    }, vptr);
-
-    //    client->AsReadArea(task->area, 1, task->regAddr, task->quantity, task->type, &data);
-    //    return;
 }
 //------------------------------------------------------------------------------
-void Simaticdriver::write(Simaticdriver::Task *task, const std::function<void ()> doNext)
+void SimaticDriver::write(SimaticDriver::Task *task, const std::function<void ()> doNext)
 {
     if(!client) {
         errorFiller(task->listOfTags, "driver write error: driver is null"); qualityFiller(task->listOfTags, Bad);
         //emit LoggingSystem(MessError, QDateTime::currentDateTime(), this->objectName(), "Simatic driver read error: driver is null");
         return;
     }
-    if (Started) Connect();
-    if(!client->Connected()){
-        errorFiller(task->listOfTags, "driver write error: driver isn\'t connected"); qualityFiller(task->listOfTags, Bad); doNext();
-        //emit LoggingSystem(MessError, QDateTime::currentDateTime(), this->objectName(), "Simatic driver read error: driver isn\'t connected");
+    if(started) connect(); //Если драйвер запущен
+    if(!client->Connected()){ //TODO переделать. Попытки подключиться должны крутиться в цикле в драйвере.
+        errorFiller(task->listOfTags,
+            "driver write error: driver isn\'t connected");
+        qualityFiller(task->listOfTags, Bad);
+        doNext();
         return;
     }
+    //создаю массив для новых значений тэгов
+    // TODO long long избыточно кадому типу своё
     long long data[task->quantity];
-    for(int i = 0; i < task->quantity; i++){
-        if(task->listOfTags[i])
+    for(int i = 0; i < task->quantity; i++){ //перебираю массив
+        if(task->listOfTags[i])//TODO Странная проверка наверное убрать.
+            //Запись новых значений тэгов в массив.
             data[i] = task->listOfTags[i]->newValue.toLongLong();
         else
             data[i] = 0;
     }
-    TS7DataItem Item;
+    TS7DataItem Item; //создаю Item(структура из snap7)
+    //чтоб закинуть в него новые значения тэгов
     Item.Area     = task->area;
     Item.WordLen  = task->type;
-    Item.DBNumber = 1;
+    Item.DBNumber = task->DBNumb;
     Item.Start    = task->regAddr;
     Item.Amount   = task->quantity;
     Item.pdata    = &data;
-    int res = client->WriteMultiVars(&Item, 1);
-    if(res == 0){
-        if (Item.Result == 0){
-            readyFiller(task->listOfTags, true);
-            newValueFiller(task->listOfTags);
-            errorFiller(task->listOfTags, "");
-            qualityFiller(task->listOfTags, Good);
-        }else{
-            errorFiller(task->listOfTags, "driver write error: " + QString(CliErrorText(Item.Result).c_str())); qualityFiller(task->listOfTags, Bad);
-            if (res == 589856)
-                noError = false;
-        }
-    }else{
-        errorFiller(task->listOfTags, "driver write error: " + QString(CliErrorText(res).c_str())); qualityFiller(task->listOfTags, Bad);
-        if (res == 589856)
+
+    client->WriteMultiVars(&Item, 1);//запрос к ПЛК
+
+    if (Item.Result == 0){//0 значит успешно выполнен.
+        //Заполнение тэгов результатами запроса и служебной инфой.
+        readyFiller(task->listOfTags, true);
+        newValueFiller(task->listOfTags);
+        errorFiller(task->listOfTags, "");
+        qualityFiller(task->listOfTags, Good);
+    }
+    else{
+        errorFiller(task->listOfTags, "driver write error: "
+                + QString(CliErrorText(Item.Result).c_str()));
+        qualityFiller(task->listOfTags, Bad);
+        if (Item.Result == 589856)
             noError = false;
     }
-    doNext();
-    return;
+
+    doNext();//переход к следующей tack
+    //TODO убрать этот дебильный переход к след. задаче ерез ямбду
 }
+
 //------------------------------------------------------------------------------
-bool Simaticdriver::check(int res, QString function)
+void SimaticDriver::scheduleHandler()
 {
-    if(noError){
-        noError = false;
-        if(res < 0){
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Simatic driver " + function + " error: libruary error");
-        }else if(res > 0){
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Simatic driver " + function + " error: " + CliErrorText(res).c_str());
-        }
-    }
-    return res == 0;
-}
-//------------------------------------------------------------------------------
-void Simaticdriver::scheduleHandler()
-{
-    if (Started)
-        taskTimer->singleShot(1, this, &Simaticdriver::handleNextTask);
+    if (started)
+        taskTimer->singleShot(1, this, &SimaticDriver::handleNextTask);
 }
 //------------------------------------------------------------------------------
 
-QList<Tag *> Simaticdriver::sortTags(QList<Tag *> listOfTags)
+QList<Tag *> SimaticDriver::sortTags(QList<Tag *> listOfTags)
 {
     bool ready = false;
     if (listOfTags.count() < 2) return listOfTags;
@@ -367,7 +350,7 @@ QList<Tag *> Simaticdriver::sortTags(QList<Tag *> listOfTags)
     return listOfTags;
 }
 //------------------------------------------------------------------------------
-bool Simaticdriver::strToAddr(QString str, SimAddress *address)
+bool SimaticDriver::strToAddr(QString str, SimAddress *address)
 {
     if(!address) return false;
     if (str.count() < 2) return false;
@@ -376,31 +359,40 @@ bool Simaticdriver::strToAddr(QString str, SimAddress *address)
     str.remove(0, 1);
     if (MemType == "m"){
         address->area = S7AreaMK;
-    } else if(MemType == "i"){
+    }
+    else if(MemType == "i"){
         address->area = S7AreaPE;
-    } else if(MemType == "q"){
+    }
+    else if(MemType == "q"){
         address->area = S7AreaPA;
-    } else if(MemType == "d"){
+    }
+    else if(MemType == "d"){
         address->area = S7AreaDB;
-    } else if(MemType == "c"){
+    }
+    else if(MemType == "c"){
         address->area = S7AreaCT;
-    } else if(MemType == "t"){
+    }
+    else if(MemType == "t"){
         address->area = S7AreaTM;
-    } else return false;
+    }
+    else return false;
     if(str == "") return false;
-    QStringList addressParts = str.split(".", QString::SkipEmptyParts);
+    QStringList addressParts = str.split(".", Qt::SkipEmptyParts);
     if(addressParts.count() == 1){
         if (addressParts[0].count() < 2) return false;
         QString DataType = addressParts[0].left(1);
         addressParts[0].remove(0, 1);
         if (DataType == "b"){
+            address->type = S7WLBit;
+        }else if(DataType == "B"){
             address->type = S7WLByte;
         }else if(DataType == "w"){
             address->type = S7WLWord;
         }else if(DataType == "d"){
             address->type = S7WLDWord;
+        }else if(DataType == "r"){
+            address->type = S7WLReal;
         }else if(DataType == "c"){
-
             address->type = S7WLCounter;
         }else if(DataType == "t"){
             address->type = S7WLTimer;
@@ -418,7 +410,7 @@ bool Simaticdriver::strToAddr(QString str, SimAddress *address)
     }else return false;
 }
 //------------------------------------------------------------------------------
-bool Simaticdriver::compare(SimAddress a1, SimAddress a2)
+bool SimaticDriver::compare(SimAddress a1, SimAddress a2)
 {
     if (a1.area > a2.area)
         return true;
@@ -434,7 +426,7 @@ bool Simaticdriver::compare(SimAddress a1, SimAddress a2)
         return false;
 }
 //------------------------------------------------------------------------------
-void Simaticdriver::WriteRequested(Tag *tag)
+void SimaticDriver::WriteRequested(Tag *tag)
 {
     SimAddress address;
     if(!strToAddr(tag->address, &address)){

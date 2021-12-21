@@ -2,9 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 1.4
 
 Item {
-
     property int counter: 0
-
     id: root
     function addMessage(date, time, unit, action){
         dataModel.append({"date": date, "time":time, "unit": unit, "action": action})
@@ -14,7 +12,6 @@ Item {
             //counter ++
         }
     }
-
     ListModel {
         id: dataModel
 //        ListElement {
@@ -24,7 +21,6 @@ Item {
 //            action: "Авария датчик подпора"
 //        }
     }
-
     TableView {
         id: view
         selectionMode: SelectionMode.NoSelection
@@ -67,7 +63,6 @@ Item {
                 renderType: Text.NativeRendering
                 text: styleData.value
                 color: "red"
-
             }
         }
     }

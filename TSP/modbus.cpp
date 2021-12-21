@@ -123,7 +123,7 @@ void Modbusdriver::getTask()///Переделать!!!
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::Connect()
+void Modbusdriver::connect()
 {
     if(!modbusDevice) return;
     if(modbusDevice->state() != QModbusDevice::ConnectedState) {
@@ -138,8 +138,8 @@ void Modbusdriver::Connect()
                 emit LoggingSig(MessInfo, QDateTime::currentDateTime(), false, objectName(), "Modbus driver connected");
                 noError = true;
             }
-            if (!Started){
-                Started = true;
+            if (!started){
+                started = true;
                 emit onStartedChanged();
                 scheduleHandler();
             }
@@ -148,10 +148,10 @@ void Modbusdriver::Connect()
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::Disconnect()
+void Modbusdriver::disconnect()
 {
     if(!modbusDevice) return;
-    Started = false;
+    started = false;
     modbusDevice->disconnectDevice();
     taskTimer->stop();
     emit LoggingSig(MessInfo, QDateTime::currentDateTime(), false, objectName(), "Modbus driver disconnected");
@@ -214,7 +214,7 @@ void Modbusdriver::read(Modbusdriver::Task *task, const std::function<void ()> d
         //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver read error: driver is null");
         return;
     }
-    if (Started) Connect();
+    if (started) connect();
     if(modbusDevice->state() != QModbusDevice::ConnectedState){
         errorFiller(task->listOfTags, "driver read error: driver isn\'t connected");
         qualityFiller(task->listOfTags, Bad);
@@ -285,7 +285,7 @@ void Modbusdriver::write(Task * task, const std::function<void()> doNext)
         qualityFiller(task->listOfTags, Bad);
         doNext();
     }
-    if (Started) Connect();
+    if (started) connect();
     if(modbusDevice->state() != QModbusDevice::ConnectedState){
         errorFiller(task->listOfTags, "driver write error: driver isn\'t connected");
         qualityFiller(task->listOfTags, Bad);
@@ -389,7 +389,7 @@ bool Modbusdriver::strToAddr(QString str, MBaddress * address)
 //------------------------------------------------------------------------------
 void Modbusdriver::scheduleHandler()
 {
-    if (Started)
+    if (started)
         taskTimer->singleShot(1, this, &Modbusdriver::handleNextTask);
 }
 
@@ -447,7 +447,7 @@ void Modbusdriver::initThread(QModbusClient *modbusDevice)
     taskTimer->moveToThread(thread);
     this->modbusDevice = modbusDevice;
     modbusDevice->moveToThread(thread);
-    QObject::connect(this, &Driver::connectDriver, this, &Driver::Connect, Qt::QueuedConnection);
-    QObject::connect(this, &Driver::disconnectDriver, this, &Driver::Disconnect, Qt::QueuedConnection);
+    QObject::connect(this, &Driver::connectDriver, this, &Driver::connect, Qt::QueuedConnection);
+    QObject::connect(this, &Driver::disconnectDriver, this, &Driver::disconnect, Qt::QueuedConnection);
 }
 //------------------------------------------------------------------------------

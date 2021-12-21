@@ -25,8 +25,8 @@ public:
         QModbusDataUnit::RegisterType regType;
     };
     //methods
-    void Connect() override;
-    void Disconnect() override;
+    void connect() override;
+    void disconnect() override;
 private:
     //structs
     struct Task : public MBaddress{

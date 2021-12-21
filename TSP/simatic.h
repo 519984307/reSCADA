@@ -5,13 +5,13 @@
 #include "driver.h"
 #include "snap7/snap7.h"
 
-class Simaticdriver : public Driver
+class SimaticDriver : public Driver
 {
 public:
     //constructor
-    Simaticdriver(int id, QString name, QString address = "127.0.0.1", int rack = 0, int slot = 2, QString comment = "");
+    SimaticDriver(int id, QString name, QString address = "127.0.0.1", int rack = 0, int slot = 2, QString comment = "");
     //destructor
-    ~Simaticdriver();
+    ~SimaticDriver();
     //enums
     enum Area{
         S7AreaPE = 0x81,
@@ -34,15 +34,17 @@ public:
     struct SimAddress{
         Area area;
         WordLenght type;
+        int DBNumb{1};
         int regAddr;
     };
     //methods
-    void Connect() override;
-    void Disconnect() override;
+    void connect() override;
+    void disconnect() override;
 private:
     //structs
     struct Task : public SimAddress{
-        int quantity = 0, groupId;
+        int quantity{0};
+        int groupId{0};
         QList<Tag*> listOfTags;
         bool writeTask = false;
     };
@@ -58,11 +60,11 @@ private:
     void getTask();
     template <typename Tarr>
     void valueFiller(QList<Tag*> listOfTags, Tarr data[]);
-    void valueFiller(Task * task, uint8_t data[]);
+    void valueFiller(Task * task, byte * data[]);
     void read(Task * task, const std::function<void()> doNext);
     void write(Task * task, const std::function<void()> doNext);
-    bool check(int res, QString function = "unknown function");
-    void scheduleHandler();
+    //bool check(int res, QString function = "unknown function");
+    void scheduleHandler(); //TODO вынести в класс драйвера
     QList<Tag*> sortTags(QList<Tag*> listOfTags) override;
     bool strToAddr(QString str, SimAddress * address);
     inline bool compare(SimAddress a1, SimAddress a2);

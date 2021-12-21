@@ -195,7 +195,7 @@ QVariant TSPTableModelDrivers::data(const QModelIndex &index, int role) const
         DriverConfig * config = listOfDriverConfigs[index.row()];
         switch(index.column()){
         case driverId:      return config->id;
-        case driverStatus:  return config->driver?(config->driver->Started?"Run":"Stop"):"Error";
+        case driverStatus:  return config->driver?(config->driver->started?"Run":"Stop"):"Error";
         case driverType:    return config->type;
         case driverName:    return config->name;
         case driverOptions: return config->options;
@@ -221,7 +221,7 @@ QVariant TSPTableModelDrivers::data(const QModelIndex &index, int role) const
         case driverStatus: {
             Driver * driver = listOfDriverConfigs[index.row()]->driver;
             if(driver)
-                return driver->Started ? icons->iconTrue : icons->iconFalse;
+                return driver->started ? icons->iconTrue : icons->iconFalse;
             else
                 return icons->iconError;
         }
@@ -323,7 +323,7 @@ void TSPTableModelDrivers::doubleClicked(const QModelIndex &index)
     else if((options & AllowToManageDrivers) != 0 && index.column() == driverStatus){
         Driver * driver = listOfDriverConfigs[index.row()]->driver;
         if (driver)
-            driver->Started ? emit driver->disconnectDriver() : driver->connectDriver();
+            driver->started ? emit driver->disconnectDriver() : emit driver->connectDriver();
         updateRequest();
     }else if((options & AllowToEdit) != 0 && index.column() != driverStatus)
         editing = true;

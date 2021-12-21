@@ -18,13 +18,13 @@ public:
     int Id;
     QString Comment;
     QString Options;
-    bool Started = false;
+    bool started = false;
     QString type;
     //methods
     bool InsertGroup(Group  * group);
     Group * getGroupById(int Id);
-    virtual void Connect() = 0;
-    virtual void Disconnect() = 0;
+    virtual void connect() = 0;
+    virtual void disconnect() = 0;
 protected:
 
 //    struct Task {

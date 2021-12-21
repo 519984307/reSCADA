@@ -16,19 +16,16 @@ Tag::Tag(int Id,
     virtualization(Virtualization),
     type(Type),
     comment(Comment),
-    config(Config)
+    config(Config)//TODO засунуть конфиг в тег
 {
     setObjectName(Name);
     if (virtualization == VValue || virtualization == VRandom){
         quality = Good;
     }
 }
-//------------------------------------------------------------------------------
-//Tag::~Tag()
-//{
 
-//}
 //------------------------------------------------------------------------------
+//TODO добавить числа с плав. запятой и массив байтов
 QVariant Tag::ReadValue()
 {
     if (access != WO && access != NA){

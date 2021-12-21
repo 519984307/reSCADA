@@ -37,15 +37,15 @@ bool TSP::AddDriver(int id, QString  name, QString type, QString options, QStrin
     if (type == "modbusTCP"){
         options = options.simplified();
         options.replace(" ", "");
-        QStringList optionsList = options.split(',', QString::SkipEmptyParts);
+        QStringList optionsList = options.split(',', Qt::SkipEmptyParts);
         int timeout = 100;
         QString addr = "127.0.0.1";
         int port = 502;
         foreach (QString option, optionsList) {
-            QStringList optionPart = option.split('=', QString::SkipEmptyParts);
+            QStringList optionPart = option.split('=', Qt::SkipEmptyParts);
             if (optionPart.count() == 2){
                 if(optionPart[0]=="address"){
-                    QStringList addressPartsList = optionPart[1].split(':', QString::SkipEmptyParts);
+                    QStringList addressPartsList = optionPart[1].split(':', Qt::SkipEmptyParts);
                     if (addressPartsList.count() == 1) {
                         addr = addressPartsList[0];
                     }else if (addressPartsList.count() == 2){
@@ -90,7 +90,7 @@ bool TSP::AddDriver(int id, QString  name, QString type, QString options, QStrin
     }else if(type == "modbusRTU"){
         options = options.simplified();
         options.replace(" ", "");
-        QStringList optionsList = options.split(',', QString::SkipEmptyParts);
+        QStringList optionsList = options.split(',', Qt::SkipEmptyParts);
         QString port = "COM1";
         QString baudrate = "19200";
         QSerialPort::DataBits databits = QSerialPort::Data8;
@@ -98,7 +98,7 @@ bool TSP::AddDriver(int id, QString  name, QString type, QString options, QStrin
         QSerialPort::StopBits stopbits = QSerialPort::OneStop;
         int timeout = 100;
         foreach (QString option, optionsList) {
-            QStringList optionPart = option.split('=', QString::SkipEmptyParts);
+            QStringList optionPart = option.split('=', Qt::SkipEmptyParts);
             if (optionPart.count() == 2){
                 if (optionPart[0] == "port"){
                     port = optionPart[1];
@@ -177,9 +177,9 @@ bool TSP::AddDriver(int id, QString  name, QString type, QString options, QStrin
         QString addr = "127.0.0.1";
         int rack = 0;
         int slot = 2;
-        QStringList optionsList = options.split(',', QString::SkipEmptyParts);
+        QStringList optionsList = options.split(',', Qt::SkipEmptyParts);
         foreach (QString option, optionsList) {
-            QStringList optionPart = option.split('=', QString::SkipEmptyParts);
+            QStringList optionPart = option.split('=', Qt::SkipEmptyParts);
             if (optionPart.count() == 2){
                 if(optionPart[0] == "address"){
                     addr = optionPart[1];
@@ -211,7 +211,7 @@ bool TSP::AddDriver(int id, QString  name, QString type, QString options, QStrin
             emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: driver id isn\'t unique"); config->errorString = "driver id isn\'t unique";
             return false;
         }
-        driver = new Simaticdriver(id, name, addr, rack, slot, comment);
+        driver = new SimaticDriver(id, name, addr, rack, slot, comment);
         driver->Options = options;
         emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " created");
         config->driver = driver; listOfDrivers.append(driver);
@@ -239,9 +239,9 @@ bool TSP::AddGroup(int id, QString name, QString options, int delay, int driverI
 
     options.replace(" ", "");
     options = options.toLower();
-    QStringList optionsList = options.split(',', QString::SkipEmptyParts);
+    QStringList optionsList = options.split(',', Qt::SkipEmptyParts);
     foreach (QString option, optionsList) {
-        QStringList optionParts = option.split('=', QString::SkipEmptyParts);
+        QStringList optionParts = option.split('=', Qt::SkipEmptyParts);
         if (optionParts.size() != 2){
             emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
             return false;
@@ -297,7 +297,7 @@ bool TSP::addTag(int id, QString name, QString address, QString options, int gro
     options = options.simplified();
     options.replace(" ", "");
     options = options.toLower();
-    QStringList optionsList = options.split(',', QString::SkipEmptyParts);
+    QStringList optionsList = options.split(',', Qt::SkipEmptyParts);
 
     foreach (QString option, optionsList) {
         if (option == "rw")
@@ -402,6 +402,7 @@ void TSP::Init()
 void TSP::Start()
 {
     foreach (Group * group, listOfGroups) {
+        //просто заставит отсортировать тэги в группах
         emit group->onTagInserted(group);
     }
     foreach (Driver * driver, listOfDrivers) {
