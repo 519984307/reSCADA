@@ -776,6 +776,26 @@ TextString SrvEventText(TSrvEvent *Event)
 //==============================================================================
 // Helper GET routines
 //==============================================================================
+
+int dataSizeByte(int WordLength)
+{
+    switch (WordLength){
+    case S7WLBit     : return 1;  // S7 sends 1 byte per bit
+    case S7WLByte    : return 1;
+    //case S7WLChar    : return 1;
+    case S7WLWord    : return 2;
+    case S7WLDWord   : return 4;
+    //case S7WLInt     : return 2;
+    //case S7WLDInt    : return 4;
+    case S7WLReal    : return 4;
+    case S7WLCounter : return 2;
+    case S7WLTimer   : return 2;
+    //case S7WL8byte   : return 8;//TODO realise in server s7_server
+    //case S7WL256byte : return 256;//TODO realise in server s7_server
+    default          : return 0;
+    }
+}
+//---------------------------------------------------------------------------
 word SwapWord(pword Value)
 {
     return ((*Value >> 8) & 0xFF) | ((*Value << 8) & 0xFF00);

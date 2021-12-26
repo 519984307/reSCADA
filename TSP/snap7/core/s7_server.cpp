@@ -274,6 +274,8 @@ int TS7Worker::DataSizeByte(int WordLength)
 		case S7WLReal    : return 4;
 		case S7WLCounter : return 2;
 		case S7WLTimer   : return 2;
+//                case S7WL8byte   : return 8;
+//                case S7WL256byte : return 256;
 		default          : return 0;
      }
 }

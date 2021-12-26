@@ -34,26 +34,26 @@ public:
     const QString version = "3.0b";
     QSettings * ini = nullptr;
     //methods
-    bool AddDriver(int id, QString name, QString type, QString options, QString comment); //for external use
-    bool AddGroup(int id, QString name, QString options, int delay, int driverId, QString comment); //for external use
+    bool addDriver(int id, QString name, QString type, QString options, QString comment); //for external use
+    bool addGroup(int id, QString name, QString options, int delay, int driverId, QString comment); //for external use
     bool addTag(int id, QString name, QString address, QString options, int groupId, QString comment); //for external use
     bool addTag(Tag * tag); //for external use
-    void Init(); //for external use
-    void ShowGUI();
-    void Start(); //for external use
-    void Stop(); //for external use
-    Tag * GetTagById(int id); //for external use
-    Tag * GetTagByName(QString name); //for external use
-    Tag * GetTagByAddress(int groupId, QString addr); //for external use
-    Driver * GetDriverById(int id); //for external use
-    Group * GetGroupById(int id); //for external use
+    void init(); //for external use
+    void showGUI();
+    void start(); //for external use
+    void stop(); //for external use
+    Tag * getTagById(int id); //for external use
+    Tag * getTagByName(QString name); //for external use
+    Tag * getTagByAddress(int groupId, QString addr); //for external use
+    Driver * getDriverById(int id); //for external use
+    Group * getGroupById(int id); //for external use
     void LoadIniFromOld(QString FileName = "");
     void LoadIni(QString FileName = "tagsNEW.ini");
     void SaveIni(QString FileName = "tagsNEW.ini");
-    void LoadJson(QString FileName = "tags.json");
-    void SaveJson(QString FileName = "tags.json");
+    void loadJson(QString FileName = "tags.json");
+    void saveJson(QString FileName = "tags.json");
 signals:
-    void LoggingSig(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
+    void s_loggingSig(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
 private:
     //variables
     //int maxId = 0;

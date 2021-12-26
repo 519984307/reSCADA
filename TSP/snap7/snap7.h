@@ -74,21 +74,21 @@
 // Visual C++ not C99 compliant (VS2008--)
 #ifdef _MSC_VER
 # if _MSC_VER >= 1600
-#  include <stdint.h>  // VS2010++ have it 
+#  include <stdint.h>  // VS2010++ have it
 # else
-   typedef signed __int8     int8_t;
-   typedef signed __int16    int16_t;
-   typedef signed __int32    int32_t;
-   typedef signed __int64    int64_t;
-   typedef unsigned __int8   uint8_t;
-   typedef unsigned __int16  uint16_t;
-   typedef unsigned __int32  uint32_t;
-   typedef unsigned __int64  uint64_t;
-   #ifdef _WIN64
-     typedef unsigned __int64  uintptr_t;
-   #else
-     typedef unsigned __int32  uintptr_t;
-   #endif
+typedef signed __int8     int8_t;
+typedef signed __int16    int16_t;
+typedef signed __int32    int32_t;
+typedef signed __int64    int64_t;
+typedef unsigned __int8   uint8_t;
+typedef unsigned __int16  uint16_t;
+typedef unsigned __int32  uint32_t;
+typedef unsigned __int64  uint64_t;
+#ifdef _WIN64
+typedef unsigned __int64  uintptr_t;
+#else
+typedef unsigned __int32  uintptr_t;
+#endif
 # endif
 #else
 # include <stdint.h>
@@ -122,10 +122,10 @@ extern "C" {
 #endif
 
 #if !defined(_UINTPTR_T_DEFINED) && !defined(OS_SOLARIS) && !defined(OS_BSD) && !defined(OS_OSX)
-  typedef unsigned char   uint8_t;  //  8 bit unsigned integer
-  typedef unsigned short  uint16_t; // 16 bit unsigned integer
-  typedef unsigned int    uint32_t; // 32 bit unsigned integer
-  typedef unsigned long   uintptr_t;// 64 bit unsigned integer
+typedef unsigned char   uint8_t;  //  8 bit unsigned integer
+typedef unsigned short  uint16_t; // 16 bit unsigned integer
+typedef unsigned int    uint32_t; // 32 bit unsigned integer
+typedef unsigned long   uintptr_t;// 64 bit unsigned integer
 #endif
 
 #endif
@@ -141,33 +141,33 @@ extern "C" {
 //                                   COMMON
 //******************************************************************************
 // Exact length types regardless of platform/processor
-  typedef uint8_t  byte;
-  typedef uint16_t   word;
-  typedef int16_t    smallint;
-  typedef uint32_t   longword;
-  typedef int32_t    longint;
-  typedef byte       *pbyte;
-  typedef word       *pword;
-  typedef longword   *plongword;
-  typedef smallint   *psmallint;
-  typedef longint    *plongint;
-  typedef float      *pfloat;
+typedef uint8_t    byte;
+typedef uint16_t   word;
+typedef int16_t    smallint;
+typedef uint32_t   longword;
+typedef int32_t    longint;
+typedef byte       *pbyte;
+typedef word       *pword;
+typedef longword   *plongword;
+typedef smallint   *psmallint;
+typedef longint    *plongint;
+typedef float      *pfloat;
 typedef uintptr_t  S7Object; // multi platform/processor object reference
-                             // DON'T CONFUSE IT WITH AN OLE OBJECT, IT'S SIMPLY
-                             // AN INTEGER VALUE (32 OR 64 BIT) USED AS HANDLE.
+    // DON'T CONFUSE IT WITH AN OLE OBJECT, IT'S SIMPLY
+    // AN INTEGER VALUE (32 OR 64 BIT) USED AS HANDLE.
 
 #ifndef __cplusplus
 typedef struct
 {
-  int   tm_sec;
-  int   tm_min;
-  int   tm_hour;
-  int   tm_mday;
-  int   tm_mon;
-  int   tm_year;
-  int   tm_wday;
-  int   tm_yday;
-  int   tm_isdst;
+    int   tm_sec;
+    int   tm_min;
+    int   tm_hour;
+    int   tm_mday;
+    int   tm_mon;
+    int   tm_year;
+    int   tm_wday;
+    int   tm_yday;
+    int   tm_isdst;
 }tm;
 
 typedef int bool;
@@ -202,15 +202,15 @@ const longword errIsoResvd_4            = 0x000F0000; // Unassigned
 
 // Tag Struct
 typedef struct{
-	int Area;
-	int DBNumber;
-	int Start;
-	int Size;
-	int WordLen;
+    int Area;
+    int DBNumber;
+    int Start;
+    int Size;
+    int WordLen;
 }TS7Tag, *PS7Tag;
 
 //------------------------------------------------------------------------------
-//                                  PARAMS LIST            
+//                                  PARAMS LIST
 //------------------------------------------------------------------------------
 const int p_u16_LocalPort  	= 1;
 const int p_u16_RemotePort 	= 2;
@@ -228,7 +228,7 @@ const int p_i32_BRecvTimeout    = 13;
 const int p_u32_RecoveryTime    = 14;
 const int p_u32_KeepAliveTime   = 15;
 
-// Client/Partner Job status 
+// Client/Partner Job status
 const int JobComplete           = 0;
 const int JobPending            = 1;
 
@@ -282,23 +282,28 @@ const int MaxVars     = 20; // Max vars that can be transferred with MultiRead/M
 const word CONNTYPE_PG                      = 0x0001;  // Connect to the PLC as a PG
 const word CONNTYPE_OP                      = 0x0002;  // Connect to the PLC as an OP
 const word CONNTYPE_BASIC                   = 0x0003;  // Basic connection
-
 // Area ID
-const byte S7AreaPE   {0x81};
-const byte S7AreaPA   {0x82};
-const byte S7AreaMK   {0x83};
-const byte S7AreaDB   {0x84};
-const byte S7AreaCT   {0x1C};
-const byte S7AreaTM   {0x1D};
-
+enum Area{
+    S7AreaPE = 0x81,
+    S7AreaPA = 0x82,
+    S7AreaMK = 0x83,
+    S7AreaDB = 0x84,
+    S7AreaCT = 0x1C,
+    S7AreaTM = 0x1D
+};
 // Word Length
-const int S7WLBit     = 0x01;
-const int S7WLByte    = 0x02;
-const int S7WLWord    = 0x04;
-const int S7WLDWord   = 0x06;
-const int S7WLReal    = 0x08;
-const int S7WLCounter = 0x1C;
-const int S7WLTimer   = 0x1D;
+enum WordLenght{
+    S7WLBit     = 0x01,
+    S7WLByte    = 0x02,
+//    S7WLChar    = 0x03,
+    S7WLWord    = 0x04,
+//    S7WLInt     = 0x05,
+    S7WLDWord   = 0x06,
+//    S7WLDInt    = 0x07,
+    S7WLReal    = 0x08,
+    S7WLCounter = 0x1C,
+    S7WLTimer   = 0x1D,
+};
 
 // Block type
 const byte Block_OB   {0x38};
@@ -328,13 +333,13 @@ const byte BlockLangGRAPH {0x06};
 
 // Read/Write Multivars
 typedef struct{
-   int   Area;
-   int   WordLen;
-   int   Result;
-   int   DBNumber;
-   int   Start;
-   int   Amount;
-   void  *pdata;
+    int   Area;
+    int   WordLen;
+    int   Result;
+    int   DBNumber;
+    int   Start;
+    int   Amount;
+    void  *pdata;
 } TS7DataItem, *PS7DataItem;
 
 //typedef int TS7ResultItems[MaxVars];
@@ -342,33 +347,33 @@ typedef struct{
 
 // List Blocks
 typedef struct {
-   int OBCount;
-   int FBCount;
-   int FCCount;
-   int SFBCount;
-   int SFCCount;
-   int DBCount;
-   int SDBCount;
+    int OBCount;
+    int FBCount;
+    int FCCount;
+    int SFBCount;
+    int SFCCount;
+    int DBCount;
+    int SDBCount;
 } TS7BlocksList, *PS7BlocksList;
 
 // Blocks info
 typedef struct {
-   int BlkType;    // Block Type (OB, DB) 
-   int BlkNumber;  // Block number
-   int BlkLang;    // Block Language
-   int BlkFlags;   // Block flags
-   int MC7Size;    // The real size in bytes
-   int LoadSize;   // Load memory size
-   int LocalData;  // Local data
-   int SBBLength;  // SBB Length
-   int CheckSum;   // Checksum
-   int Version;    // Block version
-   // Chars info
-   char CodeDate[11]; // Code date
-   char IntfDate[11]; // Interface date 
-   char Author[9];    // Author
-   char Family[9];    // Family
-   char Header[9];    // Header
+    int BlkType;    // Block Type (OB, DB)
+    int BlkNumber;  // Block number
+    int BlkLang;    // Block Language
+    int BlkFlags;   // Block flags
+    int MC7Size;    // The real size in bytes
+    int LoadSize;   // Load memory size
+    int LocalData;  // Local data
+    int SBBLength;  // SBB Length
+    int CheckSum;   // Checksum
+    int Version;    // Block version
+    // Chars info
+    char CodeDate[11]; // Code date
+    char IntfDate[11]; // Interface date
+    char Author[9];    // Author
+    char Family[9];    // Family
+    char Header[9];    // Header
 } TS7BlockInfo, *PS7BlockInfo ;
 
 typedef word TS7BlocksOfType[0x2000];
@@ -376,54 +381,54 @@ typedef TS7BlocksOfType *PS7BlocksOfType;
 
 // Order code
 typedef struct {
-   char Code[21];
-   byte V1;
-   byte V2;
-   byte V3;
+    char Code[21];
+    byte V1;
+    byte V2;
+    byte V3;
 } TS7OrderCode, *PS7OrderCode;
 
 // CPU Info
 typedef struct {
-   char ModuleTypeName[33];
-   char SerialNumber[25];
-   char ASName[25];
-   char Copyright[27];
-   char ModuleName[25];
+    char ModuleTypeName[33];
+    char SerialNumber[25];
+    char ASName[25];
+    char Copyright[27];
+    char ModuleName[25];
 } TS7CpuInfo, *PS7CpuInfo;
 
 // CP Info
 typedef struct {
-   int MaxPduLengt;
-   int MaxConnections;
-   int MaxMpiRate;
-   int MaxBusRate;
+    int MaxPduLengt;
+    int MaxConnections;
+    int MaxMpiRate;
+    int MaxBusRate;
 } TS7CpInfo, *PS7CpInfo;
 
 // See §33.1 of "System Software for S7-300/400 System and Standard Functions"
 // and see SFC51 description too
 typedef struct {
-   word LENTHDR;
-   word N_DR;
+    word LENTHDR;
+    word N_DR;
 } SZL_HEADER, *PSZL_HEADER;
 
 typedef struct {
-   SZL_HEADER Header;
-   byte Data[0x4000-4];
+    SZL_HEADER Header;
+    byte Data[0x4000-4];
 } TS7SZL, *PS7SZL;
 
 // SZL List of available SZL IDs : same as SZL but List items are big-endian adjusted
 typedef struct {
-   SZL_HEADER Header;
-   word List[0x2000-2];
+    SZL_HEADER Header;
+    word List[0x2000-2];
 } TS7SZLList, *PS7SZLList;
 
 // See §33.19 of "System Software for S7-300/400 System and Standard Functions"
 typedef struct {
-   word  sch_schal;
-   word  sch_par;
-   word  sch_rel;
-   word  bart_sch;
-   word  anl_sch;
+    word  sch_schal;
+    word  sch_par;
+    word  sch_rel;
+    word  bart_sch;
+    word  anl_sch;
 } TS7Protection, *PS7Protection;
 
 // Client completion callback
@@ -645,14 +650,14 @@ const word evrUploadInvalidID         = 0x0010;
 const word evrResNotFound             = 0x0011;
 
 typedef struct{
-	time_t EvtTime;    // Timestamp
-	int EvtSender;     // Sender
-	longword EvtCode;  // Event code
-	word EvtRetCode;   // Event result
-	word EvtParam1;    // Param 1 (if available)
-	word EvtParam2;    // Param 2 (if available)
-	word EvtParam3;    // Param 3 (if available)
-	word EvtParam4;    // Param 4 (if available)
+    time_t EvtTime;    // Timestamp
+    int EvtSender;     // Sender
+    longword EvtCode;  // Event code
+    word EvtRetCode;   // Event result
+    word EvtParam1;    // Param 1 (if available)
+    word EvtParam2;    // Param 2 (if available)
+    word EvtParam3;    // Param 3 (if available)
+    word EvtParam4;    // Param 4 (if available)
 }TSrvEvent, *PSrvEvent;
 
 // Server Events callback
@@ -739,12 +744,12 @@ int S7API Par_SetSendCallback(S7Object Partner, pfn_ParSendCompletion pCompletio
 // BRecv
 int S7API Par_BRecv(S7Object Partner, longword *R_ID, void *pData, int *Size, longword Timeout);
 int S7API Par_CheckAsBRecvCompletion(S7Object Partner, int *opResult, longword *R_ID,
-	void *pData, int *Size);
+    void *pData, int *Size);
 int S7API Par_SetRecvCallback(S7Object Partner, pfn_ParRecvCallBack pCompletion, void *usrPtr);
 // Stat
 int S7API Par_GetTimes(S7Object Partner, longword *SendTime, longword *RecvTime);
 int S7API Par_GetStats(S7Object Partner, longword *BytesSent, longword *BytesRecv,
-	longword *SendErrors, longword *RecvErrors);
+    longword *SendErrors, longword *RecvErrors);
 int S7API Par_GetLastError(S7Object Partner, int *LastError);
 int S7API Par_GetStatus(S7Object Partner, int *Status);
 int S7API Par_ErrorText(int Error, char *Text, int TextLen);
@@ -752,6 +757,7 @@ int S7API Par_ErrorText(int Error, char *Text, int TextLen);
 //******************************************************************************
 //                           HELPER DATA ACCESS FUNCTIONS
 //******************************************************************************
+int dataSizeByte(int WordLength);
 // GET
 bool GetBitAt(void *Buffer, int Pos, int Bit);
 byte GetByteAt(void *Buffer, int Pos);
@@ -774,7 +780,7 @@ void SetDateTimeAt(void *Buffer, int Pos, tm Value);
 
 #pragma pack()
 #ifdef __cplusplus
- }
+}
 #endif // __cplusplus
 
 #ifdef __cplusplus
@@ -788,8 +794,8 @@ class TS7Client : public QObject
 private:
     S7Object Client;
 public:
-	TS7Client();
-	~TS7Client();
+    TS7Client();
+    ~TS7Client();
     // Control functions
     int Connect();
     int ConnectTo(const char *RemAddress, int Rack, int Slot);
@@ -836,53 +842,53 @@ public:
     int GetOrderCode(PS7OrderCode pUsrData);
     int GetCpuInfo(PS7CpuInfo pUsrData);
     int GetCpInfo(PS7CpInfo pUsrData);
-	int ReadSZL(int ID, int Index, PS7SZL pUsrData, int *Size);
-	int ReadSZLList(PS7SZLList pUsrData, int *ItemsCount);
-	// Control functions
-	int PlcHotStart();
-	int PlcColdStart();
-	int PlcStop();
-	int CopyRamToRom(int Timeout);
-	int Compress(int Timeout);
-	// Security functions
-	int GetProtection(PS7Protection pUsrData);
-	int SetSessionPassword(char *Password);
-	int ClearSessionPassword();
-	// Properties
-	int ExecTime();
-	int LastError();
-	int PDURequested();
-	int PDULength();
-	int PlcStatus();
-	bool Connected();
-	// Async functions
-	int SetAsCallback(pfn_CliCompletion pCompletion, void *usrPtr);
-	bool CheckAsCompletion(int *opResult);
-	int WaitAsCompletion(longword Timeout);
-	int AsReadArea(int Area, int DBNumber, int Start, int Amount, int WordLen, void *pUsrData);
-	int AsWriteArea(int Area, int DBNumber, int Start, int Amount, int WordLen, void *pUsrData);
-	int AsListBlocksOfType(int BlockType, PS7BlocksOfType pUsrData, int *ItemsCount);
-	int AsReadSZL(int ID, int Index, PS7SZL pUsrData, int *Size);
-	int AsReadSZLList(PS7SZLList pUsrData, int *ItemsCount);
-	int AsUpload(int BlockType, int BlockNum, void *pUsrData, int *Size);
-	int AsFullUpload(int BlockType, int BlockNum, void *pUsrData, int *Size);
-	int AsDownload(int BlockNum, void *pUsrData,  int Size);
-	int AsCopyRamToRom(int Timeout);
-	int AsCompress(int Timeout);
-	int AsDBRead(int DBNumber, int Start, int Size, void *pUsrData);
-	int AsDBWrite(int DBNumber, int Start, int Size, void *pUsrData);
-	int AsMBRead(int Start, int Size, void *pUsrData);
-	int AsMBWrite(int Start, int Size, void *pUsrData);
-	int AsEBRead(int Start, int Size, void *pUsrData);
-	int AsEBWrite(int Start, int Size, void *pUsrData);
-	int AsABRead(int Start, int Size, void *pUsrData);
-	int AsABWrite(int Start, int Size, void *pUsrData);
+    int ReadSZL(int ID, int Index, PS7SZL pUsrData, int *Size);
+    int ReadSZLList(PS7SZLList pUsrData, int *ItemsCount);
+    // Control functions
+    int PlcHotStart();
+    int PlcColdStart();
+    int PlcStop();
+    int CopyRamToRom(int Timeout);
+    int Compress(int Timeout);
+    // Security functions
+    int GetProtection(PS7Protection pUsrData);
+    int SetSessionPassword(char *Password);
+    int ClearSessionPassword();
+    // Properties
+    int ExecTime();
+    int LastError();
+    int PDURequested();
+    int PDULength();
+    int PlcStatus();
+    bool Connected();
+    // Async functions
+    int SetAsCallback(pfn_CliCompletion pCompletion, void *usrPtr);
+    bool CheckAsCompletion(int *opResult);
+    int WaitAsCompletion(longword Timeout);
+    int AsReadArea(int Area, int DBNumber, int Start, int Amount, int WordLen, void *pUsrData);
+    int AsWriteArea(int Area, int DBNumber, int Start, int Amount, int WordLen, void *pUsrData);
+    int AsListBlocksOfType(int BlockType, PS7BlocksOfType pUsrData, int *ItemsCount);
+    int AsReadSZL(int ID, int Index, PS7SZL pUsrData, int *Size);
+    int AsReadSZLList(PS7SZLList pUsrData, int *ItemsCount);
+    int AsUpload(int BlockType, int BlockNum, void *pUsrData, int *Size);
+    int AsFullUpload(int BlockType, int BlockNum, void *pUsrData, int *Size);
+    int AsDownload(int BlockNum, void *pUsrData,  int Size);
+    int AsCopyRamToRom(int Timeout);
+    int AsCompress(int Timeout);
+    int AsDBRead(int DBNumber, int Start, int Size, void *pUsrData);
+    int AsDBWrite(int DBNumber, int Start, int Size, void *pUsrData);
+    int AsMBRead(int Start, int Size, void *pUsrData);
+    int AsMBWrite(int Start, int Size, void *pUsrData);
+    int AsEBRead(int Start, int Size, void *pUsrData);
+    int AsEBWrite(int Start, int Size, void *pUsrData);
+    int AsABRead(int Start, int Size, void *pUsrData);
+    int AsABWrite(int Start, int Size, void *pUsrData);
     int AsTMRead(int Start, int Amount, void *pUsrData);
     int AsTMWrite(int Start, int Amount, void *pUsrData);
     int AsCTRead(int Start, int Amount, void *pUsrData);
-	int AsCTWrite(int Start, int Amount, void *pUsrData);
+    int AsCTWrite(int Start, int Amount, void *pUsrData);
     int AsDBGet(int DBNumber, void *pUsrData, int *Size);
-	int AsDBFill(int DBNumber, int FillChar);
+    int AsDBFill(int DBNumber, int FillChar);
 };
 typedef TS7Client *PS7Client;
 //******************************************************************************
@@ -903,8 +909,8 @@ public:
     int SetParam(int ParamNumber, void *pValue);
     // Events
     int SetEventsCallback(pfn_SrvCallBack PCallBack, void *UsrPtr);
-	int SetReadEventsCallback(pfn_SrvCallBack PCallBack, void *UsrPtr);
-	int SetRWAreaCallback(pfn_RWAreaCallBack PCallBack, void *UsrPtr);
+    int SetReadEventsCallback(pfn_SrvCallBack PCallBack, void *UsrPtr);
+    int SetRWAreaCallback(pfn_RWAreaCallBack PCallBack, void *UsrPtr);
     bool PickEvent(TSrvEvent *pEvent);
     void ClearEvents();
     longword GetEventsMask();
@@ -920,7 +926,7 @@ public:
     int ServerStatus();
     int GetCpuStatus();
     int SetCpuStatus(int Status);
-	int ClientsCount();
+    int ClientsCount();
 };
 typedef TS7Server *PS7Server;
 
@@ -930,38 +936,38 @@ typedef TS7Server *PS7Server;
 class TS7Partner
 {
 private:
-	S7Object Partner; // Partner Handle
+    S7Object Partner; // Partner Handle
 public:
-	TS7Partner(bool Active);
-	~TS7Partner();
-	// Control
-	int GetParam(int ParamNumber, void *pValue);
-	int SetParam(int ParamNumber, void *pValue);
-	int Start();
-	int StartTo(const char *LocalAddress,
-				const char *RemoteAddress,
-				int LocalTSAP,
-				int RemoteTSAP);
-	int Stop();
-	// Data I/O functions : BSend
-	int BSend(longword R_ID, void *pUsrData, int Size);
-	int AsBSend(longword R_ID, void *pUsrData, int Size);
-	bool CheckAsBSendCompletion(int *opResult);
-	int WaitAsBSendCompletion(longword Timeout);
-	int SetSendCallback(pfn_ParSendCompletion pCompletion, void *usrPtr);
-	// Data I/O functions : BRecv
-	int BRecv(longword *R_ID, void *pUsrData, int *Size, longword Timeout);
-	bool CheckAsBRecvCompletion(int *opResult, longword *R_ID, void *pUsrData, int *Size);
-	int SetRecvCallback(pfn_ParRecvCallBack pCallback, void *usrPtr);
-	// Properties
-	int Status();
-	int LastError();
-	int GetTimes(longword *SendTime, longword *RecvTime);
-	int GetStats(longword *BytesSent,
-				 longword *BytesRecv,
-				 longword *ErrSend,
-				 longword *ErrRecv);
-	bool Linked();
+    TS7Partner(bool Active);
+    ~TS7Partner();
+    // Control
+    int GetParam(int ParamNumber, void *pValue);
+    int SetParam(int ParamNumber, void *pValue);
+    int Start();
+    int StartTo(const char *LocalAddress,
+        const char *RemoteAddress,
+        int LocalTSAP,
+        int RemoteTSAP);
+    int Stop();
+    // Data I/O functions : BSend
+    int BSend(longword R_ID, void *pUsrData, int Size);
+    int AsBSend(longword R_ID, void *pUsrData, int Size);
+    bool CheckAsBSendCompletion(int *opResult);
+    int WaitAsBSendCompletion(longword Timeout);
+    int SetSendCallback(pfn_ParSendCompletion pCompletion, void *usrPtr);
+    // Data I/O functions : BRecv
+    int BRecv(longword *R_ID, void *pUsrData, int *Size, longword Timeout);
+    bool CheckAsBRecvCompletion(int *opResult, longword *R_ID, void *pUsrData, int *Size);
+    int SetRecvCallback(pfn_ParRecvCallBack pCallback, void *usrPtr);
+    // Properties
+    int Status();
+    int LastError();
+    int GetTimes(longword *SendTime, longword *RecvTime);
+    int GetStats(longword *BytesSent,
+        longword *BytesRecv,
+        longword *ErrSend,
+        longword *ErrRecv);
+    bool Linked();
 };
 typedef TS7Partner *PS7Partner;
 //******************************************************************************

@@ -27,6 +27,7 @@
 #define s7_micro_client_h
 //----------------------------------------------------------------------------------
 #include "s7_peer.h"
+#include "s7_types.h"
 //----------------------------------------------------------------------------------
 
 const longword errCliMask                   = 0xFFF00000;
@@ -244,6 +245,9 @@ struct TSnap7Job
     // Generic
     int IParam;   // Used for full upload and CopyRamToRom extended timeout
 };
+//!TODO нужно переместить туда где эту фун-ю
+//!будет "видеть" и клиент и сервер. Она не должна дублироваться.
+//int DataSizeByte(int WordLength);
 
 class TSnap7MicroClient: public TSnap7Peer
 {

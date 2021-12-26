@@ -12,7 +12,7 @@ TSP::TSP(QObject *parent, QString name) : QObject(parent)
     qRegisterMetaType<tsp_enums::MessType>("MessType");
     this->setObjectName(name);
     if(QFile("./tags.json").exists())
-        LoadJson();
+        loadJson();
     else if(QFile("./tagsNEW.ini").exists())
         LoadIni();
     else if(QFile("./tags.ini").exists())
@@ -26,12 +26,12 @@ TSP::~TSP()
     }
 }
 //------------------------------------------------------------------------------
-bool TSP::AddDriver(int id, QString  name, QString type, QString options, QString comment)
+bool TSP::addDriver(int id, QString  name, QString type, QString options, QString comment)
 {
     DriverConfig * config = new DriverConfig{id, name, type, options, comment};
     listOfDriverConfigs.append(config);
     if (name == "") {
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver creation error: name isn\'t valid"); config->errorString = "name isn\'t valid";
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver creation error: name isn\'t valid"); config->errorString = "name isn\'t valid";
         return false;
     }
     if (type == "modbusTCP"){
@@ -53,39 +53,39 @@ bool TSP::AddDriver(int id, QString  name, QString type, QString options, QStrin
                         addr = addressPartsList[0];
                         port = addressPartsList[1].toInt(&ok, 10);
                         if (!ok){
-                            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation tcp address error: port isn\'t valid"); config->errorString = "port isn\'t valid";
+                            emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation tcp address error: port isn\'t valid"); config->errorString = "port isn\'t valid";
                             return false;
                         }
                     }else{
-                        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: options isn\'t valid"); config->errorString = "options isn\'t valid";
+                        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: options isn\'t valid"); config->errorString = "options isn\'t valid";
                         return false;
                     }
                 }else if(optionPart[0] == "timeout"){
                     bool ok = false;
                     timeout = optionPart[1].toInt(&ok);
                     if (!ok){
-                        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: timeout isn\'t valid " + optionPart[1]); config->errorString = "timeout isn\'t valid " + optionPart[1];
+                        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: timeout isn\'t valid " + optionPart[1]); config->errorString = "timeout isn\'t valid " + optionPart[1];
                         return false;
                     }
                 }else{
-                    emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown option " + optionPart[0]); config->errorString = "unknown option " + optionPart[0];
+                    emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown option " + optionPart[0]); config->errorString = "unknown option " + optionPart[0];
                     return false;
                 }
             }else{
-                emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
+                emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
                 return false;
             }
         }
-        Driver * driver = GetDriverById(id);
+        Driver * driver = getDriverById(id);
         if (driver){
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: driver id isn\'t unique"); config->errorString = "driver id isn\'t unique";
+            emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: driver id isn\'t unique"); config->errorString = "driver id isn\'t unique";
             return false;
         }
         driver = new Modbusdriver(id, name, addr, port, timeout, comment);
-        driver->Options = options;
-        emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " created");
+        driver->options = options;
+        emit s_loggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " created");
         config->driver = driver; listOfDrivers.append(driver);
-        QObject::connect(driver, &Driver::LoggingSig, this, &TSP::LoggingSig);
+        QObject::connect(driver, &Driver::s_logging, this, &TSP::s_loggingSig);
         return true;
     }else if(type == "modbusRTU"){
         options = options.simplified();
@@ -114,7 +114,7 @@ bool TSP::AddDriver(int id, QString  name, QString type, QString options, QStrin
                     else if (optionPart[1] == "8")
                         databits = QSerialPort::Data8;
                     else{
-                        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown data bits " + optionPart[1]); config->errorString = "unknown data bits " + optionPart[1];
+                        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown data bits " + optionPart[1]); config->errorString = "unknown data bits " + optionPart[1];
                         return false;
                     }
                 }else if(optionPart[0] == "parity"){
@@ -129,7 +129,7 @@ bool TSP::AddDriver(int id, QString  name, QString type, QString options, QStrin
                     else if (optionPart[1] == "M")
                         parity = QSerialPort::MarkParity;
                     else{
-                        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown parity " + optionPart[1]); config->errorString = "unknown parity " + optionPart[1];
+                        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown parity " + optionPart[1]); config->errorString = "unknown parity " + optionPart[1];
                         return false;
                     }
                 }else if(optionPart[0] == "stopbits"){
@@ -140,35 +140,35 @@ bool TSP::AddDriver(int id, QString  name, QString type, QString options, QStrin
                     else if (optionPart[1] == "2")
                         stopbits = QSerialPort::TwoStop;
                     else{
-                        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown stop bits " + optionPart[1]); config->errorString = "unknown stop bits " + optionPart[1];
+                        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown stop bits " + optionPart[1]); config->errorString = "unknown stop bits " + optionPart[1];
                         return false;
                     }
                 }else if(optionPart[0] == "timeout"){
                     bool ok = false;
                     timeout = optionPart[0].toInt(&ok);
                     if (!ok){
-                        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: timeout isn\'t valid " + optionPart[1]); config->errorString = "timeout isn\'t valid" + optionPart[1];
+                        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: timeout isn\'t valid " + optionPart[1]); config->errorString = "timeout isn\'t valid" + optionPart[1];
                         return false;
                     }
                 }else{
-                    emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown option " + optionPart[0]); config->errorString = "unknown option " + optionPart[0];
+                    emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown option " + optionPart[0]); config->errorString = "unknown option " + optionPart[0];
                     return false;
                 }
             }else{
-                emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
+                emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
                 return false;
             }
         }
-        Driver * driver = GetDriverById(id);
+        Driver * driver = getDriverById(id);
         if (driver){
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: driver id isn\'t unique"); config->errorString = "driver id isn\'t unique";
+            emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: driver id isn\'t unique"); config->errorString = "driver id isn\'t unique";
             return false;
         }
         driver = new Modbusdriver(id, name, port, baudrate, databits, parity, stopbits, timeout, comment);
-        driver->Options = options;
-        emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " created");
+        driver->options = options;
+        emit s_loggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " created");
         config->driver = driver; listOfDrivers.append(driver);
-        QObject::connect(driver, &Driver::LoggingSig, this, &TSP::LoggingSig);
+        QObject::connect(driver, &Driver::s_logging, this, &TSP::s_loggingSig);
         return true;
     }
     else if(type == "simatic"){
@@ -187,52 +187,52 @@ bool TSP::AddDriver(int id, QString  name, QString type, QString options, QStrin
                     bool ok = false;
                     rack = optionPart[1].toInt(&ok);
                     if(!ok){
-                        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: rack isn\'t valid"); config->errorString = "rack isn\'t valid";
+                        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: rack isn\'t valid"); config->errorString = "rack isn\'t valid";
                         return false;
                     }
                 }else if(optionPart[0] == "slot"){
                     bool ok = false;
                     slot = optionPart[1].toInt(&ok);
                     if(!ok){
-                        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: slot isn\'t valid"); config->errorString = "slot isn\'t valid";
+                        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: slot isn\'t valid"); config->errorString = "slot isn\'t valid";
                         return false;
                     }
                 }else{
-                    emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown option " + optionPart[0]); config->errorString = "unknown option " + optionPart[0];
+                    emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: unknown option " + optionPart[0]); config->errorString = "unknown option " + optionPart[0];
                     return false;
                 }
             }else{
-                emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
+                emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
                 return false;
             }
         }
-        Driver * driver = GetDriverById(id);
+        Driver * driver = getDriverById(id);
         if (driver){
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: driver id isn\'t unique"); config->errorString = "driver id isn\'t unique";
+            emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: driver id isn\'t unique"); config->errorString = "driver id isn\'t unique";
             return false;
         }
         driver = new SimaticDriver(id, name, addr, rack, slot, comment);
-        driver->Options = options;
-        emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " created");
+        driver->options = options;
+        emit s_loggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " created");
         config->driver = driver; listOfDrivers.append(driver);
-        QObject::connect(driver, &Driver::LoggingSig, this, &TSP::LoggingSig);
+        QObject::connect(driver, &Driver::s_logging, this, &TSP::s_loggingSig);
         return true;
 
     }
     else{
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: type isn\'t valid"); config->errorString = "type isn\'t valid";
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: type isn\'t valid"); config->errorString = "type isn\'t valid";
         return false;
     }
 }
 //------------------------------------------------------------------------------
-bool TSP::AddGroup(int id, QString name, QString options, int delay, int driverId, QString comment)
+bool TSP::addGroup(int id, QString name, QString options, int delay, int driverId, QString comment)
 {
     GroupConfig * config = new GroupConfig{id, name, options, delay, driverId, comment};
     listOfGroupConfigs.append(config);
     int optimizerRangeInterval = 4;
     int optimizerRangeMax = 70;
     if (name == "") {
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group creation error: name isn\'t valid"); config->errorString = "name isn\'t valid";
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group creation error: name isn\'t valid"); config->errorString = "name isn\'t valid";
         return false;
     }
     options = options.simplified();
@@ -243,13 +243,13 @@ bool TSP::AddGroup(int id, QString name, QString options, int delay, int driverI
     foreach (QString option, optionsList) {
         QStringList optionParts = option.split('=', Qt::SkipEmptyParts);
         if (optionParts.size() != 2){
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
+            emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
             return false;
         }else{
             bool ok = false;
             int val =  optionParts[1].toInt(&ok, 10);
             if (!ok){
-                emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
+                emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
                 return false;
             }
             if (optionParts[0] == "ri"){
@@ -257,28 +257,28 @@ bool TSP::AddGroup(int id, QString name, QString options, int delay, int driverI
             }else if (optionParts[0] == "rm"){
                 optimizerRangeMax = val;
             }else{
-                emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
+                emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: options aren\'t valid"); config->errorString = "options aren\'t valid";
                 return false;
             }
         }
     }
-    Driver * driver = GetDriverById(driverId);
+    Driver * driver = getDriverById(driverId);
     if (!driver){
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: driverId isn\'t valid"); config->errorString = "driverId isn\'t valid";
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: driverId isn\'t valid"); config->errorString = "driverId isn\'t valid";
         return false;
     }
-    Group * group = GetGroupById(id);
+    Group * group = getGroupById(id);
     if (group){
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: group id isn\'t unique"); config->errorString = "group id isn\'t valid";
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " creation error: group id isn\'t unique"); config->errorString = "group id isn\'t valid";
         return false;
     }
     group = new Group(id, driverId, name, delay, optimizerRangeInterval, optimizerRangeMax, comment);
-    if(!driver->InsertGroup(group)){
+    if(!driver->insertGroup(group)){
         delete group;
         return false;
     }
-    emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " created");
-    group->Options = options;
+    emit s_loggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Group " + name + " created");
+    group->options = options;
     config->group = group; listOfGroups.append(group);
     return true;
 }
@@ -287,7 +287,7 @@ bool TSP::addTag(int id, QString name, QString address, QString options, int gro
 {
     TagConfig * config = new TagConfig{ id, name, address, options, groupId, comment };
     if (name == "") {
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag creation error: name isn\'t valid");
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag creation error: name isn\'t valid");
         config->errorString = "name isn\'t valid";
         return false;
     }
@@ -323,13 +323,13 @@ bool TSP::addTag(int id, QString name, QString address, QString options, int gro
         else if (option == "float")
             type = TFloat;
         else {
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + name + " creation error: unknown option");
+            emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + name + " creation error: unknown option");
             config->errorString = "unknown option";
             return false;
         }
     }
     if (address == "") {
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + name + " creation error: address isn\'t valid");
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + name + " creation error: address isn\'t valid");
         config->errorString = "address isn\'t valid";
         return false;
     }
@@ -349,12 +349,12 @@ bool TSP::addTag(int id, QString name, QString address, QString options, int gro
 bool TSP::addTag(Tag *tag)
 {
     if (!tag){
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " inserting error: tag is null");
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " inserting error: tag is null");
         return false;
     }
-    Group * group = GetGroupById(tag->groupId);
+    Group * group = getGroupById(tag->groupId);
     if (!group){
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " inserting error: groupId isn\'t valid");
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " inserting error: groupId isn\'t valid");
         return false;
     }
 
@@ -362,76 +362,73 @@ bool TSP::addTag(Tag *tag)
         tag->id = maxTagId();
     }
     Tag * twin = nullptr;
-    twin = GetTagById(tag->id);
+    twin = getTagById(tag->id);
     if (twin){
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " creation error: tag id isn\'t unique");
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " creation error: tag id isn\'t unique");
         //        twin->setError("tag id isn\'t unique"); twin->setQuality(Bad); twin->access = NA;
         tag->setError("tag id isn\'t unique");
         tag->setQuality(Bad); tag->access = NA;
     }
-    twin = GetTagByName(tag->objectName());
+    twin = getTagByName(tag->objectName());
     if (twin){
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " creation error: tag name isn\'t unique");
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " creation error: tag name isn\'t unique");
         //        twin->setError("tag name isn\'t unique"); twin->setQuality(Bad); twin->access = NA;
         tag->setError("tag name isn\'t unique");
         tag->setQuality(Bad); tag->access = NA;
     }
-    twin = GetTagByAddress(tag->groupId, tag->address);
+    twin = getTagByAddress(tag->groupId, tag->address);
     if (twin){
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " creation error: tag address isn\'t unique");
+        emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " creation error: tag address isn\'t unique");
         //        twin->setError("tag address isn\'t unique"); twin->setQuality(Bad); twin->access = NA;
         tag->setError("tag address isn\'t unique");
         tag->setQuality(Bad); tag->access = NA;
     }
-    if(tag->access != NA && tag->access != WO && !twin){
-        if(!group->InsertTag(tag)){
+    if( !twin /*tag->access != NA && tag->access != WO &&*/ ){
+        if(!group->insertTag(tag)){
             return false;
         }
     }
-    emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " created" + (twin ? ", but the error occured" : "") );
-    emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " added");
+    emit s_loggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " created" + (twin ? ", but the error occured" : "") );
+    emit s_loggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " added");
     listOfTags.append(tag);
     return true;
 }
 //------------------------------------------------------------------------------
-void TSP::Init()
+void TSP::init()
 {
 
 }
 //------------------------------------------------------------------------------
-void TSP::Start()
+void TSP::start()
 {
-    foreach (Group * group, listOfGroups) {
-        //просто заставит отсортировать тэги в группах
-        emit group->onTagInserted(group);
-    }
+    //Запуск драйвров
     foreach (Driver * driver, listOfDrivers) {
-        emit driver->connectDriver();
+        emit driver->s_connectDriver();
     }
 }
 //------------------------------------------------------------------------------
 
-void TSP::Stop()
+void TSP::stop()
 {
     foreach (Driver * driver, listOfDrivers) {
-        emit driver->disconnectDriver();
+        emit driver->s_disconnectDriver();
     }
 }
 //------------------------------------------------------------------------------
-Driver *TSP::GetDriverById(int id)
+Driver *TSP::getDriverById(int id)
 {
     foreach (Driver * thisDriver, listOfDrivers) {
-        if(thisDriver->Id == id){
+        if(thisDriver->id == id){
             return thisDriver;
         }
     }
     return nullptr;
 }
 //------------------------------------------------------------------------------
-Group *TSP::GetGroupById(int id)
+Group *TSP::getGroupById(int id)
 {
     foreach (Group * thisGroup, listOfGroups) {
-        if(thisGroup->Id == id){
+        if(thisGroup->id == id){
             return thisGroup;
         }
     }
@@ -454,11 +451,11 @@ int TSP::maxTagId()
 int TSP::nextTagId(int preId)
 {
     do preId ++;
-    while (GetTagById(preId) != nullptr);
+    while (getTagById(preId) != nullptr);
     return preId;
 }
 //------------------------------------------------------------------------------
-Tag *TSP::GetTagById(int id)
+Tag *TSP::getTagById(int id)
 {
     foreach (Tag * thisTag, listOfTags) {
         if(thisTag->id == id){
@@ -468,7 +465,7 @@ Tag *TSP::GetTagById(int id)
     return nullptr;
 }
 //------------------------------------------------------------------------------
-Tag *TSP::GetTagByName(QString name)
+Tag *TSP::getTagByName(QString name)
 {
     foreach (Tag * thisTag, listOfTags) {
         if(thisTag->objectName() == name){
@@ -478,7 +475,7 @@ Tag *TSP::GetTagByName(QString name)
     return nullptr;
 }
 //------------------------------------------------------------------------------
-Tag *TSP::GetTagByAddress(int groupId, QString addr)
+Tag *TSP::getTagByAddress(int groupId, QString addr)
 {
     foreach (Tag * thisTag, listOfTags) {
         if(thisTag->address == addr && thisTag->groupId == groupId){
@@ -499,11 +496,11 @@ void TSP::SaveIni(QString FileName)
     ini->beginWriteArray("Drivers", listOfDrivers.count());
     for(int i = 0; i < listOfDrivers.count(); i ++){
         ini->setArrayIndex(i);
-        ini->setValue("Driver", QString::number(listOfDrivers[ i ]->Id) + "~"
+        ini->setValue("Driver", QString::number(listOfDrivers[ i ]->id) + "~"
                        + listOfDrivers[ i ]->objectName() + "~"
                        + listOfDrivers[ i ]->type + "~"
-                       + listOfDrivers[ i ]->Options + "~"
-                       + listOfDrivers[ i ]->Comment);
+                       + listOfDrivers[ i ]->options + "~"
+                       + listOfDrivers[ i ]->comment);
     }
     ini->endArray();
 
@@ -511,12 +508,12 @@ void TSP::SaveIni(QString FileName)
     ini->beginWriteArray("Groups", listOfGroups.count());
     for(int i = 0; i < listOfGroups.count(); i ++){
         ini->setArrayIndex(i);
-        ini->setValue("Group", QString::number(listOfGroups[ i ]->Id) + "~"
+        ini->setValue("Group", QString::number(listOfGroups[ i ]->id) + "~"
                        + listOfGroups[ i ]->objectName() + "~"
-                       + listOfGroups[ i ]->Options + "~"
-                       + QString::number(listOfGroups[ i ]->Delay) + "~"
-                       + QString::number(listOfGroups[ i ]->DriverId) + "~"
-                       + listOfGroups[ i ]->Comment);
+                       + listOfGroups[ i ]->options + "~"
+                       + QString::number(listOfGroups[ i ]->delay) + "~"
+                       + QString::number(listOfGroups[ i ]->driverId) + "~"
+                       + listOfGroups[ i ]->comment);
     }
     ini->endArray();
 
@@ -535,7 +532,7 @@ void TSP::SaveIni(QString FileName)
     delete ini;
 }
 //------------------------------------------------------------------------------
-void TSP::LoadJson(QString FileName)
+void TSP::loadJson(QString FileName)
 {
     QFile loadFile(FileName);
     if (!loadFile.open(QIODevice::ReadOnly | QIODevice::Text)) return;
@@ -546,7 +543,7 @@ void TSP::LoadJson(QString FileName)
         foreach (QJsonValue valdriver, drivers) {
             if (valdriver.isObject()){
                 QJsonObject driver = valdriver.toObject();
-                AddDriver(driver["id"].toInt(),
+                addDriver(driver["id"].toInt(),
                         driver["name"].toString(),
                         driver["type"].toString(),
                         driver["options"].toString(),
@@ -559,7 +556,7 @@ void TSP::LoadJson(QString FileName)
         foreach (QJsonValue valgroup, groups) {
             if (valgroup.isObject()){
                 QJsonObject group = valgroup.toObject();
-                AddGroup(group["id"].toInt(),
+                addGroup(group["id"].toInt(),
                         group["name"].toString(),
                         group["options"].toString(),
                         group["delay"].toInt(),
@@ -584,7 +581,7 @@ void TSP::LoadJson(QString FileName)
     }
 }
 //------------------------------------------------------------------------------
-void TSP::SaveJson(QString FileName)
+void TSP::saveJson(QString FileName)
 {
     QFile saveFile(FileName);
     if (!saveFile.open(QIODevice::WriteOnly)) return;
@@ -643,7 +640,7 @@ void TSP::LoadIni(QString FileName)
         ini->setArrayIndex(i);
         TMP =  ini->value("Driver").toString();
 
-        AddDriver(TMP.section('~',0,0).toUInt(),
+        addDriver(TMP.section('~',0,0).toUInt(),
                    TMP.section('~',1,1),
                    TMP.section('~',2,2),
                    TMP.section('~',3,3),
@@ -657,7 +654,7 @@ void TSP::LoadIni(QString FileName)
         ini->setArrayIndex(i);
         TMP =  ini->value("Group").toString();
 
-        AddGroup(TMP.section('~',0,0).toUInt(),
+        addGroup(TMP.section('~',0,0).toUInt(),
                   TMP.section('~',1,1),
                   TMP.section('~',2,2),
                   TMP.section('~',3,3).toUInt(),
@@ -693,7 +690,7 @@ void TSP::LoadIniFromOld(QString FileName)
 
     for(int i = 0; i < size; i++){
         ini->setArrayIndex(i);
-        AddDriver(ini->value("Id").toInt(),
+        addDriver(ini->value("Id").toInt(),
                    ini->value("Name").toString(),
                    driverTypeFromInt(ini->value("Type").toInt()),
                    ini->value("Options").toString(),
@@ -707,7 +704,7 @@ void TSP::LoadIniFromOld(QString FileName)
 
     for(int i = 0; i < size; i++){
         ini->setArrayIndex(i);
-        AddGroup(ini->value("Id").toInt(),
+        addGroup(ini->value("Id").toInt(),
                   ini->value("Name").toString(),
                   "ri=" + ini->value("OptimizerRangeInterval").toString()
                   + ", rm=" + ini->value("OptimizerRangeMax").toString(),

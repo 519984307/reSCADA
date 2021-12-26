@@ -2,67 +2,73 @@
 #include "group.h"
 #include "SCADAenums.h"
 //------------------------------------------------------------------------------
-Group::Group(int id, int driverId, QString name, int delay, int optimizerRangeInterval, int optimizerRangeMax, QString comment)
+Group::Group(int id,
+    int driverId,
+    QString name,
+    int delay,
+    int optimizerRangeInterval,
+    int optimizerRangeMax,
+    QString comment)
 {
-    this->Id = id;
+    this->id = id;
     this->setObjectName(name);
-    this->Delay = delay;
-    this->LastUpdate = QDateTime::currentDateTime();
-    this->OptimizerRangeMax = optimizerRangeMax;
-    this->OptimizerRangeInterval = optimizerRangeInterval;
-    this->Comment = comment;
-    this->DriverId = driverId;
+    this->delay = delay;
+    this->lastUpdate = QDateTime::currentDateTime();
+    this->optimRangeMax = optimizerRangeMax;
+    this->optimRangeInterval = optimizerRangeInterval;
+    this->comment = comment;
+    this->driverId = driverId;
 }
 //------------------------------------------------------------------------------
 Group::~Group()
 {
-    foreach (Tag * tag, ListOfTags) {
+    foreach (Tag * tag, listOfTags) {
         delete tag;
     }
 }
 //------------------------------------------------------------------------------
-Quality Group::ReadQuality()
+Quality Group::readQuality()
 {
     return quality;
 }
 //------------------------------------------------------------------------------
-void Group::Update(bool updateTime)
+void Group::update(bool updateTime)
 {
     static Quality newQuality;
 
-    UpdateFreq = ListOfTags[0]->updateFreq;
-    newQuality = ListOfTags[0]->ReadQuality();
+    updateFreq = listOfTags[0]->updateFreq;
+    newQuality = listOfTags[0]->readQuality();
 
-    for(int i = 1; i < ListOfTags.count(); i++) {
+    for(int i = 1; i < listOfTags.count(); i++) {
 
-        if (newQuality != Check && ListOfTags[i]->ReadQuality() != newQuality){
+        if (newQuality != Check && listOfTags[i]->readQuality() != newQuality){
             newQuality = Check;
         }
 
-        if(ListOfTags[i]->updateFreq < UpdateFreq)
-            UpdateFreq = ListOfTags[i]->updateFreq;
+        if(listOfTags[i]->updateFreq < updateFreq)
+            updateFreq = listOfTags[i]->updateFreq;
     }
 
     setQuality(newQuality);
     if(updateTime)
-        LastUpdate = QDateTime::currentDateTime();
-    emit onUpdated();
+        lastUpdate = QDateTime::currentDateTime();
+    emit s_onUpdated();
 }
 //------------------------------------------------------------------------------
-bool Group::InsertTag(Tag *tag)
+bool Group::insertTag(Tag *tag)
 {
     if (tag){
         tag->moveToThread(this->thread());
         if(tag->virtualization == No){
-            ListOfTags.append(tag);
+            listOfTags.append(tag);
         }else{
-            ListOfVirtualTags.append(tag);
+            listOfVirtualTags.append(tag);
         }
-        QObject::connect(tag, &Tag::onWriteRequested, this, &Group::onWriteRequested);
-        QObject::connect(tag, &Tag::LoggingSig, this, &Group::LoggingSig);
+        QObject::connect(tag, &Tag::s_onWriteRequested, this, &Group::s_onWriteRequested);
+        QObject::connect(tag, &Tag::s_logging, this, &Group::s_logging);
         return true;
     }else{
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group inserting tag error: tag is null");
+        emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Group inserting tag error: tag is null");
         return false;
     }
 }
@@ -71,10 +77,10 @@ void Group::setQuality(Quality quality)
 {
     if(this->quality != quality){
         this->quality = quality;
-        emit LoggingSig(MessVerbose, QDateTime::currentDateTime(),
+        emit s_logging(MessVerbose, QDateTime::currentDateTime(),
                         false, this->objectName(), "Group quality s_valueChd: "
                         + Prom::qualityToString(quality));
-        emit onQualityChanged();
+        emit s_onQualityChanged();
     }
 }
 //------------------------------------------------------------------------------

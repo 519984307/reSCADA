@@ -183,7 +183,7 @@ TSPTableModelDrivers::TSPTableModelDrivers(QList<DriverConfig *> &listOfDriverCo
     appendHeader(Qt::Horizontal, driverHeader);
     foreach (DriverConfig * config, listOfDriverConfigs) {
         if(config->driver)
-            connect(config->driver, &Driver::onStartedChanged, this, &TSPTableModel::updateRequest);
+            connect(config->driver, &Driver::s_onStartedChanged, this, &TSPTableModel::updateRequest);
     }
 }
 //------------------------------------------------------------------------------
@@ -323,7 +323,7 @@ void TSPTableModelDrivers::doubleClicked(const QModelIndex &index)
     else if((options & AllowToManageDrivers) != 0 && index.column() == driverStatus){
         Driver * driver = listOfDriverConfigs[index.row()]->driver;
         if (driver)
-            driver->started ? emit driver->disconnectDriver() : emit driver->connectDriver();
+            driver->started ? emit driver->s_disconnectDriver() : emit driver->s_connectDriver();
         updateRequest();
     }else if((options & AllowToEdit) != 0 && index.column() != driverStatus)
         editing = true;
@@ -338,7 +338,7 @@ TSPTableModelGroups::TSPTableModelGroups(QList<GroupConfig *> &listOfGroupConfig
     appendHeader(Qt::Horizontal, groupHeader);
     foreach (GroupConfig * config, listOfGroupConfigs) {
         if(config->group)
-            connect(config->group, &Group::onQualityChanged, this, &TSPTableModel::updateRequest);
+            connect(config->group, &Group::s_onQualityChanged, this, &TSPTableModel::updateRequest);
     }
 }
 //------------------------------------------------------------------------------
@@ -351,7 +351,7 @@ QVariant TSPTableModelGroups::data(const QModelIndex &index, int role) const
         switch(index.column()){
         case groupId:       return config->id;
         case groupDriverId: return config->driverId;
-        case groupQuality:  return config->group?(Prom::qualityToString(config->group->ReadQuality())):"Error";
+        case groupQuality:  return config->group?(Prom::qualityToString(config->group->readQuality())):"Error";
         case groupName:     return config->name;
         case groupOptions:  return config->options;
         case groupDelay:    return config->delay;
@@ -377,7 +377,7 @@ QVariant TSPTableModelGroups::data(const QModelIndex &index, int role) const
         case groupQuality: {
             Group * group = listOfGroupConfigs[index.row()]->group;
             if(group)
-                switch (group->ReadQuality()) {
+                switch (group->readQuality()) {
                 case tsp_enums::Good:       return icons->iconTrue;
                 case tsp_enums::Bad:        return icons->iconFalse;
                 case tsp_enums::Check:      return icons->iconCheck;
@@ -484,8 +484,8 @@ TSPTableModelTags::TSPTableModelTags(QList<TagConfig *> &listOfTagConfigs, int &
     appendHeader(Qt::Horizontal, tagHeader);
     foreach (TagConfig * config, listOfTagConfigs) {
         if(config->tag){
-            connect(config->tag, &Tag::onQualityChanged, this, &TSPTableModel::updateRequest);
-            connect(config->tag, &Tag::onValueChanged, this, &TSPTableModel::updateRequest);
+            connect(config->tag, &Tag::s_onQualityChanged, this, &TSPTableModel::updateRequest);
+            connect(config->tag, &Tag::s_onValueChanged, this, &TSPTableModel::updateRequest);
         }
     }
 }
@@ -499,13 +499,13 @@ QVariant TSPTableModelTags::data(const QModelIndex &index, int role) const
         switch(index.column()){
         case tagId:       return config->id;
         case tagGroupId:  return config->groupId;
-        case tagQuality:  return config->tag?(Prom::qualityToString(config->tag->ReadQuality())):"Error";
+        case tagQuality:  return config->tag?(Prom::qualityToString(config->tag->readQuality())):"Error";
         case tagName:     return config->name;
         case tagOptions:  return config->options;
         case tagAddress:  return config->address;
         case tagValue:    {
             if (config->tag){
-                QVariant value = config->tag->ReadValue();
+                QVariant value = config->tag->readValue();
                 switch (config->tag->type) {
                 case TInt: return value.toInt();
                 case TFloat: return value.toDouble();
@@ -536,7 +536,7 @@ QVariant TSPTableModelTags::data(const QModelIndex &index, int role) const
         case tagQuality: {
             Tag * tag = listOfTagConfigs[index.row()]->tag;
             if(tag)
-                switch (tag->ReadQuality()) {
+                switch (tag->readQuality()) {
                 case tsp_enums::Good:       return icons->iconTrue;
                 case tsp_enums::Bad:        return icons->iconFalse;
                 case tsp_enums::Check:      return icons->iconCheck;
@@ -551,7 +551,7 @@ QVariant TSPTableModelTags::data(const QModelIndex &index, int role) const
                 switch (tag->type) {
                 case TInt: return icons->iconInt;
                 case TFloat: return icons->iconFloat;
-                case TBool: return tag->ReadValue().toBool() ? icons->iconTrue : icons->iconFalse;
+                case TBool: return tag->readValue().toBool() ? icons->iconTrue : icons->iconFalse;
                 }
             else
                 return icons->iconError;
@@ -663,22 +663,22 @@ void TSPTableModelTags::doubleClicked(const QModelIndex &index)
             case TInt: {
                 bool ok = false;
                 int value = QInputDialog::getInt(nullptr, QString::fromUtf8("Изменение"), QString::fromUtf8("Введите новое значение:"),
-                                                tag->ReadValue().toInt(), std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 1, &ok);
+                                                tag->readValue().toInt(), std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 1, &ok);
                 if (ok){
-                    tag->WriteValue(value);
+                    tag->writeValue(value);
                 }
                 return;
             }
             case TFloat: {
                 bool ok = false;
                 double value = QInputDialog::getDouble(nullptr, QString::fromUtf8("Изменение"), QString::fromUtf8("Введите новое значение:"),
-                                                tag->ReadValue().toDouble(), std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 1, &ok);
+                                                tag->readValue().toDouble(), std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), 1, &ok);
                 if (ok){
-                    tag->WriteValue(value);
+                    tag->writeValue(value);
                 }
             }
             case TBool: {
-                tag->WriteValue(!tag->ReadValue().toBool());
+                tag->writeValue(!tag->readValue().toBool());
                 return;
             }
             default: return;

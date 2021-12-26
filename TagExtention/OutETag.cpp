@@ -69,7 +69,7 @@ bool OutETag::setValue(QVariant Value, bool notImit)
         return false;
     }
     //_setTimer->stop(); убрал, но боюсь
-    if(_tag->ReadQuality() != Prom::Good){
+    if(_tag->readQuality() != Prom::Good){
         _setedValue = Value;
         _logging(Prom::MessAlarm, "установить значение - "+ Value.toString() + " не удалось: нет связи", false);
         emit s_valueChd(_value);
@@ -92,7 +92,7 @@ bool OutETag::setValue(QVariant Value, bool notImit)
         convVal =  QVariant(Value.toDouble() * 1000).toInt();
         break;
     }
-    if( ! _tag->WriteValue(convVal)){
+    if( ! _tag->writeValue(convVal)){
         _logging(Prom::MessAlarm, "TSP отказал в установке значения - " + Value.toString(), _imit);
         emit s_valueChd(_value);
         return false;
@@ -146,7 +146,7 @@ void OutETag::writeImit(bool setImit)
         else {//++++ выкл. имиации
             _logging(Prom::MessInfo, "имитация отключена", false);
             if(_ok){
-                emit s_qualityChd(_tag->ReadQuality() == Prom::Good);
+                emit s_qualityChd(_tag->readQuality() == Prom::Good);
             }
         }
         if(_value != _imitVal) {
@@ -175,7 +175,7 @@ void OutETag::writeImitVal(QVariant setVal)
 void OutETag::_qualityChangedSlot()
 {
     ETag::_qualityChangedSlot();
-    if(_tag->ReadQuality() == Prom::Good){
+    if(_tag->readQuality() == Prom::Good){
         if(_ferstLoad){
             _ferstLoad = false;
             if( saveValue ){

@@ -4,44 +4,53 @@
 #include <QObject>
 #include <QDateTime>
 #include <QList>
+
 #include "tag.h"
+#include "listOfTags.h"
 
 class Group : public QObject
 {
     Q_OBJECT
 public:
     //constructor
-    Group(int id, int driverId, QString name, int delay, int optimizerRangeInterval = 4, int optimizerRangeMax = 70, QString Comment = "");
+    Group(int id,
+        int driverId,
+        QString name,
+        int delay,
+        int optimizerRangeInterval = 4,
+        int optimizerRangeMax = 70,
+        QString Comment = "");
     //destructor
     ~Group();
     //variables
-    int Delay;
-    QDateTime LastUpdate;
-    QList<Tag*> ListOfTags;
-    QList<Tag*> ListOfVirtualTags;
-    int Id;
-    int OptimizerRangeInterval;
-    int OptimizerRangeMax;
-    QString Options;
-    QString Comment;
-    int DriverId;
-    double UpdateFreq;
+    int delay;
+    QDateTime lastUpdate;
+    int id;
+    int optimRangeInterval;
+    int optimRangeMax;
+    QString options;
+    QString comment;
+    int driverId;
+    double updateFreq;
     //methods
-    void Update(bool updateTime = true);
-    bool InsertTag(Tag *tag);
+    void update(bool updateTime = true);
+    bool insertTag(Tag *tag);
+    ListOfTags listOfTags;
+    ListOfTags listOfVirtualTags;
 private:
     //variables
     Quality quality = Unknown;
+    bool tagsSorted {false};
     //methods
     void setQuality(Quality quality);
 signals:
-    void onQualityChanged(); //for external use
-    void onWriteRequested(Tag * tag);
-    void onUpdated();
-    void LoggingSig(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
-    void onTagInserted(Group *);
+    void s_onQualityChanged(); //for external use
+    void s_onWriteRequested(Tag * tag);
+    void s_onUpdated();
+    void s_logging(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
+    void s_onTagInserted(Group *);
 public slots:
-    Quality ReadQuality(); //for external use
+    Quality readQuality(); //for external use
 };
 
 #endif // GROUP_H

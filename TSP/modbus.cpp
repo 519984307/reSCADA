@@ -7,9 +7,9 @@ Modbusdriver::Modbusdriver(int id, QString name, QString address, int port, int 
     modbusDevice->setConnectionParameter(QModbusDevice::NetworkAddressParameter, address);
     modbusDevice->setConnectionParameter(QModbusDevice::NetworkPortParameter, port);
     modbusDevice->setTimeout(timeout); //ms
-    this->Id = id;
+    this->id = id;
     this->setObjectName(name);
-    this->Comment = comment;
+    this->comment = comment;
     this->type = "modbusTCP";
 }
 
@@ -23,9 +23,9 @@ Modbusdriver::Modbusdriver(int id, QString name, QString port, QString baudrate,
     modbusDevice->setConnectionParameter(QModbusDevice::SerialBaudRateParameter, QVariant(baudrate));
     modbusDevice->setConnectionParameter(QModbusDevice::SerialStopBitsParameter, stopbits);
     modbusDevice->setTimeout(timeout); //ms
-    this->Id = id;
+    this->id = id;
     this->setObjectName(name);
-    this->Comment = comment;
+    this->comment = comment;
     this->type = "modbusRTU";
 }
 //------------------------------------------------------------------------------
@@ -48,19 +48,19 @@ void Modbusdriver::handleNextTask()
         Task * task = listOfTasks.takeFirst();
         if (task->writeTask){
             write(task, [this, task]()
-            {///Atantion Lambda!!
-                delete task;
-                scheduleHandler();
-            });
+                {///Atantion Lambda!!
+                    delete task;
+                    scheduleHandler();
+                });
         }
         else{
             read(task, [this, task]()
-            {///Atantion Lambda!!
-                Group * group = getGroupById(task->groupId);
-                group->Update();
-                delete task;
-                scheduleHandler();
-            });
+                {///Atantion Lambda!!
+                    Group * group = getGroupById(task->groupId);
+                    group->update();
+                    delete task;
+                    scheduleHandler();
+                });
         }
     }else{
         getTask();
@@ -76,43 +76,43 @@ void Modbusdriver::getTask()///Переделать!!!
     Task * task = nullptr;
     foreach (Group * group, listOfGroups) {//перебираю группы
 
-        if(group->LastUpdate.msecsTo(QDateTime::currentDateTime()) > group->Delay){///Что это бля?
-            QList<Tag *> newTagList = prepareTagsList(group->ListOfTags);
+        if(group->lastUpdate.msecsTo(QDateTime::currentDateTime()) > group->delay){///Что это бля?
+//            QList<Tag *> newTagList = prepareTagsList(group->listOfTags);
 
-            for(int i = 0; i < newTagList.count(); i++){//перебираю тэги
+            for(int i = 0; i < group->listOfTags.count(); i++){//перебираю тэги
 
                 bool send = false;
 
-                if(!strToAddr(newTagList[i]->address, curTagAdr)){ //get address
-                    emit LoggingSig(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver error: address isn\'t valid in getTask() function");
+                if(!strToAddr(group->listOfTags[i]->address, curTagAdr)){ //get address
+                    emit s_logging(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver error: address isn\'t valid in getTask() function");
                 }
                 if(!task){
                     task = new Task;
-                    task->quantity = 1;
+                    //task->quantity = 1;
                     task->devAddr = curTagAdr->devAddr;
                     task->regType = curTagAdr->regType;
                     task->regAddr = curTagAdr->regAddr;
-                    task->groupId = group->Id;
-                    task->listOfTags.append(newTagList[i]);
+                    task->groupId = group->id;
+                    task->listOfTags.append(group->listOfTags[i]);
                 }
                 else{
-                    if (task->devAddr != curTagAdr->devAddr || task->regType != curTagAdr->regType  ///Тут
-                         || task->regAddr + task->quantity + group->OptimizerRangeInterval < curTagAdr->regAddr
-                         || curTagAdr->regAddr != task->regAddr + task->quantity){ //dev addr or reg type or range interval exception
+                    if (task->devAddr != curTagAdr->devAddr || task->regType
+                            != curTagAdr->regType  ///Тут
+                        || task->regAddr + task->listOfTags.count()
+                                + group->optimRangeInterval
+                            < curTagAdr->regAddr
+                        || curTagAdr->regAddr != task->regAddr
+                                + task->listOfTags.count()){ //dev addr or reg type or range interval exception
                         send = true;
                         i--;
                     }
                     else{
-//                        for(int i = 0; i < curTagAdr->regAddr - (task->regAddr - task->quantity); i++){ //filler. Runs 0 times if current reg addr - prev reg addr = 1
-//                            task->listOfTags.append(nullptr);
-//                        }
-                        //task->quantity = curTagAdr->regAddr - task->regAddr + 1;
-                        task->quantity ++;
-                        task->listOfTags.append(newTagList[i]);
-                        if(task->quantity == group->OptimizerRangeMax)send = true; //range max exception
+                        task->listOfTags.append(group->listOfTags[i]);
+                        if(task->listOfTags.count() == group->optimRangeMax)
+                            send = true; //range max exception
                     }
                 }
-                if(send || i + 1 == newTagList.count()){
+                if(send || i + 1 == group->listOfTags.count()){
                     listOfTasks.append(task);
                     task = nullptr;
                 }
@@ -130,17 +130,17 @@ void Modbusdriver::connect()
         if(!modbusDevice->connectDevice()) {
             if(noError){
                 qualityFiller(listOfGroups, Bad);
-                emit LoggingSig(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver connection error: " + modbusDevice->errorString());
+                emit s_logging(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver connection error: " + modbusDevice->errorString());
                 noError = false;
             }
         }else{
             if(modbusDevice->state() == QModbusDevice::ConnectedState){
-                emit LoggingSig(MessInfo, QDateTime::currentDateTime(), false, objectName(), "Modbus driver connected");
+                emit s_logging(MessInfo, QDateTime::currentDateTime(), false, objectName(), "Modbus driver connected");
                 noError = true;
             }
             if (!started){
                 started = true;
-                emit onStartedChanged();
+                emit s_onStartedChanged();
                 scheduleHandler();
             }
         }
@@ -154,12 +154,12 @@ void Modbusdriver::disconnect()
     started = false;
     modbusDevice->disconnectDevice();
     taskTimer->stop();
-    emit LoggingSig(MessInfo, QDateTime::currentDateTime(), false, objectName(), "Modbus driver disconnected");
+    emit s_logging(MessInfo, QDateTime::currentDateTime(), false, objectName(), "Modbus driver disconnected");
     foreach(Group * group, listOfGroups){
-        qualityFiller(group->ListOfTags, Bad);
-        group->Update();
+        qualityFiller(group->listOfTags, Bad);
+        group->update();
     }
-    emit onStartedChanged();
+    emit s_onStartedChanged();
 }
 
 //------------------------------------------------------------------------------
@@ -217,51 +217,53 @@ void Modbusdriver::read(Modbusdriver::Task *task, const std::function<void ()> d
     if (started) connect();
     if(modbusDevice->state() != QModbusDevice::ConnectedState){
         errorFiller(task->listOfTags, "driver read error: driver isn\'t connected");
-        qualityFiller(task->listOfTags, Bad);
+        qualityFiller(task->listOfTags, Bad );
         doNext();
         //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver read error: driver isn\'t connected");
         return;
     }
-    if (auto *lastRequest = modbusDevice->sendReadRequest(QModbusDataUnit(task->regType, task->regAddr, task->quantity), task->devAddr)) {
+    if (auto *lastRequest = modbusDevice->sendReadRequest(
+            QModbusDataUnit(task->regType, task->regAddr,
+                task->listOfTags.count()), task->devAddr)) {
         lastRequest->setProperty("twice", false);
         if (!lastRequest->isFinished()){
-            QObject::connect(lastRequest, &QModbusReply::finished, this, [this, task, lastRequest,
-                             doNext]()
-                                {///Atantion Lambda!!
-                                    if (lastRequest->property("twice").toBool()) //sometimes this solution helps to avoid QSerialBus bug
-                                        return;
-                                    lastRequest->setProperty("twice", true);
+            QObject::connect(lastRequest, &QModbusReply::finished, this,
+                [this, task, lastRequest, doNext]()
+                {///Atantion Lambda!!
+                    if (lastRequest->property("twice").toBool()) //sometimes this solution helps to avoid QSerialBus bug
+                        return;
+                    lastRequest->setProperty("twice", true);
 
-                                    if (!lastRequest){
-                                        errorFiller(task->listOfTags, "driver read error: unknown error");
-                                        qualityFiller(task->listOfTags, Bad);
-                                        doNext();
-                                        return;
-                                    }
+                    if (!lastRequest){
+                        errorFiller(task->listOfTags, "driver read error: unknown error");
+                        qualityFiller(task->listOfTags, Bad);
+                        doNext();
+                        return;
+                    }
 
-                                    if (lastRequest->error() == QModbusDevice::NoError) {
-                                        //const QModbusDataUnit unit = lastRequest->result();
-                                        valueFiller(task->listOfTags, lastRequest->result());
-                                        errorFiller(task->listOfTags, "");
-                                        qualityFiller(task->listOfTags, Good);
-                                    }
-                                    else if (lastRequest->error() == QModbusDevice::ProtocolError) {
-                                        //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver read error: " + lastRequest->errorString() + " (modbus exception: " + QString::number(int(lastRequest->rawResult().exceptionCode())) + ")");
-                                        errorFiller(task->listOfTags, "driver read error: "
-                                            + lastRequest->errorString() + " (modbus exception: "
-                                            + QString::number(int(lastRequest->rawResult().exceptionCode())) + ")");
-                                        qualityFiller(task->listOfTags, Bad);
-                                    }
-                                    else {
-                                        //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver read error: " + lastRequest->errorString() + " (code: " + lastRequest->error() + ")");
-                                        errorFiller(task->listOfTags, "driver read error: "
-                                            + lastRequest->errorString()
-                                            + " (code: " + lastRequest->error() + ")");
-                                        qualityFiller(task->listOfTags, Bad);
-                                    }
-                                    doNext();
-                                    lastRequest->deleteLater();
-                                });
+                    if (lastRequest->error() == QModbusDevice::NoError) {
+                        //const QModbusDataUnit unit = lastRequest->result();
+                        valueFiller(task->listOfTags, lastRequest->result());
+                        errorFiller(task->listOfTags, "");
+                        qualityFiller(task->listOfTags, Good);
+                    }
+                    else if (lastRequest->error() == QModbusDevice::ProtocolError) {
+                        //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver read error: " + lastRequest->errorString() + " (modbus exception: " + QString::number(int(lastRequest->rawResult().exceptionCode())) + ")");
+                        errorFiller(task->listOfTags, "driver read error: "
+                                + lastRequest->errorString() + " (modbus exception: "
+                                + QString::number(int(lastRequest->rawResult().exceptionCode())) + ")");
+                        qualityFiller(task->listOfTags, Bad);
+                    }
+                    else {
+                        //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver read error: " + lastRequest->errorString() + " (code: " + lastRequest->error() + ")");
+                        errorFiller(task->listOfTags, "driver read error: "
+                                + lastRequest->errorString()
+                                + " (code: " + lastRequest->error() + ")");
+                        qualityFiller(task->listOfTags, Bad);
+                    }
+                    doNext();
+                    lastRequest->deleteLater();
+                });
         }else{
             errorFiller(task->listOfTags, "");
             qualityFiller(task->listOfTags, Good);
@@ -293,45 +295,45 @@ void Modbusdriver::write(Task * task, const std::function<void()> doNext)
         //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver write error: driver isn\'t connected");
         return;
     }
-    QModbusDataUnit writeUnit = QModbusDataUnit(task->regType, task->regAddr, task->quantity);
-    for (int i = 0; i < task->quantity; i++) {
+    QModbusDataUnit writeUnit = QModbusDataUnit(task->regType, task->regAddr, task->listOfTags.count());
+    for (int i = 0; i < task->listOfTags.count(); i++) {
         writeUnit.setValue(i, task->listOfTags[i]->newValue.toInt());
     }
     if (auto *lastRequest = modbusDevice->sendWriteRequest(writeUnit, task->devAddr)) {
         lastRequest->setProperty("twice", false); //sometimes this solution helps to avoid QSerialBus bug
         if (!lastRequest->isFinished()) {
             QObject::connect(lastRequest, &QModbusReply::finished, this,
-                             [this, task, lastRequest, doNext]()
-                                {///Atantion Lambda!!
-                                    if (lastRequest->property("twice").toBool())
-                                        return;
-                                    lastRequest->setProperty("twice", true);
-                                    if (lastRequest->error() == QModbusDevice::ProtocolError) {
-                                        //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver write response error: " + lastRequest->errorString() + " (modbus exception: " + QString::number(int(lastRequest->rawResult().exceptionCode())) + ")");
-                                        errorFiller(task->listOfTags, "driver write response error: "
-                                            + lastRequest->errorString() + " (modbus exception: "
-                                            + QString::number(int(lastRequest->rawResult().exceptionCode())) + ")");
-                                        qualityFiller(task->listOfTags, Bad);
-                                        readyFiller(task->listOfTags ,true);
-                                        doNext();
-                                    }
-                                    else if (lastRequest->error() != QModbusDevice::NoError) {
-                                        //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver write response error: "  + lastRequest->errorString() + " (code: " + lastRequest->error() + ")");
-                                        errorFiller(task->listOfTags, "driver write response error: "
-                                            + lastRequest->errorString() + " (code: " + lastRequest->error() + ")");
-                                        qualityFiller(task->listOfTags, Bad);
-                                        readyFiller(task->listOfTags ,true);
-                                        doNext();
-                                    }
-                                    else{
-                                        errorFiller(task->listOfTags, "");
-                                        qualityFiller(task->listOfTags, Good);
-                                        readyFiller(task->listOfTags ,true);
-                                        newValueFiller(task->listOfTags);
-                                        doNext();
-                                    }
-                                    lastRequest->deleteLater();
-                                });
+                [this, task, lastRequest, doNext]()
+                {///Atantion Lambda!!
+                    if (lastRequest->property("twice").toBool())
+                        return;
+                    lastRequest->setProperty("twice", true);
+                    if (lastRequest->error() == QModbusDevice::ProtocolError) {
+                        //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver write response error: " + lastRequest->errorString() + " (modbus exception: " + QString::number(int(lastRequest->rawResult().exceptionCode())) + ")");
+                        errorFiller(task->listOfTags, "driver write response error: "
+                                + lastRequest->errorString() + " (modbus exception: "
+                                + QString::number(int(lastRequest->rawResult().exceptionCode())) + ")");
+                        qualityFiller(task->listOfTags, Bad);
+                        readyFiller(task->listOfTags ,true);
+                        doNext();
+                    }
+                    else if (lastRequest->error() != QModbusDevice::NoError) {
+                        //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver write response error: "  + lastRequest->errorString() + " (code: " + lastRequest->error() + ")");
+                        errorFiller(task->listOfTags, "driver write response error: "
+                                + lastRequest->errorString() + " (code: " + lastRequest->error() + ")");
+                        qualityFiller(task->listOfTags, Bad);
+                        readyFiller(task->listOfTags ,true);
+                        doNext();
+                    }
+                    else{
+                        errorFiller(task->listOfTags, "");
+                        qualityFiller(task->listOfTags, Good);
+                        readyFiller(task->listOfTags ,true);
+                        newValueFiller(task->listOfTags);
+                        doNext();
+                    }
+                    lastRequest->deleteLater();
+                });
         }else{
             errorFiller(task->listOfTags, "");
             qualityFiller(task->listOfTags, Good);
@@ -356,13 +358,13 @@ bool Modbusdriver::strToAddr(QString str, MBaddress * address)
     if(!address) return false;
     QStringList addrList = str.split(':', QString::SkipEmptyParts);
     if (addrList.count() != 3){
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver optimizer error: address isn\'t valid");
+        //emit s_logging(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver optimizer error: address isn\'t valid");
         return false;
     }else{
         bool ok = false;
         address->devAddr = addrList[0].toInt(&ok);
         if(!ok){
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver optimizer error: device address isn\'t valid");
+            //emit s_logging(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver optimizer error: device address isn\'t valid");
             return false;
         }
         if (addrList[1] == "DC")
@@ -374,12 +376,12 @@ bool Modbusdriver::strToAddr(QString str, MBaddress * address)
         else if (addrList[1] == "HR")
             address->regType = QModbusDataUnit::HoldingRegisters;
         else{
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver optimizer error: register type isn\'t valid");
+            //emit s_logging(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver optimizer error: register type isn\'t valid");
             return false;
         }
         address->regAddr = addrList[2].toInt(&ok);
         if(!ok){
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver optimizer error: register address isn\'t valid");
+            //emit s_logging(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver optimizer error: register address isn\'t valid");
             return false;
         }
         return true;
@@ -412,11 +414,11 @@ bool Modbusdriver::compare(Modbusdriver::MBaddress a1, Modbusdriver::MBaddress a
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::WriteRequested(Tag *tag)
+void Modbusdriver::writeRequest(Tag *tag)
 {
     MBaddress address;
     if(!strToAddr(tag->address, &address)){
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver write error: address isn\'t valid");
+        emit s_logging(MessError, QDateTime::currentDateTime(), false, objectName(), "Modbus driver write error: address isn\'t valid");
         return;
     }
 
@@ -430,8 +432,12 @@ void Modbusdriver::WriteRequested(Tag *tag)
 
 
     foreach (Task * task, listOfTasks) {
-        if(task->devAddr == address.devAddr && task->regAddr == address.regAddr && task->regType == address.regType && task->writeTask){
+        if(task->devAddr == address.devAddr
+          && task->regAddr == address.regAddr
+          && task->regType == address.regType
+          && task->writeTask){
             listOfTasks.removeOne(task);
+            delete task;
         }
     }
     listOfTasks.prepend(task);
@@ -447,7 +453,7 @@ void Modbusdriver::initThread(QModbusClient *modbusDevice)
     taskTimer->moveToThread(thread);
     this->modbusDevice = modbusDevice;
     modbusDevice->moveToThread(thread);
-    QObject::connect(this, &Driver::connectDriver, this, &Driver::connect, Qt::QueuedConnection);
-    QObject::connect(this, &Driver::disconnectDriver, this, &Driver::disconnect, Qt::QueuedConnection);
+    QObject::connect(this, &Driver::s_connectDriver, this, &Driver::connect, Qt::QueuedConnection);
+    QObject::connect(this, &Driver::s_disconnectDriver, this, &Driver::disconnect, Qt::QueuedConnection);
 }
 //------------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 #include <QVariant>
 #include <QDateTime>
 #include "enums.h"
+#include <memory>
 using namespace tsp_enums;
 class Tag : public QObject
 {
@@ -21,7 +22,7 @@ public:
         QString Comment = "",
         TagConfig * Config = nullptr);
     //destructor
-    //~Tag();
+    ~Tag();
     //variables
     int id;
     QString address;
@@ -43,6 +44,11 @@ public:
     void setError(QString error);
     bool reqestUpdate();
     TagConfig * config{ nullptr };
+    Quality getQuality() const;
+    //Сюда цепляются структуры с данными
+    //TODO Убрать этот костыль
+    /*std::unique_ptr<void>*/ void *speshData{nullptr};
+
 
 private:
     //variables
@@ -52,16 +58,16 @@ private:
     QString error = "";
     QDateTime LastUpdate = QDateTime::currentDateTime();
 signals:
-    void onValueChanged(QVariant); //for external use
-    void onQualityChanged(); //for external use
-    void onErrorChanged(QString error); //for external use
-    void onWriteRequested(Tag * tag);
-    void LoggingSig(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
+    void s_onValueChanged(QVariant); //for external use
+    void s_onQualityChanged(); //for external use
+    void s_onErrorChanged(QString error); //for external use
+    void s_onWriteRequested(Tag * tag);
+    void s_logging(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
 public slots:
-    QVariant ReadValue(); //for external use
-    Quality ReadQuality(); //for external use
-    QString ReadError(); //for external use
-    bool WriteValue(QVariant value); //for external use
+    QVariant readValue(); //for external use
+    Quality readQuality(); //for external use
+    QString readError(); //for external use
+    bool writeValue(QVariant value); //for external use
 };
 
 #endif // TAG_H

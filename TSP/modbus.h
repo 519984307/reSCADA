@@ -29,11 +29,7 @@ public:
     void disconnect() override;
 private:
     //structs
-    struct Task : public MBaddress{
-        int quantity = 0, groupId;
-        QList<Tag*> listOfTags;
-        bool writeTask = false;
-    };
+    struct Task : public MBaddress, CommonTask{};
     //variables
     QList<Task*> listOfTasks;
     QModbusClient * modbusDevice = nullptr;
@@ -44,12 +40,12 @@ private:
     void valueFiller(QList<Tag*> listOfTags, QModbusDataUnit unit);
     void read(Task * task, const std::function<void()> doNext);
     void write(Task * task, const std::function<void()> doNext);
-    bool strToAddr(QString str, MBaddress * adress);
+    static bool strToAddr(QString str, MBaddress * adress);
     void scheduleHandler();
-    QList<Tag*> sortTags(QList<Tag*> listOfTags) override;
-    inline bool compare(MBaddress a1, MBaddress a2);
+    static QList<Tag*> sortTags(QList<Tag*> listOfTags);
+    static inline bool compare(MBaddress a1, MBaddress a2);
 public slots:
-    void WriteRequested(Tag * tag) override;
+    void writeRequest(Tag * tag) override;
 };
 
 #endif // MODBUSDRIVER_H

@@ -25,8 +25,14 @@ Tag::Tag(int Id,
 }
 
 //------------------------------------------------------------------------------
+Tag::~Tag()
+{
+    operator delete( speshData );
+}
+
+//------------------------------------------------------------------------------
 //TODO добавить числа с плав. запятой и массив байтов
-QVariant Tag::ReadValue()
+QVariant Tag::readValue()
 {
     if (access != WO && access != NA){
         switch (type) {
@@ -35,35 +41,35 @@ QVariant Tag::ReadValue()
         case TBool:
             return value.toBool();
         default:
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag reading error: data type isn\'t valid");
+            emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag reading error: data type isn\'t valid");
             return 0;
         }
     } else {
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag reading error: access denied");
+        emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag reading error: access denied");
         return 0;
     }
 }
 //------------------------------------------------------------------------------
-Quality Tag::ReadQuality()
+Quality Tag::readQuality()
 {
     return quality;
 }
 //------------------------------------------------------------------------------
-QString Tag::ReadError()
+QString Tag::readError()
 {
     return error;
 }
 //------------------------------------------------------------------------------
-bool Tag::WriteValue(QVariant value)
+bool Tag::writeValue(QVariant value)
 {
     if (access != RO && access != NA){
         this->newValue = value;
         ready = false;
-        emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag writing: " + value.toString());
-        emit onWriteRequested(this);
+        emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag writing: " + value.toString());
+        emit s_onWriteRequested(this);
         return true;
     } else {
-        emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag writing error: access denied");
+        emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag writing error: access denied");
         return false;
     }
 }
@@ -72,8 +78,8 @@ void Tag::setValue(QVariant value)
 {
     if (this->value != value){
         this->value = value;
-        emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag value s_valueChd: " + ReadValue().toString());
-        emit onValueChanged(value);
+        emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag value s_valueChd: " + readValue().toString());
+        emit s_onValueChanged(value);
     }
     if (ready) newValue = value;
 }
@@ -87,8 +93,8 @@ void Tag::setQuality(Quality quality)
 
     if (this->quality != quality){
         this->quality = quality;
-        emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag quality s_valueChd: " + Prom::qualityToString(quality));
-        emit onQualityChanged();
+        emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag quality s_valueChd: " + Prom::qualityToString(quality));
+        emit s_onQualityChanged();
     }
 }
 //------------------------------------------------------------------------------
@@ -97,10 +103,16 @@ void Tag::setError(QString error)
     if (this->error != error){
         this->error = error;
         if(error == ""){
-            emit LoggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag error reseted");
+            emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag error reseted");
         }else{
-            emit LoggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag error: " + error);
+            emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag error: " + error);
         }
-        emit onErrorChanged(error);
+        emit s_onErrorChanged(error);
     }
+}
+
+//------------------------------------------------------------------------------
+Quality Tag::getQuality() const
+{
+    return quality;
 }

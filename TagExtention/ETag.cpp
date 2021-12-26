@@ -45,8 +45,8 @@ ETag::ETag(Unit * Owner,
         if(g_TSP != nullptr)
             _tag = g_TSP->GetTagByName(_owner->tagPrefix + _DBName);
         if(_tag != nullptr){
-            connect(_tag, &Tag::onQualityChanged, this, &ETag::_qualityChangedSlot, Qt::QueuedConnection);
-            connect(_tag, &Tag::onValueChanged, this, &ETag::_acceptValue, Qt::QueuedConnection);
+            connect(_tag, &Tag::s_onQualityChanged, this, &ETag::_qualityChangedSlot, Qt::QueuedConnection);
+            connect(_tag, &Tag::s_onValueChanged, this, &ETag::_acceptValue, Qt::QueuedConnection);
             _ok = true;
             _logging (Prom::MessVerbose, "тэг " + _owner->tagPrefix + _DBName + " загружен", false);
         }
@@ -79,7 +79,7 @@ bool ETag::connected()
 {
     if(_imit) return true;
     if(_ok )
-        return _tag->ReadQuality() > 0;
+        return _tag->readQuality() > 0;
     return false;
 }
 
@@ -116,7 +116,7 @@ void ETag::_logging(Prom::MessType MessType, QString Discription, bool imitation
 //------------------------------------------------------------------------------
 void ETag::_qualityChangedSlot()
 {
-    if(_tag->ReadQuality() == Prom::Good){
+    if(_tag->readQuality() == Prom::Good){
         emit s_qualityChd(true);
         _logging (Prom::MessVerbose, "соединение восстановлено", false);
     }

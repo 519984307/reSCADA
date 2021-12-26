@@ -108,7 +108,7 @@ void InETag::writeImit(bool setImit)
             //            else connect(_tag ,SIGNAL(onValueChanged(QVariant)), this, SLOT(CheckVal()));
             _logging(Prom::MessInfo, "имитация отключена", false);
             if(_ok){
-                if(_tag->ReadQuality() != Prom::Good){
+                if(_tag->readQuality() != Prom::Good){
                     emit s_qualityChd(false);
                 }
                 if(_pulse) _pulseTimer->start();
@@ -140,7 +140,7 @@ void InETag::writeImitVal(QVariant setVal)
 void InETag::_qualityChangedSlot()
 {
     ETag::_qualityChangedSlot();
-    if(_tag->ReadQuality() == Prom::Good && ! _imit) {
+    if(_tag->readQuality() == Prom::Good && ! _imit) {
         if(_pulse){
             _pulseTimer->start();
         }

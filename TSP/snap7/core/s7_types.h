@@ -58,8 +58,10 @@ const int S7WLDInt    = 0x07;
 const int S7WLReal    = 0x08;
 const int S7WLCounter = 0x1C;
 const int S7WLTimer   = 0x1D;
+const int S7WL8byte   = 0x1E;
+const int S7WL256byte = 0x1F;
 
-  // Block type
+ // Block type
 const byte Block_OB   = 0x38;
 const byte Block_DB   = 0x41;
 const byte Block_SDB  = 0x42;

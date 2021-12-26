@@ -3,72 +3,67 @@
 
 #include <QTimer>
 #include "driver.h"
-#include "snap7/snap7.h"
+#include "snap7.h"
+
+struct SimAddress{
+  Area memArea;
+  WordLenght type;
+  int DBNumb{-1};
+  struct {
+    int memSlot{-1};//Это может быть байт, слово, двойное слово и т.д.
+    int bit{0};//Номер бита для булевых тэгов, у остальных всегда 0
+  }regAddr;
+  //    SimAddress& operator= (const SimAddress& SA){
+  //      memArea = SA.memArea;
+  //      type = SA.type;
+  //      DBNumb = SA.DBNumb;
+  //      regAddr = SA.regAddr;
+  //      return *this;
+  //    }
+};
+//class SimTag : public Tag, SimAddress{};
 
 class SimaticDriver : public Driver
 {
 public:
-    //constructor
-    SimaticDriver(int id, QString name, QString address = "127.0.0.1", int rack = 0, int slot = 2, QString comment = "");
-    //destructor
-    ~SimaticDriver();
-    //enums
-    enum Area{
-        S7AreaPE = 0x81,
-        S7AreaPA = 0x82,
-        S7AreaMK = 0x83,
-        S7AreaDB = 0x84,
-        S7AreaCT = 0x1C,
-        S7AreaTM = 0x1D
-    };
-    enum WordLenght{
-        S7WLBit     = 0x01,
-        S7WLByte    = 0x02,
-        S7WLWord    = 0x04,
-        S7WLDWord   = 0x06,
-        S7WLReal    = 0x08,
-        S7WLCounter = 0x1C,
-        S7WLTimer   = 0x1D,
-    };
-    //structs
-    struct SimAddress{
-        Area area;
-        WordLenght type;
-        int DBNumb{1};
-        int regAddr;
-    };
-    //methods
-    void connect() override;
-    void disconnect() override;
+  //constructor
+  SimaticDriver(int id, QString name, QString address = "127.0.0.1", int rack = 0, int slot = 2, QString comment = "");
+  //destructor
+  ~SimaticDriver();
+  //enums
+
+  //methods
+  void connect() override;
+  void disconnect() override;
+  static void sortTags(QList<Tag*> &listOfTags);
+  static bool strToAddr(QString str, SimAddress * address);
+  static inline bool compare(SimAddress *a1, SimAddress *a2);
+
 private:
-    //structs
-    struct Task : public SimAddress{
-        int quantity{0};
-        int groupId{0};
-        QList<Tag*> listOfTags;
-        bool writeTask = false;
-    };
-    //variables
-    QList<Task*> listOfTasks;
-    TS7Client * client = nullptr;
-    QString address;
-    int rack;
-    int slot;
-    //methods
-    void initThread();
-    void handleNextTask() override;
-    void getTask();
-    template <typename Tarr>
-    void valueFiller(QList<Tag*> listOfTags, Tarr data[]);
-    void valueFiller(Task * task, byte * data[]);
-    void read(Task * task, const std::function<void()> doNext);
-    void write(Task * task, const std::function<void()> doNext);
-    //bool check(int res, QString function = "unknown function");
-    void scheduleHandler(); //TODO вынести в класс драйвера
-    QList<Tag*> sortTags(QList<Tag*> listOfTags) override;
-    bool strToAddr(QString str, SimAddress * address);
-    inline bool compare(SimAddress a1, SimAddress a2);
+  //structs
+  struct Task : public SimAddress, CommonTask{
+    int endAdr{-1};
+    //int buffByteCount{0};
+  };
+  //variables
+  QList<Task*> listOfTasks;
+  TS7Client * client = nullptr;
+  QString address;
+  int rack;
+  int slot;
+  //methods
+  void initThread();
+  void handleNextTask() override;
+  void getTask();
+  template <typename Tarr>
+  void valueFiller(QList<Tag*> listOfTags, Tarr data[]);
+  void valueFiller(Task * task, byte * data[]);
+  void read(Task * task, const std::function<void()> doNext);
+  void write(Task * task, const std::function<void()> doNext);
+  //bool check(int res, QString function = "unknown function");
+  void scheduleHandler(); //TODO вынести в класс драйвера
+
 public slots:
-    void WriteRequested(Tag * tag) override;
+  void writeRequest(Tag * tag) override;
 };
 #endif // SIMATICDRIVER_H

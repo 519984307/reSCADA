@@ -10,7 +10,7 @@ TSPWindow::TSPWindow(TSP * tsp, QWidget *parent, int options)
     ui->setupUi(this);
     setWindowTitle("Trofen SCADA platform " + tsp->version);
     if((options & ShowSystemLog) != 0){
-        QObject::connect(tsp, &TSP::LoggingSig, [this](MessType messType, QDateTime DateTime, bool, QString Source, QString Message){
+        QObject::connect(tsp, &TSP::s_loggingSig, [this](MessType messType, QDateTime DateTime, bool, QString Source, QString Message){
             switch (messType) {
             case MessError:{
                 if(ui->statusbar)ui->statusbar->showMessage("<<SYSTEM ERROR>> " + DateTime.toString("hh:mm:ss.zzz ") + Source + " " + Message);
@@ -29,7 +29,7 @@ TSPWindow::TSPWindow(TSP * tsp, QWidget *parent, int options)
         });
     }
     if((options & ShowUserLog) != 0){
-        QObject::connect(tsp, &TSP::LoggingSig, [this](MessType messType, QDateTime DateTime, bool, QString Source, QString Message){
+        QObject::connect(tsp, &TSP::s_loggingSig, [this](MessType messType, QDateTime DateTime, bool, QString Source, QString Message){
             switch (messType) {
             case MessError:{
                 if(ui)ui->statusbar->showMessage("<<USER ERROR>> " + DateTime.toString("hh:mm:ss.zzz ") + Source + " " + Message);
@@ -74,7 +74,7 @@ void TSPWindow::on_tabWidget_currentChanged(int index)
 void TSPWindow::on_action_TSP_triggered()
 {
     ui->tableTags->sortByColumn(4, Qt::AscendingOrder );
-    emit tsp->LoggingSig(MessVerbose, QDateTime::currentDateTime(), true, "", "GUI action: open help");
+    emit tsp->s_loggingSig(MessVerbose, QDateTime::currentDateTime(), true, "", "GUI action: open help");
     QMessageBox::about(this, "О программе", "Trofen Scada Platform\nВерсия: " + tsp->version + "\nДата сборки: " +
                        __DATE__ + " " + __TIME__ + "\nАвтор: Никита Плынский\nТелефон: 89192697533\nTelegram: @trofen");
 }
@@ -109,7 +109,7 @@ void TSPWindow::on_action_saveCopy_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Сохранить тэги", QDir::currentPath(), "Json tags (*.json);;All files (*.*)");
     if(fileName != "")
-        tsp->SaveJson(fileName);
+        tsp->saveJson(fileName);
 }
 
 void TSPWindow::buttonsReorganizer()

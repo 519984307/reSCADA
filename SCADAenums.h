@@ -257,16 +257,18 @@ const std::vector <QString> EF_GT_OW_0KMQi   = { "Упр. вых. открыти
 #define TSP_ENUMS
 //TSP ENUMS BEGIN
 enum Quality{
+    NotValid = -3,
     Check = -2,
     Unknown = -1,
     Bad = 0,
-    Good};
+    Good = 1
+};
 
 enum Access{
-    RW = 0,
-    RO,
-    WO,
-    NA
+    RW = 0,//read & write
+    RO,    //read only
+    WO,    //write only
+    NA     //not avaible
 };
 
 enum Virtualization{
