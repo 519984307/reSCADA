@@ -81,7 +81,7 @@ bool TSP::addDriver(int id, QString  name, QString type, QString options, QStrin
             emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: driver id isn\'t unique"); config->errorString = "driver id isn\'t unique";
             return false;
         }
-        driver = new Modbusdriver(id, name, addr, port, timeout, comment);
+        driver = new ModBusDriver(id, name, addr, port, timeout, comment);
         driver->options = options;
         emit s_loggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " created");
         config->driver = driver; listOfDrivers.append(driver);
@@ -164,7 +164,7 @@ bool TSP::addDriver(int id, QString  name, QString type, QString options, QStrin
             emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " creation error: driver id isn\'t unique"); config->errorString = "driver id isn\'t unique";
             return false;
         }
-        driver = new Modbusdriver(id, name, port, baudrate, databits, parity, stopbits, timeout, comment);
+        driver = new ModBusDriver(id, name, port, baudrate, databits, parity, stopbits, timeout, comment);
         driver->options = options;
         emit s_loggingSig(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Driver " + name + " created");
         config->driver = driver; listOfDrivers.append(driver);
@@ -295,7 +295,7 @@ bool TSP::addTag(int id, QString name, QString address, QString options, int gro
     Virtualization virtualization = No;
     DataType type = TInt;
     options = options.simplified();
-    options.replace(" ", "");
+    options = options.replace(" ", "");
     options = options.toLower();
     QStringList optionsList = options.split(',', Qt::SkipEmptyParts);
 
@@ -328,6 +328,8 @@ bool TSP::addTag(int id, QString name, QString address, QString options, int gro
             return false;
         }
     }
+    address = address.simplified();
+    address = address.replace(" ", "");
     if (address == "") {
         emit s_loggingSig(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + name + " creation error: address isn\'t valid");
         config->errorString = "address isn\'t valid";

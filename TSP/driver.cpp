@@ -20,7 +20,7 @@ bool Driver::insertGroup(Group *group)
             group->moveToThread(thread);
             listOfGroups.append(group);
 //            QObject::connect(group, &Group::s_onTagInserted, this, &Driver::TagInserted, Qt::DirectConnection);
-            QObject::connect(group, &Group::s_onWriteRequested, this, &Driver::writeRequest);
+            QObject::connect(group, &Group::s_onWriteRequested, this, &Driver::createWriteTask);
             QObject::connect(group, &Group::s_logging, this, &Driver::s_logging);
             return true;
         }

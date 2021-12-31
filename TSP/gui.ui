@@ -210,14 +210,26 @@
     </property>
     <addaction name="action_showAccess"/>
    </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Тэг</string>
+    </property>
+    <addaction name="actionTrue"/>
+    <addaction name="actionFalse"/>
+   </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_view"/>
    <addaction name="menu_window"/>
    <addaction name="menu_help"/>
+   <addaction name="menu"/>
   </widget>
   <action name="actionTrue">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/rsrc/indicator_true.png</normaloff>:/rsrc/indicator_true.png</iconset>
    </property>
    <property name="text">
     <string>Выставить true</string>
@@ -228,7 +240,11 @@
   </action>
   <action name="actionFalse">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/rsrc/indicator_empty.png</normaloff>:/rsrc/indicator_empty.png</iconset>
    </property>
    <property name="text">
     <string>Выставить false</string>
@@ -341,6 +357,8 @@
    <header>guiItems.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="rsrc.qrc"/>
+ </resources>
  <connections/>
 </ui>

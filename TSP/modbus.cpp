@@ -1,7 +1,7 @@
 #include "modbus.h"
 #include <QDebug>
 //------------------------------------------------------------------------------
-Modbusdriver::Modbusdriver(int id, QString name, QString address, int port, int timeout, QString comment)
+ModBusDriver::ModBusDriver(int id, QString name, QString address, int port, int timeout, QString comment)
 {
     initThread(new QModbusTcpClient());
     modbusDevice->setConnectionParameter(QModbusDevice::NetworkAddressParameter, address);
@@ -14,7 +14,7 @@ Modbusdriver::Modbusdriver(int id, QString name, QString address, int port, int 
 }
 
 //------------------------------------------------------------------------------
-Modbusdriver::Modbusdriver(int id, QString name, QString port, QString baudrate, QSerialPort::DataBits databits, QSerialPort::Parity parity, QSerialPort::StopBits stopbits, int timeout, QString comment)
+ModBusDriver::ModBusDriver(int id, QString name, QString port, QString baudrate, QSerialPort::DataBits databits, QSerialPort::Parity parity, QSerialPort::StopBits stopbits, int timeout, QString comment)
 {
     initThread(new QModbusRtuSerialMaster());
     modbusDevice->setConnectionParameter(QModbusDevice::SerialPortNameParameter, QVariant(port));
@@ -29,7 +29,7 @@ Modbusdriver::Modbusdriver(int id, QString name, QString port, QString baudrate,
     this->type = "modbusRTU";
 }
 //------------------------------------------------------------------------------
-Modbusdriver::~Modbusdriver()
+ModBusDriver::~ModBusDriver()
 {
     //Disconnect();
 
@@ -42,7 +42,7 @@ Modbusdriver::~Modbusdriver()
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::handleNextTask()
+void ModBusDriver::handleNextTask()
 {
     if (listOfTasks.count() > 0){
         Task * task = listOfTasks.takeFirst();
@@ -70,7 +70,7 @@ void Modbusdriver::handleNextTask()
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::getTask()///Переделать!!!
+void ModBusDriver::getTask()///Переделать!!!
 {
     MBaddress * curTagAdr = new MBaddress;
     Task * task = nullptr;
@@ -123,7 +123,7 @@ void Modbusdriver::getTask()///Переделать!!!
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::connect()
+void ModBusDriver::connect()
 {
     if(!modbusDevice) return;
     if(modbusDevice->state() != QModbusDevice::ConnectedState) {
@@ -148,7 +148,7 @@ void Modbusdriver::connect()
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::disconnect()
+void ModBusDriver::disconnect()
 {
     if(!modbusDevice) return;
     started = false;
@@ -163,10 +163,20 @@ void Modbusdriver::disconnect()
 }
 
 //------------------------------------------------------------------------------
-QList<Tag *> Modbusdriver::sortTags(QList<Tag *> listOfTags)
+bool ModBusDriver::insertGroup(Group *group)
+{
+    if( Driver::insertGroup( group ) ){
+    group->listOfTags.sort = ModBusDriver::sortTags;
+    return true;
+  }
+  return false;
+}
+
+//------------------------------------------------------------------------------
+void ModBusDriver::sortTags(QList<Tag *> &listOfTags)
 {
     bool ready = false;
-    if (listOfTags.count() < 2) return listOfTags;
+    if (listOfTags.count() < 2) return;
     QList<Tag *> newTagList = listOfTags;
     int i = 0;
     MBaddress * address = new MBaddress;
@@ -193,11 +203,10 @@ QList<Tag *> Modbusdriver::sortTags(QList<Tag *> listOfTags)
     }
     delete address1;
     delete address2;
-    return newTagList;
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::valueFiller(QList<Tag *> listOfTags, QModbusDataUnit unit)
+void ModBusDriver::valueFiller(QList<Tag *> listOfTags, QModbusDataUnit unit)
 {
     for (uint16_t i = 0; i < unit.valueCount(); i++) {
         if(listOfTags[i])
@@ -206,7 +215,7 @@ void Modbusdriver::valueFiller(QList<Tag *> listOfTags, QModbusDataUnit unit)
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::read(Modbusdriver::Task *task, const std::function<void ()> doNext)
+void ModBusDriver::read(ModBusDriver::Task *task, const std::function<void ()> doNext)
 {  
     if (!modbusDevice) {
         errorFiller(task->listOfTags, "driver read error: driver is null");
@@ -279,7 +288,7 @@ void Modbusdriver::read(Modbusdriver::Task *task, const std::function<void ()> d
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::write(Task * task, const std::function<void()> doNext)
+void ModBusDriver::write(Task * task, const std::function<void()> doNext)
 {
     if (!modbusDevice) {
         //emit LoggingSig(MessError, QDateTime::currentDateTime(), objectName(), "Modbus driver write error: driver is null");
@@ -353,7 +362,7 @@ void Modbusdriver::write(Task * task, const std::function<void()> doNext)
 }
 
 //------------------------------------------------------------------------------
-bool Modbusdriver::strToAddr(QString str, MBaddress * address)
+bool ModBusDriver::strToAddr(QString str, MBaddress * address)
 {
     if(!address) return false;
     QStringList addrList = str.split(':', QString::SkipEmptyParts);
@@ -389,14 +398,14 @@ bool Modbusdriver::strToAddr(QString str, MBaddress * address)
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::scheduleHandler()
+void ModBusDriver::scheduleHandler()
 {
     if (started)
-        taskTimer->singleShot(1, this, &Modbusdriver::handleNextTask);
+        taskTimer->singleShot(1, this, &ModBusDriver::handleNextTask);
 }
 
 //------------------------------------------------------------------------------
-bool Modbusdriver::compare(Modbusdriver::MBaddress a1, Modbusdriver::MBaddress a2)
+bool ModBusDriver::compare(ModBusDriver::MBaddress a1, ModBusDriver::MBaddress a2)
 {
 
     if (a1.devAddr > a2.devAddr)
@@ -414,7 +423,7 @@ bool Modbusdriver::compare(Modbusdriver::MBaddress a1, Modbusdriver::MBaddress a
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::writeRequest(Tag *tag)
+void ModBusDriver::createWriteTask(Tag *tag)
 {
     MBaddress address;
     if(!strToAddr(tag->address, &address)){
@@ -444,7 +453,7 @@ void Modbusdriver::writeRequest(Tag *tag)
 }
 
 //------------------------------------------------------------------------------
-void Modbusdriver::initThread(QModbusClient *modbusDevice)
+void ModBusDriver::initThread(QModbusClient *modbusDevice)
 {
     thread = new QThread;
     thread->start();

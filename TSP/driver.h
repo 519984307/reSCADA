@@ -28,7 +28,7 @@ public:
     bool started = false;
     QString type;
     //methods
-    bool insertGroup(Group  * group);
+    virtual bool insertGroup(Group  * group);
     Group * getGroupById(int Id);
     virtual void connect() = 0;
     virtual void disconnect() = 0;
@@ -50,7 +50,7 @@ public:
     void errorFiller(QList<Tag*> listOfTags, QString error);
     // каждый драйвер подставляет сюда свою сортировку,
     //TODO но лучше переделать
-    static void sortTags(QList<Tag*> &) {};
+    static void sortTags(QList<Tag*> &){};
     virtual void handleNextTask() = 0;
 signals:
     void s_onStartedChanged();
@@ -58,7 +58,7 @@ signals:
     void s_disconnectDriver();
     void s_logging(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
 public slots:
-    virtual void writeRequest(Tag * tag) = 0;
+    virtual void createWriteTask(Tag * tag) = 0;
 protected slots:
     //virtual void TagInserted(Group * group);
 };

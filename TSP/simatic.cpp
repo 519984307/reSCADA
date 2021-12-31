@@ -1,4 +1,5 @@
 #include "simatic.h"
+#include <qdebug.h>
 //------------------------------------------------------------------------------
 SimaticDriver::SimaticDriver(int id, QString name, QString address, int rack, int slot, QString comment)
 {
@@ -43,8 +44,8 @@ void SimaticDriver::connect()
   if( !client ) return;
 
   if( !client->Connected() || !noError ){
-    char charAddress[ 256 ];
-    memcpy( charAddress, address.toStdString().c_str(), address.size() );
+    char charAddress[ address.size() ];//TODO сделать нормальный размер
+    memcpy( &charAddress, address.toStdString().c_str(), address.size() );
     charAddress[ address.size() ] = '\0';
 
     // Запрос на соединение
@@ -62,7 +63,6 @@ void SimaticDriver::connect()
                      std::string("Simatic driver connection error: "
                                  + ( res < 0 ? "libruary error" : CliErrorText(res)) ).c_str() );
     }
-
     if (!started){
       started = true;
       emit s_onStartedChanged();
@@ -90,32 +90,20 @@ void SimaticDriver::handleNextTask()
 {
   if (listOfTasks.count() > 0){
     Task * task = listOfTasks.takeFirst();
-    if (task->writeTask){
-      write(task,
-            [this, task](){
-              delete task;
-              scheduleHandler();
-            }
-            );
-    }
-    else{
-      read(task, [this, task](){
-        Group * group = getGroupById(task->groupId);
-        group->update();
-        delete task;
-        scheduleHandler();
-      });
-    }
+    if (task->writeTask)
+      write(task);
+    else
+      read(task);
+    delete task;
   }
   else{
-    getTask();
-    scheduleHandler();
+    createReadTasks();
   }
-
+  scheduleHandler();
 }
 //------------------------------------------------------------------------------
 //Разбивает теги группы на задачи(task) с тэгами у которых адреса идут один за другим.
-void SimaticDriver::getTask()
+inline void SimaticDriver::createReadTasks()
 {
   SimAddress * address;
   Task * task = nullptr;//Текущая задача.
@@ -131,8 +119,8 @@ void SimaticDriver::getTask()
 
         if ( !task ){//Если формируется новая задача...
           task = new Task;
-          task->DBNumb = address->DBNumb;
           task->memArea = address->memArea;
+          task->DBNumb = address->DBNumb;
           task->type = task->memArea == S7AreaDB ? S7WLByte : address->type;
           task->regAddr = address->regAddr;
           task->groupId = group->id;
@@ -142,11 +130,10 @@ void SimaticDriver::getTask()
         else{//Добавление новых тегов в текущую задачу.
           if( address->DBNumb == task->DBNumb // DB совпадает
               && address->memArea == task->memArea// и обл. памяти совпадает
-              && address->type == task->type//! и тип совпадает TODO ужно оптимизировать, чтоб читать из одной DB разные типы скопом.
-              && task->listOfTags.at(i)->getQuality() == Good//и тег уже успешно опрашивался
+              && (task->memArea == S7AreaDB ? true : address->type == task->type)//! и тип совпадает TODO ужно оптимизировать, чтоб читать из одной DB разные типы скопом.
+              && group->listOfTags.at(i)->getQuality() == Good//и тег уже успешно опрашивался
               && task->regAddr.memSlot + group->optimRangeMax//и адрес не очень далеко от 1-го тэга в задаче.
-                   <= address->regAddr.memSlot) {
-            //task->buffByteCount += DataSizeByte(address->type);//Прибавление длинны новогот эга к общей длинне буфера.
+                   >= address->regAddr.memSlot) {
             task->listOfTags.append(group->listOfTags.at(i));//Добавление тэга в задачу.
           }
           else{//иначе завершаем группу
@@ -156,40 +143,46 @@ void SimaticDriver::getTask()
         }
 
       }
+      group->update();//Не уместно: группа обновляет данные перед новым запросом
     }
   }
-  delete address;
 }
 //------------------------------------------------------------------------------
-void SimaticDriver::valueFiller(SimaticDriver::Task *task, byte * data[])
+void SimaticDriver::createWriteTask(Tag *tag)
 {
-  //  int start = task->regAddr / 8;
-  //  for(int i = 0; i < task->listOfTags.count(); i++){
-  //    if(task->listOfTags[i])
-  //      task->listOfTags[i]->setValue(
-  //        ((data[(task->regAddr + i) / 8 - start])
-  //         & (1 << ((task->regAddr + i) % 8))) == 0 ? false : true);
-  //  }
+  SimAddress *address;
+  address = static_cast<SimAddress*>( tag->speshData );
+  Task * task = new Task;
+  task->writeTask = true;
+  task->memArea = address->memArea;
+  task->DBNumb = address->DBNumb;
+  task->type = task->memArea == S7AreaDB ? S7WLByte : address->type;//address->type;
+  task->regAddr = address->regAddr;
+  task->listOfTags.append( tag );
+  listOfTasks.append(task);
 }
-//------------------------------------------------------------------------------
-//void Simaticdriver::valueFiller(QList<Tag *> listOfTags, uint8_t * data)
-template<typename Tarr>
-void SimaticDriver::valueFiller(QList<Tag *> listOfTags, Tarr data[])
-{
-  for(int i = 0; i < listOfTags.count(); i++){
-    if(listOfTags[i])
-      listOfTags[i]->setValue(data[i]);
-  }
-}
-
 //------------------------------------------------------------------------------
 inline int toBitAdr( SimAddress *SA )
 {
   return SA->regAddr.memSlot * 8 + SA->regAddr.bit;
 }
-
 //------------------------------------------------------------------------------
-void SimaticDriver::read(SimaticDriver::Task *task, const std::function<void ()> doNext)
+inline int amtFromType( SimAddress *lastTagAdr, SimaticDriver::Task *task )
+{
+  if( lastTagAdr->memArea == S7AreaDB ){//Т.к. из BD читаем только байтами нужно добавить биты от типов данных длиннее байта
+    return  (lastTagAdr->regAddr.memSlot - task->regAddr.memSlot)
+           + dataSizeByte(lastTagAdr->type);
+  }
+  else if( task->type == S7WLBit ){
+    return 1 + (lastTagAdr->regAddr.memSlot - task->regAddr.memSlot ) * 8
+           + lastTagAdr->regAddr.bit - task->regAddr.bit;
+  }
+  else{
+    return 1 + lastTagAdr->regAddr.memSlot - task->regAddr.memSlot;// +1 т.к. включая начальный элемент
+  }
+}
+//------------------------------------------------------------------------------
+void SimaticDriver::read( SimaticDriver::Task *task )
 {
   if(!client) {
     errorFiller(task->listOfTags, "driver read error: driver is null"); qualityFiller(task->listOfTags, Bad);
@@ -197,108 +190,141 @@ void SimaticDriver::read(SimaticDriver::Task *task, const std::function<void ()>
     return;
   }
   if (started) connect();
-  if(!client->Connected()){
-    errorFiller(task->listOfTags, "driver read error: driver isn\'t connected"); qualityFiller(task->listOfTags, Bad);
-    doNext();
-    //emit LoggingSystem(MessError, QDateTime::currentDateTime(), this->objectName(), "Simatic driver read error: driver isn\'t connected");
-    return;
-  }
-  SimAddress * lastTagAdr = static_cast<SimAddress*>(task->listOfTags.last()->speshData);
+  if(client->Connected()){
+    SimAddress * lastTagAdr = static_cast<SimAddress*>(task->listOfTags.last()->speshData);//Получение адреса тэга
+    int_fast8_t sizeKf = dataSizeByte( task->type );//Вычисление поправ-го коэф-та в зависимости от типа
+    int amt = amtFromType(lastTagAdr,task );//Вычисление кол-ва единиц на считывание
+    byte data[amt * sizeKf];//Выделение буфера чтения
+    //Запрос на чтение
+    int res = client->ReadArea(task->memArea, task->DBNumb,
+                               task->type == S7WLBit ? toBitAdr( task )
+                                                     : task->regAddr.memSlot,
+                               amt, task->type, data);
+    if(res == 0){
+      //Запись результата в тэги
+      foreach (Tag *tag, task->listOfTags) {
+        SimAddress * tagAdr = static_cast<SimAddress*>(tag->speshData);
 
-  int amt{0};
-  if( task->listOfTags.count() == 1 ) amt = 1;
-  else if( task->type == S7WLBit){
-    amt = 1 + (lastTagAdr->regAddr.memSlot - task->regAddr.memSlot ) * 8 + lastTagAdr->regAddr.bit - task->regAddr.bit;
-  }
-  else{
-    amt = 1 + lastTagAdr->regAddr.memSlot - task->regAddr.memSlot;
-  }
-  byte data[amt * dataSizeByte(task->type)];
-  int res = 0;
-  //int start = task->regAddr;
-  res = client->ReadArea(task->memArea, task->DBNumb,
-                         task->type == S7WLBit ? toBitAdr( task )
-                                               : task->regAddr.memSlot,
-                         amt, task->type, data);
-  if(res == 0){
-
-    foreach (Tag *tag, task->listOfTags) {
-
+        switch (tagAdr->type) {
+          case S7WLBit:
+            tag->setValue( GetBitAt( data, tagAdr->regAddr.memSlot * sizeKf,
+                                   tagAdr->regAddr.bit ) );
+            break;
+          case S7WLByte:
+            tag->setValue( GetByteAt( data, tagAdr->regAddr.memSlot * sizeKf) );
+            break;
+          case S7WLWord:
+            tag->setValue( GetIntAt( data, tagAdr->regAddr.memSlot * sizeKf ) );
+            break;
+          case S7WLCounter:
+          case S7WLTimer:
+            tag->setValue( GetWordAt( data, tagAdr->regAddr.memSlot * sizeKf ) );
+            break;
+          case S7WLDWord:
+            if( tag->type == TFloat ) tag->setValue( GetRealAt( data, tagAdr->regAddr.memSlot * sizeKf ));
+            else tag->setValue( GetDIntAt( data, tagAdr->regAddr.memSlot * sizeKf ) );
+            break;
+            //Такого варианта не будет, т.к. он кодируется в егах просто как Double Word
+            //          case S7WLReal:
+            //            tag->setValue( (double)GetRealAt( data, tagAdr->regAddr.memSlot * kf ) );
+            //            break;
+          default:
+            break;
+        }
+      }
+      errorFiller(task->listOfTags, "");
+      qualityFiller(task->listOfTags, Good);
     }
 
-
-
-
-
-    //valueFiller(task, &data);
-    errorFiller(task->listOfTags, "");
-    qualityFiller(task->listOfTags, Good);
+    if( res != 0 ){
+      if (res == 589856)
+        noError = false;
+      errorFiller(task->listOfTags, "driver read error: " + QString(CliErrorText(res).c_str()));
+      qualityFiller(task->listOfTags, Bad);
+    }
   }
-
-  if( res != 0 ){
-    if (res == 589856)
-      noError = false;
-    errorFiller(task->listOfTags, "driver read error: " + QString(CliErrorText(res).c_str()));
+  else{
+    errorFiller(task->listOfTags, "driver read error: driver isn\'t connected");
     qualityFiller(task->listOfTags, Bad);
   }
-  //delete []data;
-  doNext();
-  return;
 }
 //------------------------------------------------------------------------------
-void SimaticDriver::write(SimaticDriver::Task *task, const std::function<void ()> doNext)
+void SimaticDriver::write(SimaticDriver::Task *task )
 {
   if(!client) {
-    errorFiller(task->listOfTags, "driver write error: driver is null"); qualityFiller(task->listOfTags, Bad);
+    errorFiller(task->listOfTags, "driver read error: driver is null"); qualityFiller(task->listOfTags, Bad);
     //emit LoggingSystem(MessError, QDateTime::currentDateTime(), this->objectName(), "Simatic driver read error: driver is null");
     return;
   }
-  if(started) connect(); //Если драйвер запущен
-  if(!client->Connected()){ //TODO переделать. Попытки подключиться должны крутиться в цикле в драйвере.
-    errorFiller(task->listOfTags,
-                "driver write error: driver isn\'t connected");
-    qualityFiller(task->listOfTags, Bad);
-    doNext();
-    return;
-  }
-  //создаю массив для новых значений тэгов
-  // TODO long long избыточно кадому типу своё
-  long long data[task->listOfTags.count()];
-  for(int i = 0; i < task->listOfTags.count(); i++){ //перебираю массив
-    if(task->listOfTags[i])//TODO Странная проверка наверное убрать.
-      //Запись новых значений тэгов в массив.
-      data[i] = task->listOfTags[i]->newValue.toLongLong();
-    else
+  if (started) connect();
+  if(client->Connected()){
+    SimAddress * lastTagAdr = static_cast<SimAddress*>(task->listOfTags.last()->speshData);//Получение адреса тэга
+    int_fast8_t sizeKf = dataSizeByte( task->type );//Вычисление поправ-го коэф-та в зависимости от типа
+    int amt = amtFromType(lastTagAdr,task);//Вычисление кол-ва единиц на считывание
+    byte data[amt * sizeKf];
+    for (int i = 0; i < (amt * sizeKf); i++) {
       data[i] = 0;
-  }
-  TS7DataItem Item; //создаю Item(структура из snap7)
-  //чтоб закинуть в него новые значения тэгов
-  Item.Area     = task->memArea;
-  Item.WordLen  = task->type;
-  Item.DBNumber = task->DBNumb;
-  Item.Start    = task->regAddr.memSlot;
-  Item.Amount   = task->listOfTags.count();
-  Item.pdata    = &data;
+    }
+    //Запись значений тэгов в буфер для отправки
+    int res = 0;
 
-  client->WriteMultiVars(&Item, 1);//запрос к ПЛК
+    for (int i = 0; i < task->listOfTags.count(); i++ ) {
+      SimAddress * tagAdr = static_cast<SimAddress*>(task->listOfTags.at(i)->speshData);
+      //Смещение внутри буфера записи
+#define offsetBuff (tagAdr->regAddr.memSlot - task->regAddr.memSlot) * sizeKf
+      switch (tagAdr->type) {
+        case S7WLBit:
+          //!TODO попробовать, может ПЛК нормально отреагирует на установку бита в DB с task->type == S7WLBit?
+          //! тогда не нужно будет предварительно считывать байт, чтоб не затереть соседние биты.
 
-  if (Item.Result == 0){//0 значит успешно выполнен.
-    //Заполнение тэгов результатами запроса и служебной инфой.
-    readyFiller(task->listOfTags, true);
-    newValueFiller(task->listOfTags);
-    errorFiller(task->listOfTags, "");
-    qualityFiller(task->listOfTags, Good);
+          if( task->memArea == S7AreaDB ){//Чтобы не обнулить рядомстоящие биты запрос их актуального состояния.
+            res = client->ReadArea(task->memArea, task->DBNumb, tagAdr->regAddr.memSlot,
+                                   amt, task->type,
+                                   &data[offsetBuff]);
+          }
+          SetBitAt( data, offsetBuff, tagAdr->regAddr.bit, task->listOfTags.at(i)->newValue.toBool() );
+          break;
+        case S7WLWord:
+          SetIntAt( data, offsetBuff, task->listOfTags.at(i)->newValue.toInt() );
+          break;
+        case S7WLByte:
+        case S7WLCounter:
+        case S7WLTimer:
+          SetWordAt( data, offsetBuff, task->listOfTags.at(i)->readValue().toUInt() );
+          break;
+        case S7WLDWord:
+          if( task->listOfTags.at(i)->type == TFloat )
+            SetRealAt( data, offsetBuff, task->listOfTags.at(i)->newValue.toFloat() );
+          else
+            SetDIntAt( data, offsetBuff, task->listOfTags.at(i)->newValue.toUInt() );
+          break;
+        default:
+          break;
+      }
+    }
+    if(res == 0){//Проверка, что в случае S7WLBit запрос байта со значениями рядомстоящих битов успешен.
+      res = client->WriteArea(task->memArea, task->DBNumb,
+                              task->type == S7WLBit ? toBitAdr( task )
+                                                    : task->regAddr.memSlot,
+                              amt, task->type, data);
+    }
+    if(res == 0){
+      readyFiller(task->listOfTags, true);
+      newValueFiller(task->listOfTags);
+      errorFiller(task->listOfTags, "");
+      qualityFiller(task->listOfTags, Good);
+    }
+    if( res != 0 ){
+      if (res == 589856)
+        noError = false;
+      errorFiller(task->listOfTags, "driver write error: " + QString(CliErrorText(res).c_str()));
+      qualityFiller(task->listOfTags, Bad);
+    }
   }
   else{
-    errorFiller(task->listOfTags, "driver write error: "
-                                    + QString(CliErrorText(Item.Result).c_str()));
+    errorFiller(task->listOfTags, "driver write error: driver isn\'t connected");
     qualityFiller(task->listOfTags, Bad);
-    if (Item.Result == 589856)
-      noError = false;
   }
-
-  doNext();//переход к следующей tack
-  //TODO убрать этот дебильный переход к след. задаче ерез ямбду
 }
 
 //------------------------------------------------------------------------------
@@ -311,10 +337,6 @@ void SimaticDriver::scheduleHandler()
 //------------------------------------------------------------------------------
 void SimaticDriver::sortTags(QList<Tag *> &listOfTags)
 {
-  //TODO добавить добавление данных в speshData
-
-  if( listOfTags.count() < 2 ) return;
-  //SimAddress * address = new SimAddress;
   foreach (Tag * tag, listOfTags) {
     if( tag->speshData == nullptr ){//Если тэгу еще не прицепили SimAdress
       tag->speshData = new SimAddress;
@@ -330,12 +352,12 @@ void SimaticDriver::sortTags(QList<Tag *> &listOfTags)
       }
     }
   }
+  if( listOfTags.count() < 2 ) return; //Сортировка не нужна.
   bool ready {false};
   while( !ready ){ //bubble sorting
     ready = true;
     for( int i = 0; i < listOfTags.count() - 1; i++ ){
-      if( compare(static_cast<SimAddress*>(listOfTags.at(i    )->speshData),
-                  static_cast<SimAddress*>(listOfTags.at(i + 1)->speshData)) ){
+      if( *static_cast<SimAddress*>(listOfTags.at(i    )->speshData)> *static_cast<SimAddress*>(listOfTags.at(i + 1)->speshData) ){
         listOfTags.swapItemsAt( i, i+1 );
         ready = false;
       }
@@ -349,6 +371,9 @@ bool SimaticDriver::strToAddr(QString str, SimAddress *address)
   if(!address) return false;
   if(str.count() < 2 || str == "") return false;
   str = str.toUpper();
+  //Удаление % и P# в начале строки
+  if( str[0] == '%' ) str.remove(0,1);
+  else if( str.left(2) == "P#" )str.remove(0,2);
 
   bool ok = false;
 
@@ -361,7 +386,7 @@ bool SimaticDriver::strToAddr(QString str, SimAddress *address)
   else if(str[0] == "Q"){//Диск. выходы Q
     address->memArea = S7AreaPA;
   }
-  else if(str.right(2)== "DB"){//DB
+  else if(str.left(2)== "DB"){//DB
     address->memArea = S7AreaDB;
     str.remove(0, 1);//Удаление прочитанного символа, т.к. их 2
   }
@@ -396,13 +421,13 @@ bool SimaticDriver::strToAddr(QString str, SimAddress *address)
     address->DBNumb = str.left( str.indexOf('.', 0)).toInt(&ok);
     str.remove(0, str.indexOf('.', 0) + 3);//Удаление номера DB с точкой и началом адреса "23.DBX0.4" ->"X0.4".
     if(!ok) return false;
-    if( str[1] == "W" ){
+    if( str[0] == "W" ){
       address->type = S7WLWord;
     }
-    else if( str[1] == "D" ){
+    else if( str[0] == "D" ){
       address->type = S7WLDWord;
     }
-    else if( str[1] == "X" ){
+    else if( str[0] == "X" ){
       address->type = S7WLBit;
     }
     else return false;
@@ -410,15 +435,13 @@ bool SimaticDriver::strToAddr(QString str, SimAddress *address)
   }
   //Определение длинны данных от типа тэга.
   if (address->type == S7WLBit ){
-    address->regAddr.bit = str.left(1).toInt(&ok);//Чтение номера бита.
+    address->regAddr.bit = str.right(1).toInt(&ok);//Чтение номера бита.
     if(!ok) return false;
     str.remove(str.size() - 2, 2);//Удаление номера бита и точки.
     address->regAddr.memSlot = str.toInt(&ok);//Чтение номера байта.
-    if(!ok) return false;
   }
   else {
     address->regAddr.memSlot = str.toDouble(&ok);//Чтение номера байта
-    if(!ok) return false;
   }
   return ok;
 
@@ -441,64 +464,54 @@ bool SimaticDriver::strToAddr(QString str, SimAddress *address)
   //!    Word	    558.0 - 2
   //    Word	    560.0
 }
+
 //------------------------------------------------------------------------------
-bool SimaticDriver::compare(SimAddress *a1, SimAddress *a2)
+bool SimaticDriver::insertGroup(Group *group)
 {
-  if (a1->memArea > a2->memArea)
+  if( Driver::insertGroup( group ) ){
+    group->listOfTags.sort = SimaticDriver::sortTags;
     return true;
-  else if (a1->memArea < a2->memArea)
-    return false;
-  else if(a1->memArea == S7AreaDB ){
-    if (a1->DBNumb > a2->DBNumb)
-      return true;
-    else if (a1->DBNumb < a2->DBNumb)
-      return false;
-    else if (a1->regAddr.memSlot > a2->regAddr.memSlot)
-      return true;
-    else if (a1->regAddr.memSlot < a2->regAddr.memSlot)
-      return true;
-    else return (a1->regAddr.bit > a2->regAddr.bit);
-  }
-  else{
-    if (a1->type > a2->type)
-      return true;
-    else if (a1->type < a2->type)
-      return false;
-    else if (a1->regAddr.memSlot > a2->regAddr.memSlot)
-      return true;
-    else if (a1->regAddr.memSlot < a2->regAddr.memSlot)
-      return true;
-    else return (a1->regAddr.bit > a2->regAddr.bit);
   }
   return false;
 }
+
 //------------------------------------------------------------------------------
-void SimaticDriver::writeRequest(Tag *tag)
-{
-  SimAddress address;
-  if(!strToAddr(tag->address, &address)){
-    emit s_logging(MessError, QDateTime::currentDateTime(), false, objectName(), "Simatic driver write error: address isn\'t valid");
-    return;
-  }
-
-  Task * task = new Task;
-  task->writeTask = true;
-  task->memArea = address.memArea;
-  task->DBNumb = address.DBNumb;
-  task->regAddr = address.regAddr;
-  task->type = address.type;
-  task->listOfTags.append(tag);
-
-  foreach (Task * task, listOfTasks) {
-    if(task->memArea == address.memArea
-        && task->regAddr.memSlot == address.regAddr.memSlot
-        && task->regAddr.bit == address.regAddr.bit
-        && task->type == address.type
-        && task->writeTask){
-      listOfTasks.removeOne(task);
-      delete task;
-    }
-  }
-  listOfTasks.prepend(task);
+SimAddress &SimAddress::operator=(const SimAddress &SA){
+  memArea = SA.memArea;
+  type = SA.type;
+  DBNumb = SA.DBNumb;
+  regAddr = SA.regAddr;
+  return *this;
 }
+
 //------------------------------------------------------------------------------
+bool SimAddress::operator> ( SimAddress const& SA)
+{
+  if (memArea > SA.memArea)
+    return true;
+  else if (memArea < SA.memArea)
+    return false;
+  else if(memArea == S7AreaDB ){
+    if (DBNumb > SA.DBNumb)
+      return true;
+    else if (DBNumb < SA.DBNumb)
+      return false;
+    else if (regAddr.memSlot > SA.regAddr.memSlot)
+      return true;
+    else if (regAddr.memSlot < SA.regAddr.memSlot)
+      return false;
+    else return (regAddr.bit > SA.regAddr.bit);
+  }
+  else{
+    if (type > SA.type)
+      return true;
+    else if (type < SA.type)
+      return false;
+    else if (regAddr.memSlot > SA.regAddr.memSlot)
+      return true;
+    else if (regAddr.memSlot < SA.regAddr.memSlot)
+      return false;
+    else return (regAddr.bit > SA.regAddr.bit);
+  }
+  return false;
+}

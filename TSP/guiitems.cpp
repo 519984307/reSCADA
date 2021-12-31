@@ -490,13 +490,13 @@ TSPTableModelTags::TSPTableModelTags(QList<TagConfig *> &listOfTagConfigs, int &
     }
 }
 //------------------------------------------------------------------------------
-QVariant TSPTableModelTags::data(const QModelIndex &index, int role) const
+QVariant TSPTableModelTags::data(const QModelIndex &Index, int Role) const
 {
-    if (!index.isValid())
+    if (!Index.isValid())
         return QVariant();
-    else if(role == Qt::DisplayRole || role == Qt::EditRole){
-        TagConfig * config = listOfTagConfigs[index.row()];
-        switch(index.column()){
+    else if(Role == Qt::DisplayRole || Role == Qt::EditRole){
+        TagConfig * config = listOfTagConfigs[Index.row()];
+        switch(Index.column()){
         case tagId:       return config->id;
         case tagGroupId:  return config->groupId;
         case tagQuality:  return config->tag?(Prom::qualityToString(config->tag->readQuality())):"Error";
@@ -505,12 +505,13 @@ QVariant TSPTableModelTags::data(const QModelIndex &index, int role) const
         case tagAddress:  return config->address;
         case tagValue:    {
             if (config->tag){
-                QVariant value = config->tag->readValue();
-                switch (config->tag->type) {
-                case TInt: return value.toInt();
-                case TFloat: return value.toDouble();
-                case TBool: return value.toBool() ? "True" : "False";
-                }
+//                QVariant value = config->tag->readValue();
+//                switch (config->tag->type) {
+//                case TInt: return value.toInt();
+//                case TFloat: return config->tag->readValue();
+//                case TBool: return value.toBool() ? "True" : "False";
+                //}
+                return config->tag->readValue();
             }else
                 return "Error";
         }
@@ -518,23 +519,23 @@ QVariant TSPTableModelTags::data(const QModelIndex &index, int role) const
         default: return QVariant();
         }
     }
-    else if(role == Qt::BackgroundRole){
-        TagConfig * config = listOfTagConfigs[index.row()];
+    else if(Role == Qt::BackgroundRole){
+        TagConfig * config = listOfTagConfigs[Index.row()];
         if (config->modified)               return icons->fillModified;
         else if(config->errorString != "")  return icons->fillError;
         else                                return icons->fillDefault;
     }
-    else if(role == Qt::ToolTipRole){
-        TagConfig * config = listOfTagConfigs[index.row()];
+    else if(Role == Qt::ToolTipRole){
+        TagConfig * config = listOfTagConfigs[Index.row()];
         if (config->errorString != "")
             return config->errorString;
         else
             return QVariant();
     }
-    else if(role == Qt::DecorationRole){
-        switch(index.column()){
+    else if(Role == Qt::DecorationRole){
+        switch(Index.column()){
         case tagQuality: {
-            Tag * tag = listOfTagConfigs[index.row()]->tag;
+            Tag * tag = listOfTagConfigs[Index.row()]->tag;
             if(tag)
                 switch (tag->readQuality()) {
                 case tsp_enums::Good:       return icons->iconTrue;
@@ -546,7 +547,7 @@ QVariant TSPTableModelTags::data(const QModelIndex &index, int role) const
                 return icons->iconError;
         }
         case tagValue: {
-            Tag * tag = listOfTagConfigs[index.row()]->tag;
+            Tag * tag = listOfTagConfigs[Index.row()]->tag;
             if(tag)
                 switch (tag->type) {
                 case TInt: return icons->iconInt;
@@ -559,7 +560,7 @@ QVariant TSPTableModelTags::data(const QModelIndex &index, int role) const
         case tagAddress: {
             if((options & ShowTagAccess) == 0)
                 return QVariant();
-            Tag * tag = listOfTagConfigs[index.row()]->tag;
+            Tag * tag = listOfTagConfigs[Index.row()]->tag;
             if(tag)
                 switch (tag->access) {
                 case RW: return icons->iconRW;
@@ -676,6 +677,7 @@ void TSPTableModelTags::doubleClicked(const QModelIndex &index)
                 if (ok){
                     tag->writeValue(value);
                 }
+                return;
             }
             case TBool: {
                 tag->writeValue(!tag->readValue().toBool());

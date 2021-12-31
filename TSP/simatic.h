@@ -11,15 +11,11 @@ struct SimAddress{
   int DBNumb{-1};
   struct {
     int memSlot{-1};//Это может быть байт, слово, двойное слово и т.д.
-    int bit{0};//Номер бита для булевых тэгов, у остальных всегда 0
+    int bit{-1};//Номер бита для булевых тэгов, у остальных всегда 0
   }regAddr;
-  //    SimAddress& operator= (const SimAddress& SA){
-  //      memArea = SA.memArea;
-  //      type = SA.type;
-  //      DBNumb = SA.DBNumb;
-  //      regAddr = SA.regAddr;
-  //      return *this;
-  //    }
+  SimAddress &operator= (const SimAddress& SA);
+  bool operator> (SimAddress const& SA);
+  bool operator< ( SimAddress const& SA){ return !(*this > SA); };
 };
 //class SimTag : public Tag, SimAddress{};
 
@@ -37,14 +33,15 @@ public:
   void disconnect() override;
   static void sortTags(QList<Tag*> &listOfTags);
   static bool strToAddr(QString str, SimAddress * address);
-  static inline bool compare(SimAddress *a1, SimAddress *a2);
-
-private:
-  //structs
+  //static inline bool compare(SimAddress *a1, SimAddress *a2);
+  bool insertGroup(Group  * group) override;
   struct Task : public SimAddress, CommonTask{
     int endAdr{-1};
     //int buffByteCount{0};
   };
+private:
+  //structs
+
   //variables
   QList<Task*> listOfTasks;
   TS7Client * client = nullptr;
@@ -54,16 +51,13 @@ private:
   //methods
   void initThread();
   void handleNextTask() override;
-  void getTask();
-  template <typename Tarr>
-  void valueFiller(QList<Tag*> listOfTags, Tarr data[]);
-  void valueFiller(Task * task, byte * data[]);
-  void read(Task * task, const std::function<void()> doNext);
-  void write(Task * task, const std::function<void()> doNext);
+  inline void createReadTasks();
+  void read(Task * task);
+  void write(Task * task);
   //bool check(int res, QString function = "unknown function");
   void scheduleHandler(); //TODO вынести в класс драйвера
 
 public slots:
-  void writeRequest(Tag * tag) override;
+  void createWriteTask(Tag * tag) override;
 };
 #endif // SIMATICDRIVER_H

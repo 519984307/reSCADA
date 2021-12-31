@@ -152,6 +152,7 @@ typedef longword   *plongword;
 typedef smallint   *psmallint;
 typedef longint    *plongint;
 typedef float      *pfloat;
+//typedef double     *pDouple;
 typedef uintptr_t  S7Object; // multi platform/processor object reference
     // DON'T CONFUSE IT WITH AN OLE OBJECT, IT'S SIMPLY
     // AN INTEGER VALUE (32 OR 64 BIT) USED AS HANDLE.

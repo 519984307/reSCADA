@@ -10,15 +10,15 @@
 #include <QTimer>
 #include "driver.h"
 
-class Modbusdriver : public Driver
+class ModBusDriver : public Driver
 {
 public:
     //constructor
-    Modbusdriver(int Id, QString name, QString address, int port = 502, int timeout = 30, QString comment = "");
-    Modbusdriver(int Id, QString name, QString port, QString baudrate, QSerialPort::DataBits databits = QSerialPort::Data8,
+    ModBusDriver(int Id, QString name, QString address, int port = 502, int timeout = 30, QString comment = "");
+    ModBusDriver(int Id, QString name, QString port, QString baudrate, QSerialPort::DataBits databits = QSerialPort::Data8,
                  QSerialPort::Parity parity = QSerialPort::EvenParity, QSerialPort::StopBits stopbits = QSerialPort::OneStop, int timeout = 30, QString comment = "");
     //destructor
-    ~Modbusdriver();
+    ~ModBusDriver();
     //structs
     struct MBaddress{
         int devAddr, regAddr;
@@ -27,6 +27,8 @@ public:
     //methods
     void connect() override;
     void disconnect() override;
+    // Driver interface
+    bool insertGroup(Group *group)override;
 private:
     //structs
     struct Task : public MBaddress, CommonTask{};
@@ -42,10 +44,10 @@ private:
     void write(Task * task, const std::function<void()> doNext);
     static bool strToAddr(QString str, MBaddress * adress);
     void scheduleHandler();
-    static QList<Tag*> sortTags(QList<Tag*> listOfTags);
+    static void sortTags(QList<Tag *> &listOfTags);
     static inline bool compare(MBaddress a1, MBaddress a2);
 public slots:
-    void writeRequest(Tag * tag) override;
+    void createWriteTask(Tag * tag) override;
 };
 
 #endif // MODBUSDRIVER_H

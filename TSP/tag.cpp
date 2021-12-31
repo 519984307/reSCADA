@@ -40,6 +40,8 @@ QVariant Tag::readValue()
             return value.toInt();
         case TBool:
             return value.toBool();
+       case TFloat:
+            return value.toFloat();
         default:
             emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag reading error: data type isn\'t valid");
             return 0;
