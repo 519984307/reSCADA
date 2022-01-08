@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtGraphicalEffects 1.15
 
-Item{
+Item {
     id: contItem
     property int radius: 30
     property real level: 0.8
@@ -15,7 +15,7 @@ Item{
     property color borderColor: "black"
     property color mainGradientColor: "#d3d3d3"
     property color contentGradientColor: "steelblue"
-    property int nameTopMargin: height *0.4
+    property int nameTopMargin: height * 0.4
     property int nameTextHeight: nameText.font.pixelSize
     width: 80
     height: 200
@@ -37,8 +37,16 @@ Item{
             anchors.leftMargin: parent.border.width
             anchors.topMargin: parent.border.width
             anchors.bottomMargin: parent.border.width
-            property color colorMGrd2: Qt.hsla(mainGradientColor.hslHue, mainGradientColor.hslSaturation * 0.7, mainGradientColor.hslLightness *1.2,  mainGradientColor.a)
-            property color colorMGrd3: Qt.hsla(mainGradientColor.hslHue, mainGradientColor.hslSaturation * 0.3, mainGradientColor.hslLightness *1.7,  mainGradientColor.a)
+            property color colorMGrd2: Qt.hsla(
+                                           mainGradientColor.hslHue,
+                                           mainGradientColor.hslSaturation * 0.7,
+                                           mainGradientColor.hslLightness * 1.2,
+                                           mainGradientColor.a)
+            property color colorMGrd3: Qt.hsla(
+                                           mainGradientColor.hslHue,
+                                           mainGradientColor.hslSaturation * 0.3,
+                                           mainGradientColor.hslLightness * 1.7,
+                                           mainGradientColor.a)
             Rectangle {
                 id: mSrc
                 anchors.fill: parent
@@ -80,8 +88,16 @@ Item{
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 0
                 visible: showLevel
-                property color colorGrd2: Qt.hsla(contentGradientColor.hslHue, contentGradientColor.hslSaturation * 0.7, contentGradientColor.hslLightness *1.3,  contentGradientColor.a)
-                property color colorGrd3: Qt.hsla(contentGradientColor.hslHue, contentGradientColor.hslSaturation * 0.3, contentGradientColor.hslLightness *1.5,  contentGradientColor.a)
+                property color colorGrd2: Qt.hsla(
+                                              contentGradientColor.hslHue,
+                                              contentGradientColor.hslSaturation * 0.7,
+                                              contentGradientColor.hslLightness * 1.3,
+                                              contentGradientColor.a)
+                property color colorGrd3: Qt.hsla(
+                                              contentGradientColor.hslHue,
+                                              contentGradientColor.hslSaturation * 0.3,
+                                              contentGradientColor.hslLightness * 1.5,
+                                              contentGradientColor.a)
 
                 gradient: Gradient {
                     orientation: Gradient.Horizontal
@@ -106,8 +122,6 @@ Item{
                         color: contentGradientColor
                     }
                 }
-
-
             }
         }
     }
@@ -116,9 +130,9 @@ Item{
         width: parent.width / 2
         height: 3
         color: "#501212"
-        anchors.left: parent.right
+        anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.leftMargin: - width * 0.7
+        anchors.rightMargin: -2
         anchors.bottomMargin: parent.height * levelRatio
         visible: showLevel
     }
@@ -137,12 +151,10 @@ Item{
         font.bold: true
         wrapMode: Text.WordWrap
         minimumPixelSize: 1
-
-
     }
     Text {
         id: levelDig
-        text: qsTr(contItem.level*100 + "%")
+        text: qsTr(contItem.level * 100 + "%")
         anchors.bottom: seam2.top
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
@@ -154,7 +166,7 @@ Item{
     }
     Rectangle {
         id: seam2
-        width: parent.width + parent.width*0.05
+        width: parent.width + parent.width * 0.05
         height: parent.height * 0.01
         visible: showSeam
         border.width: 1
@@ -182,7 +194,7 @@ Item{
 
     Rectangle {
         id: seam1
-        width: parent.width + parent.width*0.05
+        width: parent.width + parent.width * 0.05
         height: parent.height * 0.01
         visible: showSeam
         border.width: 1
@@ -212,11 +224,9 @@ Item{
     }
 }
 
-
-
-
 /*##^##
 Designer {
     D{i:0;formeditorZoom:0.9}
 }
 ##^##*/
+

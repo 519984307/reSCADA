@@ -1,65 +1,69 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 
-UnitPropItem{
+UnitPropItem {
     id: contItem
     width: 40
-    height: 40
+    height: width
     property alias level: regVal.level
     property alias regValve: regVal
-    signal minRangeChanged  ( string value )
-    signal maxRangeChanged  ( string value )
-    signal valveLevelChanged( string value )
+    signal minRangeChanged(string value)
+    signal maxRangeChanged(string value)
+    signal valveLevelChanged(string value)
 
-    function setMinRange ( value: string ) { mangWin.setMinRange( value ) }
-    function setMaxRange ( value: string ) { mangWin.setMaxRange( value ) }
-    function setLvl      ( value: string ) { level = Number( value ) }
+    function setMinRange(value) {
+        mangWin.setMinRange(value)
+    }
+    function setMaxRange(value) {
+        mangWin.setMaxRange(value)
+    }
+    function setLvl(value) {
+        level = Number(value)
+    }
 
     onLevelChanged: {
-        valveLevelChanged( String( level ) )
-        if( Number( mangWin.readValue ) / 100 != level )
-            mangWin.setValue( level * 100 )
+        valveLevelChanged(String(level))
+        if (Number(mangWin.readValue) / 100 != level)
+            mangWin.setValue(level * 100)
     }
     Component.onCompleted: {
-       mangWin.setValue( level * 100 )
+        mangWin.setValue(level * 100)
     }
-
-    RegulValve{
+    RegulValve {
         id: regVal
         anchors.fill: parent
         borderColor: borderCurrentColor
         backgroundColor: backgroundCurrentColor
         nameText.text: name
     }
-    RegPersentWin{
+    RegPersentWin {
         id: mangWin
-        onMaxRangeChanged: maxRangeChanged( value )
-        onMinRangeChanged: minRangeChanged( value )
+        onMaxRangeChanged: maxRangeChanged(value)
+        onMinRangeChanged: minRangeChanged(value)
         onValueChanged: {
-            level = Number( value ) / 100
+            level = Number(value) / 100
         }
     }
 
-    MouseArea{
+    MouseArea {
         anchors.fill: regVal
         acceptedButtons: Qt.RightButton | Qt.LeftButton
         onClicked: {
-            if( mouse.button & Qt.RightButton){
+            if (mouse.button & Qt.RightButton) {
                 openSettings()
-            }
-            else if(mouse.button & Qt.LeftButton ){
+            } else if (mouse.button & Qt.LeftButton) {
                 mangWin.show()
             }
         }
-//        onPressAndHold: {
-//            setLvl( level + 0.05 ) test
-//        }
+        //        onPressAndHold: {
+        //            setLvl( level + 0.05 ) test
+        //        }
     }
 }
-
 
 /*##^##
 Designer {
     D{i:0;formeditorZoom:1.75}
 }
 ##^##*/
+

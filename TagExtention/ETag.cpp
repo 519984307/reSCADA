@@ -43,7 +43,7 @@ ETag::ETag(Unit * Owner,
     connect(this, &ETag::s_logging, _owner, &Unit::logging, Qt::QueuedConnection);
     if(_owner->tagPrefix != "" && _DBName != ""){
         if(g_TSP != nullptr)
-            _tag = g_TSP->GetTagByName(_owner->tagPrefix + _DBName);
+            _tag = g_TSP->getTagByName(_owner->tagPrefix + _DBName);
         if(_tag != nullptr){
             connect(_tag, &Tag::s_onQualityChanged, this, &ETag::_qualityChangedSlot, Qt::QueuedConnection);
             connect(_tag, &Tag::s_onValueChanged, this, &ETag::_acceptValue, Qt::QueuedConnection);

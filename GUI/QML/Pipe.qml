@@ -1,56 +1,43 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import "fap.js" as Fap
 
 Item {
+    width: 200
+    height: 5
     property bool active: false
     property int borderWidth: 2
-    property int angle: 90
-    property int pipeThin: 6
-    property color acolor: Fap.run
-    property color nacolor: Fap.ready
-    width: 60
-    height: 100
-    visible: true
+    property bool horOrVert: true
+    property color activeColor: Fap.run
+    property color nActivColor: Fap.defaultColor
+    property color borderColor: Fap.border
     antialiasing: false
     onActiveChanged: pipe.requestPaint()
-    onAngleChanged: pipe.requestPaint()
+    onHorOrVertChanged: pipe.requestPaint()
 
     Canvas {
-//        MouseArea {
-//            anchors.fill: parent
-//            onClicked: {
-//                active=!active;
-//            }
-//        }
         id: pipe
-        width: parent.width
-        height: parent.height
-        x: 0
-        y: 0
         visible: parent.visible
+        anchors.fill: parent
         onPaint: {
-            var context = getContext("2d");
-            context.clearRect(0,0,width,height);
-            context.lineJoin = "round";
-            context.strokeStyle = Fap.notAlarm;
-            context.lineWidth = pipeThin+borderWidth*2;
-            context.beginPath();
-            context.moveTo(width/2, 0);
-            context.lineTo(width/2, height/2);
-            context.lineTo(width/2+width*height*Math.cos(angle*Math.PI/180), height/2+width*height*Math.sin(angle*Math.PI/180));
-            context.stroke();
-
-            if (active){
-                context.strokeStyle = acolor
-            }else{
-                context.strokeStyle = nacolor
-            }
-            context.lineWidth = pipeThin;
-            context.beginPath();
-            context.moveTo(width/2, 0);
-            context.lineTo(width/2, height/2);
-            context.lineTo(width/2+width*height*Math.cos(angle*Math.PI/180), height/2+width*height*Math.sin(angle*Math.PI/180));
-            context.stroke();
+            var ctx = getContext("2d")
+            ctx.fillStyle = borderColor
+            ctx.rect(0, 0, width, height)
+            ctx.fill()
+            ctx.lineJoin = "miter"
+            ctx.strokeStyle = active ? activeColor : nActivColor
+            ctx.lineWidth = (horOrVert ? height : width) - 2 * borderWidth
+            ctx.beginPath()
+            ctx.moveTo(horOrVert ? 0 : width / 2, horOrVert ? height / 2 : 0)
+            ctx.lineTo(horOrVert ? width : width / 2,
+                       horOrVert ? height / 2 : height)
+            ctx.stroke()
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;formeditorZoom:4}
+}
+##^##*/
+

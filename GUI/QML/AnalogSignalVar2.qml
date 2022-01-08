@@ -3,21 +3,21 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import "fap.js" as Fap
 
-AnalogSignalVar1{
-    signal alarmMaxLvlChanged( variant value )
-    signal alarmMinLvlChanged( variant value )
+AnalogSignalVar1 {
+    signal alarmMaxLvlChanged(variant value)
+    signal alarmMinLvlChanged(variant value)
     property bool max: true
     property bool min: true
-    function setAlarmMaxLvl( value ){
+    function setAlarmMaxLvl(value) {
         maxLvl.setValue(value)
     }
-    function setAlarmMinLvl( value ){
+    function setAlarmMinLvl(value) {
         minLvl.setValue(value)
     }
 
     MFUnit {
         id: maxLvl
-        visible: ! max
+        visible: !max
         width: parent.width
         height: parent.height
         anchors.left: parent.right
@@ -31,7 +31,7 @@ AnalogSignalVar1{
     }
     MFUnit {
         id: minLvl
-        visible: ! min
+        visible: !min
         width: parent.width
         height: parent.height
         anchors.right: parent.left
@@ -50,3 +50,4 @@ Designer {
     D{i:0;formeditorZoom:1.25}
 }
 ##^##*/
+

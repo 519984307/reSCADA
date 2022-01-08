@@ -44,7 +44,7 @@ void SimaticDriver::connect()
   if( !client ) return;
 
   if( !client->Connected() || !noError ){
-    char charAddress[ address.size() ];//TODO сделать нормальный размер
+    char charAddress[ address.size() ];
     memcpy( &charAddress, address.toStdString().c_str(), address.size() );
     charAddress[ address.size() ] = '\0';
 
@@ -130,7 +130,7 @@ inline void SimaticDriver::createReadTasks()
         else{//Добавление новых тегов в текущую задачу.
           if( address->DBNumb == task->DBNumb // DB совпадает
               && address->memArea == task->memArea// и обл. памяти совпадает
-              && (task->memArea == S7AreaDB ? true : address->type == task->type)//! и тип совпадает TODO ужно оптимизировать, чтоб читать из одной DB разные типы скопом.
+              && (task->memArea == S7AreaDB ? true : address->type == task->type)// и тип совпадает
               && group->listOfTags.at(i)->getQuality() == Good//и тег уже успешно опрашивался
               && task->regAddr.memSlot + group->optimRangeMax//и адрес не очень далеко от 1-го тэга в задаче.
                    >= address->regAddr.memSlot) {

@@ -1,6 +1,6 @@
 import QtQuick 2.12
 
-UnitItem{
+UnitItem {
     id: root
     width: 70
     height: 350
@@ -8,26 +8,31 @@ UnitItem{
     property alias tank: tank
     backgroundColor: "#d3d3d3"
 
-    function setLevel( value ) { tempTop.setValue( value ) }
+    function setLevel(value) {
+        tempTop.setValue(value)
+    }
 
-    function setAlarmLevelTop( value ) { alarmTempTop.setLableSilent( value ) }
-    signal alarmTopLevelChanged( variant value )
+    function setAlarmLevelTop(value) {
+        alarmTempTop.setLableSilent(value)
+    }
+    signal alarmTopLevelChanged(variant value)
 
-    function setAlarmLevelButtom( value ) { alarmTempTop.setLableSilent( value ) }
-    signal alarmButtomLevelChanged( variant value )
-
-
+    function setAlarmLevelButtom(value) {
+        alarmTempTop.setLableSilent(value)
+    }
+    signal alarmButtomLevelChanged(variant value)
 
     //++++++++ Test +++++++
-//        mouseArea.onPressAndHold: {
-//            linked = true
-//            connected = true
-//            allovAlarmBlinck = true
-//            setQuitAlarm()
-//            var cl = tank.mainGradientColor
-//            cl = backgroundCurrentColor
-//        }
-   // ------ Test ------
+    //        mouseArea.onPressAndHold: {
+    //            linked = true
+    //            connected = true
+    //            allovAlarmBlinck = true
+    //            setQuitAlarm()
+    //            var cl = tank.mainGradientColor
+    //            cl = backgroundCurrentColor
+    //        }
+    // ------ Test ------
+    UnitItem {}
     Tank {
         id: tank
         objectName: root.objectName + ".tank"
@@ -79,12 +84,4 @@ UnitItem{
         checkLimit: true
         downLimit: 20
     }
-
 }
-
-
-
-
-
-
-

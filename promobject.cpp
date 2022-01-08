@@ -119,8 +119,8 @@ PromObject::~PromObject()
     delete iniRoute;
     delete _unitsThread;
     delete _routeThread;
-    tsp->SaveJson();
-    tsp->Stop();
+    tsp->saveJson();
+    tsp->stop();
     _tspWin->close();
     delete tsp;
     delete _tspWin;
@@ -174,7 +174,7 @@ void PromObject::Logging(Prom::MessType MessTypeID,  QDateTime DateTime, bool Us
 //------------------------------------------------------------------------------
 void PromObject::saveSettings(QString FileName)
 {
-    tsp->SaveJson();
+    tsp->saveJson();
     if( FileName != "" ){
         if( iniUnit != nullptr ){
             iniUnit->sync();
@@ -403,7 +403,7 @@ void PromObject::init()
             }
         }
     }
-    tsp->Start();
+    tsp->start();
 }
 //------------------------------------------------------------------------------
 void PromObject::init(QObject *GUI)
