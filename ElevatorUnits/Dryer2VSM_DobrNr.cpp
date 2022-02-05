@@ -71,31 +71,31 @@ Dryer2VSM_DobrNr::Dryer2VSM_DobrNr( int ID,
     setT15   = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C 15", ".setT15", false, false, false, true, Prom::VCFloatInIntToDouble, true);
     setT16   = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C 16", ".setT16", false, false, false, true, Prom::VCFloatInIntToDouble, true);
 
-    connect( _T1, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
-    connect( _T2, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
-    connect( _T3, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
-    connect( _T4, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
+    connect( _T1, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
+    connect( _T2, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
+    connect( _T3, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
+    connect( _T4, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
     connect( setT1, &OutETag::s_valueChd,            this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
     connect( setT2, &OutETag::s_valueChd,            this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
     connect( setT3, &OutETag::s_valueChd,            this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
     connect( setT4, &OutETag::s_valueChd,            this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempHL, Qt::QueuedConnection );
 
-    connect( _T5, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML1, Qt::QueuedConnection );
-    connect( _T6, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML1, Qt::QueuedConnection );
+    connect( _T5, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML1, Qt::QueuedConnection );
+    connect( _T6, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML1, Qt::QueuedConnection );
     connect( setT5, &OutETag::s_valueChd,              this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML1, Qt::QueuedConnection );
     connect( setT6, &OutETag::s_valueChd,              this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML1, Qt::QueuedConnection );
 
-    connect( _T7, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
-    connect( _T8, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
-    connect( _T9, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
-    connect( _T10, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
-    connect( _T11, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
-    connect( _T12, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
-    connect( _T13, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
-    connect( _T14, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
+    connect( _T7, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
+    connect( _T8, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
+    connect( _T9, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
+    connect( _T10, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
+    connect( _T11, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
+    connect( _T12, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
+    connect( _T13, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
+    connect( _T14, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempML2, Qt::QueuedConnection );
 
-    connect( _T15, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempLL, Qt::QueuedConnection );
-    connect( _T16, &InDiscretETag::ChangeDelectLewel, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempLL, Qt::QueuedConnection );
+    connect( _T15, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempLL, Qt::QueuedConnection );
+    connect( _T16, &InDiscretETag::s_delectLevelChanged, this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempLL, Qt::QueuedConnection );
     connect( setT15, &OutETag::s_valueChd,                 this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempLL, Qt::QueuedConnection );
     connect( setT16, &OutETag::s_valueChd,                 this, &Dryer2VSM_DobrNr::ChangeDetectLvlTempLL, Qt::QueuedConnection );
 

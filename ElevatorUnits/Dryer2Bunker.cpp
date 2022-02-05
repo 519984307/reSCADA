@@ -16,39 +16,39 @@ Dryer2Bunker::Dryer2Bunker( int ID,
     _HL1 = new InDiscretETag( this, "Датчик верхнего уровня 1", ".HL1", true, false, true, false );
     _HL1->onlyChange();
     connect( _HL1, &InDiscretETag::s_valueChd,    this, &Dryer2Bunker::updateState,  Qt::QueuedConnection );
-    connect( _HL1, &InDiscretETag::Detected,   this, &Dryer2Bunker::ActivateHL1,   Qt::QueuedConnection );
-    connect( _HL1, &InDiscretETag::Undetected, this, &Dryer2Bunker::DeactivateHL1, Qt::QueuedConnection );
+    connect( _HL1, &InDiscretETag::s_detected,   this, &Dryer2Bunker::ActivateHL1,   Qt::QueuedConnection );
+    connect( _HL1, &InDiscretETag::s_undetected, this, &Dryer2Bunker::DeactivateHL1, Qt::QueuedConnection );
 
     _ML1 = new InDiscretETag( this, "Датчик среднего уровня 1", ".ML1", true, false, true, false );
     _ML1->onlyChange();
     connect( _ML1, &InDiscretETag::s_valueChd,    this, &Dryer2Bunker::updateState,  Qt::QueuedConnection );
-    connect( _ML1, &InDiscretETag::Detected,   this, &Dryer2Bunker::ActivateML1,   Qt::QueuedConnection );
-    connect( _ML1, &InDiscretETag::Undetected, this, &Dryer2Bunker::DeactivateML1, Qt::QueuedConnection );
+    connect( _ML1, &InDiscretETag::s_detected,   this, &Dryer2Bunker::ActivateML1,   Qt::QueuedConnection );
+    connect( _ML1, &InDiscretETag::s_undetected, this, &Dryer2Bunker::DeactivateML1, Qt::QueuedConnection );
 
     _LL1 = new InDiscretETag( this, "Датчик нижнего уровня 1", ".LL1", true, false, true, false );
     _LL1->onlyChange();
     connect( _LL1, &InDiscretETag::s_valueChd,    this, &Dryer2Bunker::updateState,  Qt::QueuedConnection );
-    connect( _LL1, &InDiscretETag::Detected,   this, &Dryer2Bunker::ActivateLL1,   Qt::QueuedConnection );
-    connect( _LL1, &InDiscretETag::Undetected, this, &Dryer2Bunker::DeactivateLL1, Qt::QueuedConnection );
+    connect( _LL1, &InDiscretETag::s_detected,   this, &Dryer2Bunker::ActivateLL1,   Qt::QueuedConnection );
+    connect( _LL1, &InDiscretETag::s_undetected, this, &Dryer2Bunker::DeactivateLL1, Qt::QueuedConnection );
 
     //----
     _HL2 = new InDiscretETag( this, "Датчик верхнего уровня 2", ".HL2", true, false, true, false );
     _HL2->onlyChange();
     connect( _HL2, &InDiscretETag::s_valueChd,    this, &Dryer2Bunker::updateState,  Qt::QueuedConnection );
-    connect( _HL2, &InDiscretETag::Detected,   this, &Dryer2Bunker::ActivateHL2,   Qt::QueuedConnection );
-    connect( _HL2, &InDiscretETag::Undetected, this, &Dryer2Bunker::DeactivateHL2, Qt::QueuedConnection );
+    connect( _HL2, &InDiscretETag::s_detected,   this, &Dryer2Bunker::ActivateHL2,   Qt::QueuedConnection );
+    connect( _HL2, &InDiscretETag::s_undetected, this, &Dryer2Bunker::DeactivateHL2, Qt::QueuedConnection );
 
     _ML2 = new InDiscretETag( this, "Датчик среднего уровня 2", ".ML2", true, false, true, false );
     _ML2->onlyChange();
     connect( _ML2, &InDiscretETag::s_valueChd,    this, &Dryer2Bunker::updateState,  Qt::QueuedConnection );
-    connect( _ML2, &InDiscretETag::Detected,   this, &Dryer2Bunker::ActivateML2,   Qt::QueuedConnection );
-    connect( _ML2, &InDiscretETag::Undetected, this, &Dryer2Bunker::DeactivateML2, Qt::QueuedConnection );
+    connect( _ML2, &InDiscretETag::s_detected,   this, &Dryer2Bunker::ActivateML2,   Qt::QueuedConnection );
+    connect( _ML2, &InDiscretETag::s_undetected, this, &Dryer2Bunker::DeactivateML2, Qt::QueuedConnection );
 
     _LL2 = new InDiscretETag( this, "Датчик нижнего уровня 2", ".LL2", true, false, true, false );
     _LL2->onlyChange();
     connect( _LL2, &InDiscretETag::s_valueChd,    this, &Dryer2Bunker::updateState,  Qt::QueuedConnection );
-    connect( _LL2, &InDiscretETag::Detected,   this, &Dryer2Bunker::ActivateLL2,   Qt::QueuedConnection );
-    connect( _LL2, &InDiscretETag::Undetected, this, &Dryer2Bunker::DeactivateLL2, Qt::QueuedConnection );
+    connect( _LL2, &InDiscretETag::s_detected,   this, &Dryer2Bunker::ActivateLL2,   Qt::QueuedConnection );
+    connect( _LL2, &InDiscretETag::s_undetected, this, &Dryer2Bunker::DeactivateLL2, Qt::QueuedConnection );
 
 }
 //------------------------------------------------------------------------------

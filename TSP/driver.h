@@ -41,6 +41,7 @@ public:
     QThread * thread = nullptr;
     QTimer * taskTimer;
     bool noError = true;
+    int errorCode {0};
     QList<Group*> listOfGroups;
     //methods
     void qualityFiller(QList<Tag*> listOfTags, Quality quality);

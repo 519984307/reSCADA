@@ -4,50 +4,63 @@ import QtQuick.Controls 2.12
 import "fap.js" as Fap
 
 AnalogSignalVar1 {
-    signal alarmMaxLvlChanged(variant value)
-    signal alarmMinLvlChanged(variant value)
-    property bool max: true
-    property bool min: true
-    function setAlarmMaxLvl(value) {
-        maxLvl.setValue(value)
+    id: analogSignalVar1
+    width: 180
+    height: 40
+    property alias minLvl: minLvl
+    property alias maxLvl: maxLvl
+    property alias valueMinLvl: minLvl.valueReal
+    property alias valueMaxLvl: maxLvl.valueReal
+    property bool maxShow: true
+    property bool minShow: true
+    property int oldZ: 0
+
+    Component.onCompleted: oldZ = z
+
+    mouseArea.onClicked: {
+        if ( mouse.button & Qt.RightButton) {
+            maxLvl.visible = !maxLvl.visible
+            minLvl.visible = !minLvl.visible
+            if(maxLvl.visible){
+                oldZ = z
+                z = 100
+            }
+            else z = oldZ
+        }
     }
-    function setAlarmMinLvl(value) {
-        minLvl.setValue(value)
-    }
+    mouseArea.acceptedButtons: Qt.RightButton
 
     MFUnit {
         id: maxLvl
-        visible: !max
-        width: parent.width
         height: parent.height
-        anchors.left: parent.right
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.top
+        anchors.bottomMargin: - parent.borderWidth
         backgroundColor: "#c36b6b"
         tooltip: "Max"
         readOnly: false
-        disappear: max
+        visible: false
         correctingButtons: true
-        onValueChanged: alarmMaxLvlChanged(value)
-        checkLimit: true
+        checkLimit: false
     }
     MFUnit {
         id: minLvl
-        visible: !min
-        width: parent.width
         height: parent.height
-        anchors.right: parent.left
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.bottom
+        anchors.topMargin: - parent.borderWidth
         backgroundColor: "#6e9ec8"
         tooltip: "Min"
         readOnly: false
-        disappear: min
+        visible: false
         correctingButtons: true
-        onValueChanged: alarmMinLvlChanged(value)
-        checkLimit: true
+        checkLimit: false
     }
 }
-
 /*##^##
 Designer {
     D{i:0;formeditorZoom:1.25}
 }
 ##^##*/
-

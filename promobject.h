@@ -70,8 +70,8 @@ signals:
     void s_routeSetCurrent (QVariant);         //для визуализации
     void s_routeNameUpdate (QVariant, QVariant);//для визуализации
     void s_routeUnitUpdate (QVariant, QVariant);//для визуализации
-    void s_loggingSig(Prom::MessType MessTypeID, QDateTime DateTime, QString User, QString Source, QString Message);
-    void s_setCurrentRouteSig(Route *pRoute);
+    void s_logging(Prom::MessType MessTypeID, QDateTime DateTime, QString User, QString Source, QString Message);
+    void s_setCurrentRoute(Route *pRoute);
     void s_addMessage(QVariant Date, QVariant Time, QVariant Source, QVariant Message);
     //void preDelSelf();
 

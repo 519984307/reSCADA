@@ -1,26 +1,27 @@
 import QtQuick 2.12
 
 UnitItem {
-    id: root
+    id: tankUnit
     width: 70
     height: 350
 
+    property alias level: tank.level
+    property alias alarmTopLevel: alarmTopLevel.valueReal
+    property alias alarmBottomLevel: alarmBottomLevel.valueReal
     property alias tank: tank
-    backgroundColor: "#d3d3d3"
 
-    function setLevel(value) {
-        tempTop.setValue(value)
+    function setLevel( Level ) {
+        level = Level
     }
-
     function setAlarmLevelTop(value) {
-        alarmTempTop.setLableSilent(value)
+        alarmTopLevel.setValue(value)
     }
-    signal alarmTopLevelChanged(variant value)
+    //signal alarmTopLevelChanged(int value)
 
-    function setAlarmLevelButtom(value) {
-        alarmTempTop.setLableSilent(value)
+    function setAlarmLevelBottom(value) {
+        alarmBottomLevel.setValue(value)
     }
-    signal alarmButtomLevelChanged(variant value)
+    //signal alarmBottomLevelChanged(int value)
 
     //++++++++ Test +++++++
     //        mouseArea.onPressAndHold: {
@@ -31,23 +32,32 @@ UnitItem {
     //            var cl = tank.mainGradientColor
     //            cl = backgroundCurrentColor
     //        }
-    // ------ Test ------
-    UnitItem {}
+    //    // ------ Test ------
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton | Qt.LeftButton
+        onClicked: {
+            if (mouse.button & Qt.RightButton) {
+                unP.openSettings()
+            }
+        }
+        //        onPressAndHold: {
+        //            setLvl( level + 0.05 ) test
+        //        }
+    }
     Tank {
         id: tank
-        objectName: root.objectName + ".tank"
+        objectName: tankUnit.objectName + ".tank"
         anchors.fill: parent
-        level: 0.9
-        levelRatio: 0.2
         mainGradientColor: backgroundCurrentColor
         borderWidth: borderWidth
         borderColor: borderCurrentColor
+        nameText.text: name
     }
-
     MFUnit {
         id: alarmTopLevel
         width: 54
-        objectName: root.objectName + ".alarmTopLevel"
+        objectName: tankUnit.objectName + ".alarmTopLevel"
         height: 20
         backgroundColor: "#f03e3e"
         tooltip: "Предельный верхний уровень"
@@ -60,15 +70,15 @@ UnitItem {
         valueFontSize.bold: false
         disappear: true
         correctingButtons: true
-        onValueChanged: root.alarmTopLevelChanged(value)
+        onValueRealChanged: tankUnit.alarmTopLevelChanged(valueReal)
         checkLimit: true
         downLimit: 20
     }
     MFUnit {
-        id: alarmButtomLevel
+        id: alarmBottomLevel
         width: 54
         height: 20
-        objectName: root.objectName + ".alarmButtomLevel"
+        objectName: tankUnit.objectName + ".alarmBottomLevel"
         backgroundColor: "#f03e3e"
         tooltip: "Предельный нижний уровень"
         readOnly: false
@@ -80,8 +90,9 @@ UnitItem {
         valueFontSize.bold: false
         disappear: true
         correctingButtons: true
-        onValueChanged: root.alarmButtomLevelChanged(value)
+        onValueRealChanged: tankUnit.alarmBottomLevelChanged(valueReal)
         checkLimit: true
-        downLimit: 20
+        upLimit: alarmTopLevel.valueReal
+        downLimit: 0
     }
 }

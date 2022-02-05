@@ -7,32 +7,44 @@ Window {
     width: 180
     height: 170
     title: "РК"
-
     flags: Qt.Window | Qt.Dialog
     minimumWidth: 180
     maximumHeight: 170
 
-    signal minRangeChanged ( string value )
-    signal maxRangeChanged ( string value )
-    signal valueChanged    ( string value )
+    property alias value: curValue.valueReal
+    property alias step: regStep.valueReal
 
-    function setMinRange ( value: string ) { minValue.setValue( value ) }
-    function setMaxRange ( value: string ) { maxValue.setValue( value ) }
-    function setValue    ( value: string ) { curValue.setValue( value ) }
-    function readValue   (){
-        return curValue.valueText
+    property alias valueMax: maxValue.valueReal
+    property alias valueMin: minValue.valueReal
+
+    //signal minRangeChanged(int value)
+    //signal maxRangeChanged(int value)
+    //signal valueChanged   (int value)
+    //signal stepChanged    (int value)
+
+    function setValueMinRange( MinRg ) {
+        minValue.setValue( MinRg )
+    }
+    function setValueMaxRange( MaxRg ) {
+        maxValue.setValue( MaxRg )
+    }
+    function setValue(Value) {
+        curValue.setValue( Value )
+    }
+    function setStep( Step ) {
+        regStep.setValue(Step)
     }
 
     onVisibleChanged: {
-        if( visible == true){
-            var absolutePos = mapToGlobal(0,0);
+        if (visible == true) {
+            var absolutePos = mapToGlobal(0, 0)
             x = absolutePos.x
             y = absolutePos.y
             requestActivate()
         }
     }
 
-    Text{
+    Text {
         id: textWrkDp
         height: 20
         text: "РАБОЧИЙ ДИАПАЗОН %"
@@ -43,11 +55,11 @@ Window {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }
-    Rectangle{
+    Rectangle {
         anchors.fill: textFrom
         color: "#6e9ec8"
     }
-    Text{
+    Text {
         id: textFrom
         height: 20
         text: "ОТ"
@@ -58,11 +70,11 @@ Window {
         verticalAlignment: Text.AlignVCenter
         font.pixelSize: height * 0.8
     }
-    Rectangle{
+    Rectangle {
         anchors.fill: textTo
         color: "#c36b6b"
     }
-    Text{
+    Text {
         id: textTo
         height: 20
         text: "ДО"
@@ -77,7 +89,7 @@ Window {
     MFUnit {
         id: maxValue
         height: 20
-        valueText: "80"
+        valueReal: 80
         backgroundColor: "#c36b6b"
         borderColor: "#c36b6b"
         tooltip: "Max"
@@ -86,18 +98,15 @@ Window {
         anchors.left: parent.horizontalCenter
         anchors.right: parent.right
         anchors.top: textTo.bottom
-        anchors.topMargin: 0
-        anchors.leftMargin: 0
-        anchors.rightMargin: 0
         correctingButtons: true
-        onValueChanged:  maxRangeChanged( value )
+        //onValueRealChanged: maxRangeChanged(valueReal)
         checkLimit: true
-        downLimit: Number(minValue.valueText) + 1
+        downLimit: 0//minValue.valueReal + 1
     }
     MFUnit {
         id: minValue
         height: 20
-        valueText: "20"
+        valueReal: 20
         backgroundColor: "#6e9ec8"
         borderColor: "#6e9ec8"
         tooltip: "Min"
@@ -107,26 +116,25 @@ Window {
         anchors.right: parent.horizontalCenter
         anchors.top: textFrom.bottom
         correctingButtons: true
-        onValueChanged:  minRangeChanged( value )
+        //onValueRealChanged: minRangeChanged(valueReal)
         checkLimit: true
-        upLimit: Number(maxValue.valueText) - 1
-
+        upLimit: 100//maxValue.valueReal - 1
     }
-    Item{
+    Item {
         id: item1
         height: 30
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: minValue.bottom
-        Rectangle{
+        Rectangle {
             id: min
-            width: Number(minValue.valueText)/100 * parent.width
+            width: valueMin / 100 * parent.width
             color: "#6e9ec8"
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
         }
-        Rectangle{
+        Rectangle {
             id: wrk
             color: "#1a6b14"
             anchors.left: min.right
@@ -134,23 +142,23 @@ Window {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
         }
-        Rectangle{
+        Rectangle {
             id: max
-            width: (1 - Number(maxValue.valueText)/100) * parent.width
+            width: (1 - valueMax / 100) * parent.width
             color: "#c36b6b"
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.bottom: parent.bottom
         }
-        Rectangle{
+        Rectangle {
             id: recLvl
-            x: Number(curValue.valueText)/100 * parent.width
+            x: value / 100 * parent.width
             width: 2
             height: parent.height * 1.1
             color: "#a3fa96"
         }
     }
-    Rectangle{
+    Rectangle {
         color: "#a3fa96"
         anchors.left: parent.left
         anchors.right: parent.right
@@ -171,7 +179,7 @@ Window {
     MFUnit {
         id: curValue
         height: 40
-        valueText: "60"
+        valueReal: 60
         backgroundColor: "#a3fa96"
         borderColor: "#a3fa96"
         tooltip: "Min"
@@ -181,16 +189,16 @@ Window {
         anchors.right: parent.right
         anchors.top: textLvl.bottom
         correctingButtons: true
-        onValueChanged: root.valueChanged( value )
+        //onValueRealChanged: valueChanged(valueReal)
         checkLimit: true
-        upLimit: Number(maxValue.valueText)
-        downLimit: Number(minValue.valueText)
-        step: Number(regStep.valueText)
+        upLimit: maxValue.valueReal
+        downLimit: minValue.valueReal
+        step: regStep.valueReal
     }
     Text {
         id: stepTxt
         height: 20
-        width: text.length * font.pixelSize *0.7
+        width: text.length * font.pixelSize * 0.7
         text: "ШАГ РЕГУЛИРОВКИ -"
         anchors.left: parent.left
         anchors.top: curValue.bottom
@@ -198,9 +206,9 @@ Window {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }
-    MFUnit{
+    MFUnit {
         id: regStep
-        valueText: "1"
+        valueReal: 1
         height: 20
         backgroundColor: "#a3fa96"
         borderColor: "#a3fa96"
@@ -210,9 +218,7 @@ Window {
         textInput.font.bold: true
         correctingButtons: false
         upLimit: 10
-        downLimit: 0.1
+        downLimit: 1
+        //onValueRealChanged: stepChanged(valueReal)
     }
 }
-
-
-

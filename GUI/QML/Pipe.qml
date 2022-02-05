@@ -8,10 +8,12 @@ Item {
     property int borderWidth: 2
     property bool horOrVert: true
     property color activeColor: Fap.run
-    property color nActivColor: Fap.defaultColor
+    property color nActiveColor: Fap.defaultColor
     property color borderColor: Fap.border
     antialiasing: false
     onActiveChanged: pipe.requestPaint()
+    onActiveColorChanged: pipe.requestPaint()
+    onNActiveColorChanged: pipe.requestPaint()
     onHorOrVertChanged: pipe.requestPaint()
 
     Canvas {
@@ -24,7 +26,7 @@ Item {
             ctx.rect(0, 0, width, height)
             ctx.fill()
             ctx.lineJoin = "miter"
-            ctx.strokeStyle = active ? activeColor : nActivColor
+            ctx.strokeStyle = active ? activeColor : nActiveColor
             ctx.lineWidth = (horOrVert ? height : width) - 2 * borderWidth
             ctx.beginPath()
             ctx.moveTo(horOrVert ? 0 : width / 2, horOrVert ? height / 2 : 0)

@@ -13,7 +13,7 @@ class PLC : public Unit
 {
     Q_OBJECT
 public:
-    explicit PLC(int ID,
+    explicit PLC(int *Id,
                   QString Name,
                   QString TagPefix,
                   Prom::UnitModes SaveMode = Prom::UnMdStart);

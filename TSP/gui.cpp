@@ -10,7 +10,7 @@ TSPWindow::TSPWindow(TSP * tsp, QWidget *parent, int options)
   ui->setupUi(this);
   setWindowTitle("Trofen SCADA platform " + tsp->version);
   if((options & ShowSystemLog) != 0){
-    QObject::connect(tsp, &TSP::s_loggingSig, this, &TSPWindow::statusBarLog);
+    QObject::connect(tsp, &TSP::s_logging, this, &TSPWindow::statusBarLog);
   }
   IconDir * icons = new IconDir();
 
@@ -38,7 +38,7 @@ void TSPWindow::on_tabWidget_currentChanged(int index)
 void TSPWindow::on_action_TSP_triggered()
 {
   ui->tableTags->sortByColumn(4, Qt::AscendingOrder );
-  emit tsp->s_loggingSig(MessVerbose, QDateTime::currentDateTime(), true, "", "GUI action: open help");
+  emit tsp->s_logging(MessVerbose, QDateTime::currentDateTime(), true, "", "GUI action: open help");
   QMessageBox::about(this, "О программе", "Trofen Scada Platform\nВерсия: " + tsp->version + "\nДата сборки: " +
                                             __DATE__ + " " + __TIME__ + "\nАвтор: Булгаков Ярослав\nТелефон: +7915599441");
 }
@@ -121,7 +121,7 @@ void TSPWindow::on_action_inc_triggered()
     case tabDrivers: ui->tableDrivers->incrementValues();    break;
   }
 }
-inline void TSPWindow::setValTagInCurrRow( QVariant value )
+void TSPWindow::setValTagInCurrRow( QVariant value )
 {
   int row = ui->tableTags->currentIndex().row();
   if (row < 0) return;
@@ -129,7 +129,7 @@ inline void TSPWindow::setValTagInCurrRow( QVariant value )
   qDebug()<<V.toString();
   Tag * tag = tsp->getTagById(V.toInt());
   if(tag){
-    emit tsp->s_loggingSig( MessInfo, QDateTime::currentDateTime(), true, tag->objectName(), "GUI action: set TRUE" );
+    emit tsp->s_logging( MessInfo, QDateTime::currentDateTime(), true, tag->objectName(), "GUI action: set TRUE" );
     tag->writeValue(value);
   }
 }

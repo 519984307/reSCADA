@@ -6,13 +6,13 @@
 extern Route * g_currentRoute;
 
 RouteUnit::RouteUnit(Prom::UnitType Type,
-                      int ID,
+                      int *Id,
                       QString Name,
                       QString TagPefix,
                       bool Mover,
                       Prom::UnitModes SaveMode)
     :Unit(Type,
-           ID,
+           Id,
            Name,
            TagPefix,
            Mover,

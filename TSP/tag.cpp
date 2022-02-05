@@ -67,7 +67,7 @@ bool Tag::writeValue(QVariant value)
     if (access != RO && access != NA){
         this->newValue = value;
         ready = false;
-        emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag writing: " + value.toString());
+        //emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag writing: " + value.toString());
         emit s_onWriteRequested(this);
         return true;
     } else {
@@ -80,7 +80,7 @@ void Tag::setValue(QVariant value)
 {
     if (this->value != value){
         this->value = value;
-        emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag value s_valueChd: " + readValue().toString());
+        //emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag value s_valueChd: " + readValue().toString());
         emit s_onValueChanged(value);
     }
     if (ready) newValue = value;
@@ -95,7 +95,7 @@ void Tag::setQuality(Quality quality)
 
     if (this->quality != quality){
         this->quality = quality;
-        emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag quality s_valueChd: " + Prom::qualityToString(quality));
+        //emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag quality s_valueChd: " + Prom::qualityToString(quality));
         emit s_onQualityChanged();
     }
 }

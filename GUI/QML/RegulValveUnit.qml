@@ -5,29 +5,28 @@ UnitPropItem {
     id: contItem
     width: 40
     height: width
-    property alias level: regVal.level
-    property alias regValve: regVal
-    signal minRangeChanged(string value)
-    signal maxRangeChanged(string value)
-    signal valveLevelChanged(string value)
 
+    property alias valvePosition: mangWin.value
+    property alias valveMaxRange: mangWin.valueMax
+    property alias valveMinRange: mangWin.valueMin
+    property alias regValve: regVal
     function setMinRange(value) {
-        mangWin.setMinRange(value)
+        maxRange = Number(value)
     }
     function setMaxRange(value) {
-        mangWin.setMaxRange(value)
+        minRange  = Number(value)
     }
-    function setLvl(value) {
-        level = Number(value)
+    function setValvePosition(value) {
+        valvePosition = Number(value)
     }
 
-    onLevelChanged: {
-        valveLevelChanged(String(level))
-        if (Number(mangWin.readValue) / 100 != level)
-            mangWin.setValue(level * 100)
-    }
+    //    onPositionChanged: {
+    //        positionChanged(String(position))
+    //        if (Number(mangWin.readValue) / 100 != position)
+    //            mangWin.setValue(position * 100)
+    //    }
     Component.onCompleted: {
-        mangWin.setValue(level * 100)
+        regVal.position = valvePosition
     }
     RegulValve {
         id: regVal
@@ -35,14 +34,11 @@ UnitPropItem {
         borderColor: borderCurrentColor
         backgroundColor: backgroundCurrentColor
         nameText.text: name
+        //position: mangWin.value
     }
     RegPersentWin {
         id: mangWin
-        onMaxRangeChanged: maxRangeChanged(value)
-        onMinRangeChanged: minRangeChanged(value)
-        onValueChanged: {
-            level = Number(value) / 100
-        }
+        onValueChanged: regVal.position = value
     }
 
     MouseArea {
@@ -52,11 +48,12 @@ UnitPropItem {
             if (mouse.button & Qt.RightButton) {
                 openSettings()
             } else if (mouse.button & Qt.LeftButton) {
+                mangWin.title = name
                 mangWin.show()
             }
         }
         //        onPressAndHold: {
-        //            setLvl( level + 0.05 ) test
+        //            setLvl( position + 0.05 ) test
         //        }
     }
 }

@@ -22,7 +22,7 @@ class Unit : public QObject
 public:
 
     explicit Unit(Prom::UnitType Type,
-                   int Id,
+                   int *Id,
                    QString Name,
                    QString TagPrefix,
                    bool Mover,

@@ -4,7 +4,7 @@ import QtGraphicalEffects 1.15
 Item {
     id: contItem
     property int radius: 30
-    property real level: 0.8
+    property real level: 80
     property real levelRatio: 0.8
     property alias nameText: nameText
     property alias nameTextPixSize: nameText.font.pixelSize
@@ -84,7 +84,7 @@ Item {
             Rectangle {
                 id: rectLevel
                 width: parent.width
-                height: parent.height * contItem.level * levelRatio
+                height: parent.height * contItem.level / 100 * levelRatio
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 0
                 visible: showLevel
@@ -154,7 +154,7 @@ Item {
     }
     Text {
         id: levelDig
-        text: qsTr(contItem.level * 100 + "%")
+        text: qsTr(contItem.level + "%")
         anchors.bottom: seam2.top
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
@@ -167,7 +167,7 @@ Item {
     Rectangle {
         id: seam2
         width: parent.width + parent.width * 0.05
-        height: parent.height * 0.01
+        height: Math.max(parent.height * 0.01, 3)
         visible: showSeam
         border.width: 1
         anchors.bottom: parent.bottom
@@ -195,7 +195,7 @@ Item {
     Rectangle {
         id: seam1
         width: parent.width + parent.width * 0.05
-        height: parent.height * 0.01
+        height: Math.max(parent.height * 0.01, 3)
         visible: showSeam
         border.width: 1
         anchors.top: parent.top
@@ -226,7 +226,7 @@ Item {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.9}
+    D{i:0;formeditorZoom:1.75}
 }
 ##^##*/
 

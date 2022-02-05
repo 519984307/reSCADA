@@ -5,7 +5,7 @@ Item {
     property bool active: false
     property int borderWidth: 10
     property color activeColor: Fap.ready
-    property color nActivColor: Fap.defaultColor
+    property color nActiveColor: Fap.defaultColor
     property color borderColor: Fap.border
     width: 200
     height: 200
@@ -32,7 +32,7 @@ Item {
             ctx.lineTo(width / 2, height - borderWidth)
             ctx.closePath()
             ctx.stroke()
-            ctx.fillStyle = active ? activeColor : nActivColor
+            ctx.fillStyle = active ? activeColor : nActiveColor
             ctx.fill()
         }
     }

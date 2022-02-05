@@ -3,23 +3,22 @@ import QtGraphicalEffects 1.15
 
 Item {
     id: contItem
-    property real level: 0.4
+    property int position: 40
     property alias nameText: nameText
     property alias nameTextPixSize: nameText.font.pixelSize
-    property bool showLevel: true
+    //property bool showPosition: true
     property int borderWidth: 2
     property color borderColor: "black"
     property color backgroundColor: "steelblue"
-    property bool nameOnLeft: false
+    property bool nameOnLeft: true
     property bool nameOnTop: true
 
     //    onNameOnLeftChanged: nameText.horPos = nameOnLeft ? 1 : -1
     //    onNameOnTopChanged: nameText.vertPos = nameOnLeft ? -1 : 1
     width: 40
     height: 40
-    onLevelChanged: {
-        cnvs.requestPaint()
-    }
+    onPositionChanged: cnvs.requestPaint()
+
     Text {
         id: nameText
         horizontalAlignment: Text.AlignHCenter
@@ -30,7 +29,7 @@ Item {
         wrapMode: Text.NoWrap
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: (nameOnTop ? -1 : 1) * parent.width / 2
-        anchors.horizontalCenterOffset: (nameOnLeft ? -1 : 1) * parent.width
+        anchors.horizontalCenterOffset: (nameOnLeft ? -1 : 1) * (parent.width + width + 2) / 2
         anchors.horizontalCenter: parent.horizontalCenter
         fontSizeMode: Text.HorizontalFit
     }
@@ -76,7 +75,7 @@ Item {
                     ctx.fillStyle = contItem.backgroundColor
                     ctx.moveTo(centreX, centreY)
                     ctx.arc(centreX, centreY, width, Math.PI / 2,
-                            contItem.level * 2 * Math.PI + Math.PI / 2, false)
+                            contItem.position / 100 * 2 * Math.PI + Math.PI / 2, false)
                     ctx.lineTo(centreX, centreY)
                     ctx.fill()
                 }

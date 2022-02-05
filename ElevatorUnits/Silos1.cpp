@@ -18,8 +18,8 @@ Silos1::Silos1( int ID,
     _HL = new InDiscretETag( this, "Датчик верхнего уровня", ".HL", true, false, HLNOnotNC, false );
     _HL->onlyChange();
     connect( _HL, &InDiscretETag::s_valueChd,    this, &Silos1::updateState,  Qt::QueuedConnection );
-    connect( _HL, &InDiscretETag::Detected,   this, &Silos1::ActivateHL,   Qt::QueuedConnection );
-    connect( _HL, &InDiscretETag::Undetected, this, &Silos1::DeactivateHL, Qt::QueuedConnection );
+    connect( _HL, &InDiscretETag::s_detected,   this, &Silos1::ActivateHL,   Qt::QueuedConnection );
+    connect( _HL, &InDiscretETag::s_undetected, this, &Silos1::DeactivateHL, Qt::QueuedConnection );
 }
 //------------------------------------------------------------------------------
 void Silos1::_updateStateAndMode()

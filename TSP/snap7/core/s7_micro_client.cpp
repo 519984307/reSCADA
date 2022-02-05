@@ -2340,7 +2340,6 @@ int TSnap7MicroClient::opGetProtection()
     return Result;
 }
 //******************************************************************************
-//                                     NOTE
 //          PASSWORD HACKING IS VERY FAR FROM THE AIM OF THIS PROJECT
 //  NEXT FUNCTION ONLY ENCODES THE ASCII PASSWORD TO BE DOWNLOADED IN THE PLC.
 //

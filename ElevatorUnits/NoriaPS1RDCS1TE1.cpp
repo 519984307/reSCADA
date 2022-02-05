@@ -28,16 +28,16 @@ NoriaVSM_PS1RDCS1TE1::NoriaVSM_PS1RDCS1TE1( int ID,
     _RDCS = new InDiscretETag( this, "Реле контроля скорости", ".RDCS", true, false, RDCS_NCnotNO );
     if( _engine->startForward->isOn() )_RDCS->needBeDetectedAlarm();
     else _RDCS->needBeUndetectedNoAlarmNoTime();
-    connect( _engine->KMforward, &InDiscretETag::Detected,  _RDCS, &InDiscretETag::needBeDetectedAlarm , Qt::QueuedConnection);
-    connect( _engine->KMforward, &InDiscretETag::Undetected, _RDCS, &InDiscretETag::needBeUndetectedNoAlarm , Qt::QueuedConnection);
+    connect( _engine->KMforward, &InDiscretETag::s_detected,  _RDCS, &InDiscretETag::needBeDetectedAlarm , Qt::QueuedConnection);
+    connect( _engine->KMforward, &InDiscretETag::s_undetected, _RDCS, &InDiscretETag::needBeUndetectedNoAlarm , Qt::QueuedConnection);
 
     _TE = new InDiscretETag( this, "Датчик схода ленты", ".TE", true, false,TE_NCnotNO, false );
     _TE->needBeDetectedAlarmNoTime();
 
     _CRT = new InETag( this, Prom::TpIn, "Ток нагрузки", ".current", true, 30, 1, true, false, true );
     _CRT->needBeUndetectedAlarm();
-    connect( _engine->KMforward,    &InDiscretETag::Detected,   _CRT, &InDiscretETag::needBeUndetectedAlarm,       Qt::QueuedConnection);
-    connect( _engine->KMforward,    &InDiscretETag::Undetected, _CRT, &InDiscretETag::needBeUndetectedAlarmNoTime, Qt::QueuedConnection);
+    connect( _engine->KMforward,    &InDiscretETag::s_detected,   _CRT, &InDiscretETag::needBeUndetectedAlarm,       Qt::QueuedConnection);
+    connect( _engine->KMforward,    &InDiscretETag::s_undetected, _CRT, &InDiscretETag::needBeUndetectedAlarmNoTime, Qt::QueuedConnection);
 }
 
 //------------------------------------------------------------------------------

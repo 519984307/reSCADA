@@ -3,13 +3,13 @@
 #include "OutDiscretETag.h"
 #include "promobject.h"
 
-PLC::PLC(int ID,
+PLC::PLC(int *Id,
           QString Name,
           QString TagPefix,
           Prom::UnitModes SaveMode
          )
     :Unit(Prom::TypePLC,
-           ID,
+           Id,
            Name,
            TagPefix,
            false,

@@ -20,13 +20,13 @@ NoriaRDCS1CRT1::NoriaRDCS1CRT1( int ID,
 
     if( _engine->KMforward->isDetected() )_RDCS->needBeDetectedAlarm();
     else _RDCS->needBeUndetectedAlarm();
-    connect( _engine->KMforward, &InDiscretETag::Detected,   _RDCS, &InDiscretETag::needBeDetectedAlarm , Qt::QueuedConnection);
-    connect( _engine->KMforward, &InDiscretETag::Undetected, _RDCS, &InDiscretETag::needBeUndetectedAlarm , Qt::QueuedConnection);
+    connect( _engine->KMforward, &InDiscretETag::s_detected,   _RDCS, &InDiscretETag::needBeDetectedAlarm , Qt::QueuedConnection);
+    connect( _engine->KMforward, &InDiscretETag::s_undetected, _RDCS, &InDiscretETag::needBeUndetectedAlarm , Qt::QueuedConnection);
 
     _CRT = new InETag( this, Prom::TpIn, "Ток нагрузки", ".current", true, 30, 1, true, false, true );
 
     _CRT->needBeUndetectedAlarm();
-    connect( _engine->KMforward,    &InDiscretETag::Detected,   _CRT, &InDiscretETag::needBeUndetectedAlarm,       Qt::QueuedConnection);
+    connect( _engine->KMforward,    &InDiscretETag::s_detected,   _CRT, &InDiscretETag::needBeUndetectedAlarm,       Qt::QueuedConnection);
 }
 
 //------------------------------------------------------------------------------

@@ -16,20 +16,20 @@ Druer1Bunker::Druer1Bunker( int ID,
     _HL = new InDiscretETag( this, "Датчик верхнего уровня", ".HL", true, false, true, false );
     _HL->onlyChange();
     connect(  _HL, &InDiscretETag::s_valueChd,    this, &Druer1Bunker::updateState,  Qt::QueuedConnection );
-    connect(  _HL, &InDiscretETag::Detected,   this, &Druer1Bunker::ActivateHL,   Qt::QueuedConnection );
-    connect(  _HL, &InDiscretETag::Undetected, this, &Druer1Bunker::DeactivateHL, Qt::QueuedConnection );
+    connect(  _HL, &InDiscretETag::s_detected,   this, &Druer1Bunker::ActivateHL,   Qt::QueuedConnection );
+    connect(  _HL, &InDiscretETag::s_undetected, this, &Druer1Bunker::DeactivateHL, Qt::QueuedConnection );
 
     _ML = new InDiscretETag( this, "Датчик среднего уровня", ".ML", true, false, true, false );
     _ML->onlyChange();
     connect( _ML, &InDiscretETag::s_valueChd,    this, &Druer1Bunker::updateState,  Qt::QueuedConnection );
-    connect( _ML, &InDiscretETag::Detected,   this, &Druer1Bunker::ActivateML,   Qt::QueuedConnection );
-    connect( _ML, &InDiscretETag::Undetected, this, &Druer1Bunker::DeactivateML, Qt::QueuedConnection );
+    connect( _ML, &InDiscretETag::s_detected,   this, &Druer1Bunker::ActivateML,   Qt::QueuedConnection );
+    connect( _ML, &InDiscretETag::s_undetected, this, &Druer1Bunker::DeactivateML, Qt::QueuedConnection );
 
     _LL = new InDiscretETag( this, "Датчик нижнего уровня", ".LL", true, false, true, false );
     _LL->onlyChange();
     connect( _LL, &InDiscretETag::s_valueChd,    this, &Druer1Bunker::updateState,  Qt::QueuedConnection );
-    connect( _LL, &InDiscretETag::Detected,   this, &Druer1Bunker::ActivateLL,   Qt::QueuedConnection );
-    connect( _LL, &InDiscretETag::Undetected, this, &Druer1Bunker::DeactivateLL, Qt::QueuedConnection );
+    connect( _LL, &InDiscretETag::s_detected,   this, &Druer1Bunker::ActivateLL,   Qt::QueuedConnection );
+    connect( _LL, &InDiscretETag::s_undetected, this, &Druer1Bunker::DeactivateLL, Qt::QueuedConnection );
 }
 //------------------------------------------------------------------------------
 void Druer1Bunker::_updateStateAndMode()

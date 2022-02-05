@@ -10,7 +10,7 @@ const ready = "#3a7b9a"
 const blocked = "brown"
 const manual = "yellow"
 const middle = "lime"
-const notAvailable = "darkgray"
+const notAvailable = "black"//darkgray"
 const alarm = "red"
 const notAlarm = "black"
 

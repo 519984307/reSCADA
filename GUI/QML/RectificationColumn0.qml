@@ -5,15 +5,38 @@ import QtGraphicalEffects 1.13
 
 //import LineComponent 1.0
 UnitPropItem {
-    id: rc0
+    id: root
     width: 70
     height: 350
+    property alias pidPTop: pidPTop
+    property alias sbPTop: sbPTop
+
+    property alias tOutWater: tOutWater
     property alias pipeOutWtr1: pipeOutWtr1
-    rotation: 0
-    property alias tempOutWater: tempOutWater
     property alias tank: tank
     //property int pipeThin: 3
-    property int valveNemeSize: 10
+
+//    property alias tempOutWater:         tOutWater.valueText
+//    property alias tempOutWaterAlarmMax: tOutWater.valueMaxLvl
+//    property alias tempOutWaterAlarmMin: tOutWater.valueMinLvl
+
+//    property alias tempTop:         tTop.valueText
+//    property alias tempTopAlarmMax: tTop.valueMaxLvl
+//    property alias tempTopAlarmMin: tTop.valueMinLvl
+
+//    property alias pressTop:         pTop.valueText
+//    property alias pressTopAlarmMax: pTop.valueMaxLvl
+//    property alias pressTopAlarmMin: pTop.valueMinLvl
+
+//    property alias tempBottom:         tBottom.valueText
+//    property alias tempBottomAlarmMax: tBottom.valueMaxLvl
+//    property alias tempBottomAlarmMin: tBottom.valueMinLvl
+
+//    property alias pressBottom:         pTop.valueText
+//    property alias pressBottomAlarmMax: pBottom.valueMaxLvl
+//    property alias pressBottomAlarmMin: pBottom.valueMinLvl
+
+    property int valveNameSize: 10
     property int pipePassThin: 4
     property color pipePassColor: "white"
     property int pipePassBorderWidth: 1
@@ -24,45 +47,31 @@ UnitPropItem {
     property color pipeOutWaterColor: "white" //element.colorCoolWoter
     property int pipeBorderWidth: 1
 
-    function setTempTop(value) {
-        tempTop.setValue(value)
-    }
-    function setAlarmTempTop(value) {
-        alarmTempTop.setAlarmMaxLvl(value)
-    }
-    signal alarmTempTopChanged(variant value)
+    property bool fullView: true
+    //    //property alias PIDpTopOn:pidPTop.
+    //    property alias PIDpTopShow: pidPTop.visible
 
-    function setPresTop(value) {
-        presTop.setValue(value)
-    }
-    function setAlarmPresTop(value) {
-        presTop.setAlarmMaxLvl(value)
-    }
-    signal alarmPresTopChanged(variant value)
+//    function setLevel(value) { level = value}
 
-    function setTempButtom(value) {
-        tempButtom.setValue(value)
-    }
-    function setAlarmTempButtom(value) {
-        tempButtom.setAlarmMaxLvl(value)
-    }
-    signal alarmTempButtomChanged(variant value)
+//    function setTempOutWater(value)         { tempOutWater         = value}
+//    function setTempOutWaterAlarmMax(value) { tempOutWaterAlarmMax = value}
+//    function setTempOutWaterAlarmMin(value) { tempOutWaterAlarmMin = value}
 
-    function setPresButtom(value) {
-        presButtom.setValue(value)
-    }
-    function setAlarmPresButtom(value) {
-        presButtom.setAlarmMaxLvl(value)
-    }
-    signal alarmPresButtomChanged(variant value)
+//    function setTempTop(value)         { tempTop = value}
+//    function setTempTopAlarmMax(value) { tempTopAlarmMax = value}
+//    function setTempTopAlarmMin(value) { tempTopAlarmMin = value}
 
-    function setOutWaterTemp(value) {
-        tempOutWater.setValue(value)
-    }
-    function setAlarmOutWaterTemp(value) {
-        tempOutWater.setAlarmMaxLvl(value)
-    }
-    signal alarmOutWaterTempChanged(variant value)
+//    function setPressTop(value)         { pressTop = value}
+//    function setPressTopAlarmMax(value) { pressTopAlarmMax = value}
+//    function setPressTopAlarmMin(value) { pressTopAlarmMin = value}
+
+//    function setTempBottom(value)         { tempBottom = value}
+//    function setTempBottomAlarmMax(value) { tempBottomAlarmMax = value}
+//    function setTempBottomAlarmMin(value) { tempBottomAlarmMin = value}
+
+//    function setPessBottom(value)         { pressBottom = value}
+//    function setPessBottomAlarmMax(value) { pressBottomAlarmMax = value}
+//    function setPessBottomAlarmMin(value) { pressBottomAlarmMin = value}
 
     backgroundColor: "#d3d3d3"
 
@@ -79,7 +88,7 @@ UnitPropItem {
     MouseArea {
         id: mousAr
         anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
+        acceptedButtons: Qt.RightButton | Qt.LeftButton
         onClicked: {
             if (mouse.button & Qt.RightButton) {
                 openSettings()
@@ -89,37 +98,46 @@ UnitPropItem {
     Tank {
         id: tank
         radius: 10
-        objectName: rc0.objectName + ".tank"
+        objectName:  "cube"
         anchors.fill: parent
-        level: 0.9
+        level: 90
         levelRatio: 0.2
         mainGradientColor: backgroundCurrentColor
         borderWidth: borderWidth
         borderColor: borderCurrentColor
     }
+    PID_Win{
+        id: pidPTop
+        title: "ПИД " + "давление верха " + root.name
+        processName: "Давление верха " + root.name
+        impactName: "Положение клапана охлаждающей воды"
+        objectName:  "pTopPID"
+        onIsOnChanged: sbPTop.check = isOn
+        Component.onCompleted: {
+            sbPTop.check = isOn
+        }
+    }
     AnalogSignalVar2 {
-        id: tempTop
-        objectName: rc0.objectName + ".tempTop"
+        id: tTop
+        objectName: "tTop"
         width: 60
         height: 15
         anchors.left: parent.left
         anchors.top: parent.top
-        anchors.topMargin: 44
+        anchors.topMargin: 55
         anchors.leftMargin: -14
         backgroundColor: "transparent"
         colorShortName: "green"
-        shortNameText: "T"
         valueText: "999.9"
         tooltipText: "Температура верха колонны"
-        onAlarmMaxLvlChanged: rc0.alarmTempTopChanged(value)
     }
     AnalogSignalVar2 {
-        id: presTop
-        objectName: parent.objectName + ".presTop"
+        id: pTop
+        objectName:  "pTop"
         width: 60
         height: 15
         anchors.left: parent.left
-        anchors.top: tempTop.bottom
+        anchors.top: tTop.bottom
         anchors.leftMargin: -14
         anchors.topMargin: 4
         backgroundColor: "transparent"
@@ -127,28 +145,52 @@ UnitPropItem {
         shortNameText: "P"
         valueText: "999.9"
         tooltipText: "Давление верха колонны"
-        onAlarmMaxLvlChanged: rc0.alarmPresTopChanged(value)
+        SimpleButton{
+            id: sbPTop
+            radius: height / 2
+            width: 16
+            height: 16
+            checkable: true
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.left
+            anchors.rightMargin: width / 5
+            pressCheckColor: "#8afda6"
+            mouseArea.onClicked:{
+                if( mouse.button & Qt.RightButton ){
+                    pidPTop.show()
+                }
+            }
+            onCheckChanged: pidPTop.isOn = check
+        }
     }
     AnalogSignalVar2 {
-        id: tempButtom
-        objectName: parent.objectName + ".tempButtom"
+        id: tBottom
+        objectName:  "tBottom"
         y: 240
         width: 60
         height: 15
         anchors.left: parent.left
-        anchors.bottom: presButtom.top
+        anchors.bottom: pBottom.top
         anchors.leftMargin: -14
         anchors.bottomMargin: 4
         backgroundColor: "transparent"
         colorShortName: "green"
-        shortNameText: "T"
         valueText: "999.9"
         tooltipText: "Температура низа колонны"
-        onAlarmMaxLvlChanged: rc0.alarmTempButtomChanged(value)
+    }
+
+    PID_Win{
+        id: pidPBott
+        title: "ПИД " + "давление низа " + root.name
+        processName: "Давление в кубе " + root.name
+        impactName: "Положение клапана пара"
+        objectName:  "pBottomPID"
+        onIsOnChanged: { sbPrButt.check = isOn }
+        Component.onCompleted: sbPrButt.check = isOn
     }
     AnalogSignalVar2 {
-        id: presButtom
-        objectName: parent.objectName + ".presButtom"
+        id: pBottom
+        objectName:  "pBottom"
         y: 259
         width: 60
         height: 15
@@ -161,9 +203,24 @@ UnitPropItem {
         shortNameText: "P"
         valueText: "999.9"
         tooltipText: "Давление низа колонны"
-        onAlarmMaxLvlChanged: rc0.alarmPresButtomChanged(value)
+        SimpleButton{
+            id: sbPrButt
+            radius: height / 2
+            width: 16
+            height: 16
+            checkable: true
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.left
+            anchors.rightMargin: width / 5
+            pressCheckColor: "#8afda6"
+            mouseArea.onClicked:{
+                if( mouse.button & Qt.RightButton ){
+                    pidPBott.show()
+                }
+            }
+            onCheckChanged: { pidPBott.isOn = check }
+        }
     }
-
     Triangle {
         x: -31
         width: pipeOutWaterThin * 2
@@ -173,32 +230,16 @@ UnitPropItem {
         anchors.topMargin: 0
         rotation: 0
         borderWidth: pipeBorderWidth
-        nActivColor: rc0.pipeOutWaterColor
+        nActiveColor: root.pipeOutWaterColor
     }
     Pipe {
         id: pipeOutWtr1
         x: -67
         y: -11
         width: 57
-        height: pipeOutWtrThin
-        anchors.right: parent.horizontalCenter
-        nActivColor: pipeOutWaterColor
+        height: pipeOutWaterThin
+        nActiveColor: pipeOutWaterColor
         borderWidth: pipeBorderWidth
-        anchors.rightMargin: 0
-    }
-
-    PipeAngle {
-        id: pipeOutWtrAng0
-        width: 7
-        height: 7
-        anchors.right: pipeOutWtr1.left
-        anchors.top: pipeOutWtr1.top
-        anchors.rightMargin: 0
-        nActivColor: pipeOutWaterColor
-        pipeThin: pipeOutWaterThin
-        borderWidth: pipeBorderWidth
-        rotation: 180
-        z: 0
     }
 
     Pipe {
@@ -209,13 +250,26 @@ UnitPropItem {
         anchors.top: pipeOutWtrAng0.bottom
         anchors.leftMargin: 0
         anchors.topMargin: 0
-        nActivColor: pipeOutWaterColor
+        nActiveColor: pipeOutWaterColor
         borderWidth: pipeBorderWidth
         horOrVert: false
     }
+
+    PipeAngle90 {
+        id: pipeOutWtrAng0
+        width: 7
+        height: 7
+        anchors.right: pipeOutWtr1.left
+        anchors.top: pipeOutWtr1.top
+        anchors.rightMargin: 0
+        nActiveColor: pipeOutWaterColor
+        pipeThin: pipeOutWaterThin
+        borderWidth: pipeBorderWidth
+        rotation: 180
+    }
     AnalogSignalVar2 {
-        id: tempOutWater
-        objectName: parent.objectName + ".tempOutWater"
+        id: tOutWater
+        objectName:  "tWater"
         width: 60
         height: 15
         anchors.verticalCenter: pipeOutWtr01.verticalCenter
@@ -224,14 +278,15 @@ UnitPropItem {
         colorShortName: "#008000"
         tooltipText: "Температура отходящей воды"
         valueText: "999.9"
-        shortNameText: "T"
-        onAlarmMaxLvlChanged: alarmOutWaterTempChanged(value)
+        //shortNameText: "T"
     }
 }
 
+
+
+
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:4}
+    D{i:0;formeditorZoom:1.5}
 }
 ##^##*/
-

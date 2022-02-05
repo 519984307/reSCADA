@@ -34,7 +34,7 @@ Item {
         border.color: borderColor
         Text {
             id: nameLable
-            text: qsTr("t°")
+            text: qsTr("T")
             anchors.fill: parent
             font.pixelSize: parent.height
             horizontalAlignment: Text.AlignHCenter
@@ -62,10 +62,9 @@ Item {
         MouseArea {
             id: mAr
             anchors.fill: parent
-            hoverEnabled: true
+            //hoverEnabled: true
             onEntered: {
                 tTip.visible = true
-                //TEST setValue(556.36)
             }
             onExited: {
                 tTip.visible = false

@@ -1,13 +1,11 @@
 ﻿import QtQuick 2.15
-import QtQuick.Controls 2.15
+//import QtQuick.Controls 2.15
 import "fap.js" as Fap
 
 Item {
-    id: unitItem
-    property string name: "Unknown Unit"
+    id: unit
+    property string name: "АЕАПП"
     property string description: "Unknown Unit"
-
-    property alias rotate: unitItem.rotation
 
     property bool alarm: false
     property bool alarmNotify: false
@@ -15,8 +13,8 @@ Item {
     property bool allovAlarmBlinck: true
 
     property bool blocked: false
-    property bool linked: true
-    property bool connected: true
+    property bool linked: false
+    property bool connected: false
 
     property color backgroundCurrentColor: Fap.defaultColor
     property color backgroundColor: Fap.ready
@@ -29,10 +27,15 @@ Item {
     property color borderAlarmColor: Fap.borderAlarm
     property color borderNotifyBlincColor: Fap.borderNotify
 
-    Component.onCompleted: {
-        renewColors()
-    }
-
+//    Component.onCompleted: {
+//        linkColors()
+//        renewColors()
+//    }
+    signal resetAlarm()
+//    function linkColors() {
+//        //backgroundColor = backgroundCurrentColor
+//        //borderColor = borderCurrentColor
+//    }
     function setAlarm() {
         alarm = true
     }
@@ -53,6 +56,7 @@ Item {
         notify = false
     }
     function setLinked() {
+        linkColors()
         linked = true
     }
     function setConnected() {
@@ -61,12 +65,13 @@ Item {
     function setDisconnected() {
         connected = false
     }
-    function setExName(val) {
+    function setName(val) {
         name = val
     }
 
     function renewColors() {
         if (!linked) {
+ //           linkColors()
             timer.stop()
             backgroundCurrentColor = Fap.notAvailable
             borderCurrentColor = Fap.notAvailable
@@ -108,7 +113,6 @@ Item {
             }
         }
     }
-
     onAlarmChanged: renewColors()
 
     onAlarmNotifyChanged: {
@@ -130,7 +134,6 @@ Item {
         else if (!alarmNotify)
             timer.stop()
     }
-    //WARNING проверить чтоб не перекрылость переопределением в наследниках (Fan)
     onBlockedChanged: renewColors()
     onLinkedChanged: renewColors()
     onConnectedChanged: renewColors()

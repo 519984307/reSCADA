@@ -33,11 +33,11 @@ UnloadTableLg::UnloadTableLg( int ID,
     }
     _pos->needBeDetectedAlarm();
 
-    connect( _engine->KMforward, &InDiscretETag::Detected,   _pos, &InDiscretETag::needBeDetectedAlarm, Qt::QueuedConnection);
-    connect( _engine->KMforward, &InDiscretETag::Undetected, _pos, &InDiscretETag::needBeDetectedAlarm, Qt::QueuedConnection);
+    connect( _engine->KMforward, &InDiscretETag::s_detected,   _pos, &InDiscretETag::needBeDetectedAlarm, Qt::QueuedConnection);
+    connect( _engine->KMforward, &InDiscretETag::s_undetected, _pos, &InDiscretETag::needBeDetectedAlarm, Qt::QueuedConnection);
 
-    connect( _engine->KMforward, &InDiscretETag::Detected,   _pos, &InDiscretETag::pulsSensorON,  Qt::QueuedConnection);
-    connect( _engine->KMforward, &InDiscretETag::Undetected, _pos, &InDiscretETag::pulsSensorOFF, Qt::QueuedConnection);
+    connect( _engine->KMforward, &InDiscretETag::s_detected,   _pos, &InDiscretETag::pulsSensorON,  Qt::QueuedConnection);
+    connect( _engine->KMforward, &InDiscretETag::s_undetected, _pos, &InDiscretETag::pulsSensorOFF, Qt::QueuedConnection);
 
     _forseSop = new OutDiscretETag( this, Prom::PreSet,
                                     "Аварийный стоп", ".forseStop");

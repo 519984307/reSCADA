@@ -481,7 +481,7 @@ void Route::DeleteLastUnit()
 //------------------------------------------------------------------------------
 void Route::SetAsCurrent()
 {
-    emit owner->s_setCurrentRouteSig(this);
+    emit owner->s_setCurrentRoute(this);
 }
 
 //------------------------------------------------------------------------------

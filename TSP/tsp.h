@@ -53,7 +53,7 @@ public:
     void loadJson(QString FileName = "tags.json");
     void saveJson(QString FileName = "tags.json");
 signals:
-    void s_loggingSig(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
+    void s_logging(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
 private:
     //variables
     //int maxId = 0;

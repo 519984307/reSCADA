@@ -258,6 +258,7 @@ void OutDiscretETag::saveParam()
 void OutDiscretETag::loadParam()
 {
     if(tunableImpulseTime){
+      if( _owner->ini->contains(_owner->tagPrefix+ "/" + _DBName + ".impTime") )
         _impTimer->setInterval(_owner->ini->value(_owner->tagPrefix+ "/" + _DBName + ".impTime", tunableImpulseTime ? 2000 : 0).toInt());
         //qDebug() << _DBName + " Load " << _impTimer->interval();
     }

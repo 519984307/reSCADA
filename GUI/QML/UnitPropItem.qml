@@ -3,23 +3,22 @@ import QtQuick.Controls 2.15
 import "fap.js" as Fap
 
 UnitItem {
-    id: unitPropItem
-    property alias propertyWindow3: proWindow
-    signal resetAlarm()
-    function openSettings(){
-        if(proWindow.visible == false){
-            var absolutePos = mapToGlobal(0,0);
-            proWindow.x = absolutePos.x
-            proWindow.y = absolutePos.y
-            proWindow.show()
+    id: unitProp
+    property alias propertyWindow: propWindow
+    function openSettings() {
+        if (propWindow.visible == false) {
+            var absolutePos = mapToGlobal(0, 0)
+            propWindow.x = absolutePos.x
+            propWindow.y = absolutePos.y
+            propWindow.show()
         }
-        proWindow.requestActivate()
+        propWindow.requestActivate()
     }
     PropertyWindow3 {
-        id: proWindow
-        objectName: parent.objectName + ".proWindow"
+        id: propWindow
+        objectName: "propWindow"
         winTitle: name
-        onResetAlarm: parent.resetAlarm()
+        onResetAlarm: unitProp.resetAlarm()
     }
 }
 
@@ -28,3 +27,4 @@ Designer {
     D{i:0;autoSize:true;height:480;width:640}
 }
 ##^##*/
+

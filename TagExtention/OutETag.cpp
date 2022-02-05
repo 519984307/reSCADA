@@ -229,7 +229,8 @@ void OutETag::_checkPulse()
 //------------------------------------------------------------------------------
 void OutETag::loadParam()
 {
-    if(_owner->ini && saveValue){
+    if(_owner->ini && saveValue
+      && _owner->ini->contains(_owner->tagPrefix+ "/" + _DBName + ".hardInitValue") ){
         _iniValue = _owner->ini->value(_owner->tagPrefix+ "/" + _DBName + ".hardInitValue", (_owner->ini->value(_owner->tagPrefix+ "/" + _DBName + ".value", 0).toDouble())).toDouble();
         _setedValue = _iniValue;
         _value = _iniValue;

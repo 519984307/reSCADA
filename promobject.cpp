@@ -4,7 +4,7 @@
 #include <QMediaPlayer>
 #include <QCoreApplication>//подключаем ядро Simargl SCADA
 #include <QThread>
-#include <QQmlContext>
+//#include <QQmlContext>
 
 #include "promobject.h"
 #include "unit.h"
@@ -33,7 +33,7 @@ PromObject::PromObject(/*QQmlContext *QMLcontext,*/
 
     _logThread = new LogThread();
     _logThread->start();
-    connect(this, &PromObject::s_loggingSig, _logThread->LogMaster, &Log::Logging, Qt::QueuedConnection);
+    connect(this, &PromObject::s_logging, _logThread->LogMaster, &Log::Logging, Qt::QueuedConnection);
     Logging(Prom::MessInfo, QDateTime::currentDateTime(), false, "SCADA", "ВКЛЮЧЕНИЕ");
 
     _currentRoute = nullptr;
@@ -119,7 +119,6 @@ PromObject::~PromObject()
     delete iniRoute;
     delete _unitsThread;
     delete _routeThread;
-    tsp->saveJson();
     tsp->stop();
     _tspWin->close();
     delete tsp;
@@ -152,8 +151,8 @@ void PromObject::MegaRescan()
 void PromObject::alarmDo()
 {
     if(_alarmSoundF && _alarmSoundF->isFinished()) {
-        _alarmSoundF->setLoops(3);
-        _alarmSoundF->play();
+//        _alarmSoundF->setLoops(3);
+//        _alarmSoundF->play();
     }
 }
 
@@ -168,13 +167,13 @@ void PromObject::Logging(Prom::MessType MessTypeID,  QDateTime DateTime, bool Us
 {
     if(MessTypeID == Prom::MessAlarm || MessTypeID == Prom::MessQuitAlarm  || MessTypeID == Prom::MessWarning)
         emit s_addMessage(DateTime.toString("yyyy.MM.dd"), DateTime.toString("hh:mm:ss"), Source, Message);
-    emit s_loggingSig(MessTypeID, DateTime, UserOrSys ? "Оператор" : "Система", Source, Message);
+    emit s_logging(MessTypeID, DateTime, UserOrSys ? "Оператор" : "Система", Source, Message);
     //qDebug()<< DateTime << Source + Message;
 }
 //------------------------------------------------------------------------------
 void PromObject::saveSettings(QString FileName)
 {
-    tsp->saveJson();
+    //tsp->saveJson();
     if( FileName != "" ){
         if( iniUnit != nullptr ){
             iniUnit->sync();
@@ -202,7 +201,7 @@ void PromObject::_createRoute(int ID)
 {
     emit s_routeCreated(ID);
     _currentRoute = new Route(this, ID);
-    s_routeNameUpdate(ID, _currentRoute->objectName());
+    emit s_routeNameUpdate(ID, _currentRoute->objectName());
     _RouteList.append(_currentRoute);
     _currentRoute->moveToThread(_routeThread);
 }
@@ -256,7 +255,7 @@ Unit * PromObject::UnitByName(QString Name)
 void PromObject::DeleteRoute(int id)
 {
     Route * r = _RouteList.takeAt(_indOfRouteByID(id));
-    emit Logging(Prom::MessInfo, QDateTime::currentDateTime(), false, r->objectName(), " удален");
+    Logging(Prom::MessInfo, QDateTime::currentDateTime(), false, r->objectName(), " удален");
     if(_currentRoute == r) _currentRoute = nullptr;
     delete r;
     iniRoute->remove(QString::number(id));
@@ -350,7 +349,7 @@ void PromObject::init()
     connect(_gui, SIGNAL(showTags()),         this, SLOT(  ShowTags()),          Qt::QueuedConnection);
     connect(this, SIGNAL(s_loaded()),         _gui, SLOT(  checkLoaded()),       Qt::QueuedConnection);
 
-    connect(this, &PromObject::s_setCurrentRouteSig, this,  &PromObject::SetCurrentRoute);
+    connect(this, &PromObject::s_setCurrentRoute, this,  &PromObject::SetCurrentRoute);
 
 
     QObject* routeGui = _gui->findChild<QObject*>("routeWindow");

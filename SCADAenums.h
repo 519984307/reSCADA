@@ -143,7 +143,8 @@ enum UnitType {
     TypeDryer1_Bunker,
     TypeDryer3_Bunker,
     TypeCombustor,
-    TypeDruer
+    TypeDruer,
+    TypeRectnColumn
 };
 Q_ENUM_NS(UnitType)
 
@@ -351,6 +352,6 @@ struct TagConfig{
 //Q_DECLARE_METATYPE(Prom::RouteCommand);
 //Q_DECLARE_METATYPE(Prom::RouteUnitInfo);
 
-Q_DECLARE_METATYPE(Prom::ETagValConv);
-Q_DECLARE_METATYPE(Prom::ESTagType);
+//Q_DECLARE_METATYPE(Prom::ETagValConv);
+//Q_DECLARE_METATYPE(Prom::ESTagType);
 #endif // SCADAENUMS_H

@@ -21,8 +21,8 @@ OWSinhroTransporter::OWSinhroTransporter( int ID,
 
     _SS->pulsSensor( true );
     _SS->onlyChange();
-    connect( _SS, &InETag::Detected, this, &Unit::updateState, Qt::QueuedConnection );
-    connect( _SS, &InETag::Undetected, this, &Unit::updateState, Qt::QueuedConnection );
+    connect( _SS, &InETag::s_detected, this, &Unit::updateState, Qt::QueuedConnection );
+    connect( _SS, &InETag::s_undetected, this, &Unit::updateState, Qt::QueuedConnection );
 }
 
 //------------------------------------------------------------------------------

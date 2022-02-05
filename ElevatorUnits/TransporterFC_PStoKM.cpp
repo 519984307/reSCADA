@@ -25,8 +25,8 @@ TransporterFC_PStoKM::TransporterFC_PStoKM( int ID,
         _PS->needBeDetectedAlarm();
     else _PS->needBeUndetectedAlarm();
 
-    connect( _engine->KMforward, &InDiscretETag::Detected,   _PS, &InDiscretETag::needBeDetectedAlarm,   Qt::QueuedConnection);
-    connect( _engine->KMforward, &InDiscretETag::Undetected, _PS, &InDiscretETag::onlyChange, Qt::QueuedConnection);
+    connect( _engine->KMforward, &InDiscretETag::s_detected,   _PS, &InDiscretETag::needBeDetectedAlarm,   Qt::QueuedConnection);
+    connect( _engine->KMforward, &InDiscretETag::s_undetected, _PS, &InDiscretETag::onlyChange, Qt::QueuedConnection);
     connect( _engine->startForward, &OutDiscretETag::s_on,   _PS, &InDiscretETag::needBeDetectedAlarm,   Qt::QueuedConnection);
     connect( _engine->startForward, &OutDiscretETag::s_off, _PS, &InDiscretETag::onlyChange, Qt::QueuedConnection);
 }

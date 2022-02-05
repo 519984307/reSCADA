@@ -18,20 +18,20 @@ Silos3::Silos3( int ID,
     _HL = new InDiscretETag( this, "Датчик верхнего уровня", ".HL", true, false, HLNOnotNC, false );
     _HL->onlyChange();
     connect( _HL, &InDiscretETag::s_valueChd,    this, &Silos3::updateState,  Qt::QueuedConnection );
-    connect( _HL, &InDiscretETag::Detected,   this, &Silos3::ActivateHL,   Qt::QueuedConnection );
-    connect( _HL, &InDiscretETag::Undetected, this, &Silos3::DeactivateHL, Qt::QueuedConnection );
+    connect( _HL, &InDiscretETag::s_detected,   this, &Silos3::ActivateHL,   Qt::QueuedConnection );
+    connect( _HL, &InDiscretETag::s_undetected, this, &Silos3::DeactivateHL, Qt::QueuedConnection );
 
     _ML = new InDiscretETag( this, "Датчик среднего уровня", ".ML", true, false, HLNOnotNC, false );
     _ML->onlyChange();
     connect( _ML, &InDiscretETag::s_valueChd,    this, &Silos3::updateState,  Qt::QueuedConnection );
-    connect( _ML, &InDiscretETag::Detected,   this, &Silos3::ActivateML,   Qt::QueuedConnection );
-    connect( _ML, &InDiscretETag::Undetected, this, &Silos3::DeactivateML, Qt::QueuedConnection );
+    connect( _ML, &InDiscretETag::s_detected,   this, &Silos3::ActivateML,   Qt::QueuedConnection );
+    connect( _ML, &InDiscretETag::s_undetected, this, &Silos3::DeactivateML, Qt::QueuedConnection );
 
     _LL = new InDiscretETag( this, "Датчик нижнего уровня", ".LL", true, false, HLNOnotNC, false );
     _LL->onlyChange();
     connect( _LL, &InDiscretETag::s_valueChd,    this, &Silos3::updateState,  Qt::QueuedConnection );
-    connect( _LL, &InDiscretETag::Detected,   this, &Silos3::ActivateLL,   Qt::QueuedConnection );
-    connect( _LL, &InDiscretETag::Undetected, this, &Silos3::DeactivateLL, Qt::QueuedConnection );
+    connect( _LL, &InDiscretETag::s_detected,   this, &Silos3::ActivateLL,   Qt::QueuedConnection );
+    connect( _LL, &InDiscretETag::s_undetected, this, &Silos3::DeactivateLL, Qt::QueuedConnection );
 
 }
 //------------------------------------------------------------------------------

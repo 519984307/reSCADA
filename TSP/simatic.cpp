@@ -41,7 +41,13 @@ void SimaticDriver::initThread()
 //Проверяет соединение с ПЛК, если его нет - соединяет
 void SimaticDriver::connect()
 {
-  if( !client ) return;
+  if( !client ) {
+  noError = false;
+  emit s_logging(MessError, QDateTime::currentDateTime(),
+                       false, this->objectName(),
+                       "driver is null" );
+  return;
+  }
 
   if( !client->Connected() || !noError ){
     char charAddress[ address.size() ];
@@ -58,10 +64,11 @@ void SimaticDriver::connect()
     }
     else {//Нет соединения. Сообщение об ошибке в лог.
       noError = false;
-      emit s_logging(MessError, QDateTime::currentDateTime(),
-                     false, this->objectName(),
-                     std::string("Simatic driver connection error: "
-                                 + ( res < 0 ? "libruary error" : CliErrorText(res)) ).c_str() );
+      if( errorCode != res )emit s_logging(MessError, QDateTime::currentDateTime(),
+                       false, this->objectName(),
+                       std::string("Simatic driver connection error: "
+                                   + ( res < 0 ? "libruary error" : CliErrorText(res)) ).c_str() );
+      errorCode = res;
     }
     if (!started){
       started = true;
@@ -88,18 +95,30 @@ void SimaticDriver::disconnect()
 //------------------------------------------------------------------------------
 void SimaticDriver::handleNextTask()
 {
-  if (listOfTasks.count() > 0){
-    Task * task = listOfTasks.takeFirst();
-    if (task->writeTask)
-      write(task);
-    else
-      read(task);
-    delete task;
+  if( started ){
+    if( client->Connected() ){
+      if (listOfTasks.count() > 0){
+        Task * task = listOfTasks.takeFirst();
+        if (task->writeTask)
+          write(task);
+        else
+          read(task);
+        delete task;
+      }
+      else{
+        createReadTasks();
+      }
+    }
+    else{
+      foreach (Group * group, listOfGroups) {//Перебор групп.
+        //errorFiller(group->listOfTags, "driver read error: driver isn\'t connected");
+        qualityFiller(group->listOfTags, Bad);
+        group->update();
+      }
+      connect();
+    }
+    scheduleHandler();
   }
-  else{
-    createReadTasks();
-  }
-  scheduleHandler();
 }
 //------------------------------------------------------------------------------
 //Разбивает теги группы на задачи(task) с тэгами у которых адреса идут один за другим.
@@ -115,7 +134,10 @@ inline void SimaticDriver::createReadTasks()
       for (int i = 0; i < group->listOfTags.count(); i++){
         //Пулучение адреса тэга з приепленной к нему структуры.
         address = static_cast<SimAddress*>( group->listOfTags.at(i)->speshData );
-        if( address->regAddr.memSlot == -1 ) continue; //Пропуск негодных тэгов
+        //Пропуск негодных или заккрытых для чтения тэгов
+        if( address->regAddr.memSlot == -1
+            || group->listOfTags.at(i)->access == WO
+            || group->listOfTags.at(i)->access == NA ) continue;
 
         if ( !task ){//Если формируется новая задача...
           task = new Task;
@@ -143,15 +165,20 @@ inline void SimaticDriver::createReadTasks()
         }
 
       }
-      group->update();//Не уместно: группа обновляет данные перед новым запросом
+      if(group->listOfTags.count())
+        group->update();//TODO Переделать. Не уместно: группа обновляет данные перед новым запросом
     }
   }
 }
 //------------------------------------------------------------------------------
 void SimaticDriver::createWriteTask(Tag *tag)
 {
-  SimAddress *address;
+  SimAddress * address;
   address = static_cast<SimAddress*>( tag->speshData );
+  //Пропуск негодных или заккрытых для записи тэгов
+  if( address->regAddr.memSlot == -1
+      || tag->access == RO
+      || tag->access == NA ) return;
   Task * task = new Task;
   task->writeTask = true;
   task->memArea = address->memArea;
@@ -181,15 +208,17 @@ inline int amtFromType( SimAddress *lastTagAdr, SimaticDriver::Task *task )
     return 1 + lastTagAdr->regAddr.memSlot - task->regAddr.memSlot;// +1 т.к. включая начальный элемент
   }
 }
+//NOTE просто захотелось побаловаться с #define))) Ни разу не пробовал.
+#define offsetBuff (tagAdr->regAddr.memSlot - task->regAddr.memSlot) * sizeKf
 //------------------------------------------------------------------------------
 void SimaticDriver::read( SimaticDriver::Task *task )
 {
   if(!client) {
-    errorFiller(task->listOfTags, "driver read error: driver is null"); qualityFiller(task->listOfTags, Bad);
+    errorFiller(task->listOfTags, "driver read error: driver is null");
+    qualityFiller(task->listOfTags, Bad);
     //emit LoggingSystem(MessError, QDateTime::currentDateTime(), this->objectName(), "Simatic driver read error: driver is null");
     return;
   }
-  if (started) connect();
   if(client->Connected()){
     SimAddress * lastTagAdr = static_cast<SimAddress*>(task->listOfTags.last()->speshData);//Получение адреса тэга
     int_fast8_t sizeKf = dataSizeByte( task->type );//Вычисление поправ-го коэф-та в зависимости от типа
@@ -207,24 +236,24 @@ void SimaticDriver::read( SimaticDriver::Task *task )
 
         switch (tagAdr->type) {
           case S7WLBit:
-            tag->setValue( GetBitAt( data, tagAdr->regAddr.memSlot * sizeKf,
+            tag->setValue( GetBitAt( data, offsetBuff,
                                    tagAdr->regAddr.bit ) );
             break;
           case S7WLByte:
-            tag->setValue( GetByteAt( data, tagAdr->regAddr.memSlot * sizeKf) );
+            tag->setValue( GetByteAt( data,offsetBuff) );
             break;
           case S7WLWord:
-            tag->setValue( GetIntAt( data, tagAdr->regAddr.memSlot * sizeKf ) );
+            tag->setValue( GetIntAt( data, offsetBuff ) );
             break;
           case S7WLCounter:
           case S7WLTimer:
-            tag->setValue( GetWordAt( data, tagAdr->regAddr.memSlot * sizeKf ) );
+            tag->setValue( GetWordAt( data, offsetBuff ) );
             break;
           case S7WLDWord:
-            if( tag->type == TFloat ) tag->setValue( GetRealAt( data, tagAdr->regAddr.memSlot * sizeKf ));
-            else tag->setValue( GetDIntAt( data, tagAdr->regAddr.memSlot * sizeKf ) );
+            if( tag->type == TFloat ) tag->setValue( GetRealAt( data, offsetBuff ));
+            else tag->setValue( GetDIntAt( data, offsetBuff ) );
             break;
-            //Такого варианта не будет, т.к. он кодируется в егах просто как Double Word
+            //Такого варианта не будет, т.к. он кодируется в тегах просто как Double Word
             //          case S7WLReal:
             //            tag->setValue( (double)GetRealAt( data, tagAdr->regAddr.memSlot * kf ) );
             //            break;
@@ -242,10 +271,6 @@ void SimaticDriver::read( SimaticDriver::Task *task )
       errorFiller(task->listOfTags, "driver read error: " + QString(CliErrorText(res).c_str()));
       qualityFiller(task->listOfTags, Bad);
     }
-  }
-  else{
-    errorFiller(task->listOfTags, "driver read error: driver isn\'t connected");
-    qualityFiller(task->listOfTags, Bad);
   }
 }
 //------------------------------------------------------------------------------
@@ -271,7 +296,7 @@ void SimaticDriver::write(SimaticDriver::Task *task )
     for (int i = 0; i < task->listOfTags.count(); i++ ) {
       SimAddress * tagAdr = static_cast<SimAddress*>(task->listOfTags.at(i)->speshData);
       //Смещение внутри буфера записи
-#define offsetBuff (tagAdr->regAddr.memSlot - task->regAddr.memSlot) * sizeKf
+
       switch (tagAdr->type) {
         case S7WLBit:
           //!TODO попробовать, может ПЛК нормально отреагирует на установку бита в DB с task->type == S7WLBit?
@@ -357,7 +382,7 @@ void SimaticDriver::sortTags(QList<Tag *> &listOfTags)
   while( !ready ){ //bubble sorting
     ready = true;
     for( int i = 0; i < listOfTags.count() - 1; i++ ){
-      if( *static_cast<SimAddress*>(listOfTags.at(i    )->speshData)> *static_cast<SimAddress*>(listOfTags.at(i + 1)->speshData) ){
+      if( *static_cast<SimAddress*>(listOfTags.at(i)->speshData) > *static_cast<SimAddress*>(listOfTags.at(i + 1)->speshData) ){
         listOfTags.swapItemsAt( i, i+1 );
         ready = false;
       }

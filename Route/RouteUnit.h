@@ -14,7 +14,7 @@ class RouteUnit : public Unit
     Q_OBJECT
 public:
     explicit RouteUnit(Prom::UnitType Type,
-                        int ID,
+                        int *Id,
                         QString Name,
                         QString TagPefix,
                         bool Mover,

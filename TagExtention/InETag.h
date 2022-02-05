@@ -58,9 +58,9 @@ protected:
     virtual bool _checkDetect();
 
 signals:
-    void Detected();
-    void Undetected();
-    void ChangeDelectLewel(QVariant setVal);
+    void s_detected();
+    void s_undetected();
+    void s_delectLevelChanged(QVariant setVal);
 
 public slots:
     void writeImit(bool setImit)  override;
