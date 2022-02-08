@@ -73,7 +73,7 @@ public:
     bool sensorsConnected() const  { return _sensorsConnected; }
 
     PromObject *owner() const;
-    void setOwner(PromObject *value);
+    void setOwner(PromObject *Owner);
 
     int id() const;
     void setId(int value);
@@ -120,8 +120,8 @@ private:
     QVector< QTimerExt * > _allTimers;
 
 signals:
-    void s_quitAlarm(QString);//для визуализации
-    void s_alarm(QString);//для визуализации
+    void s_quitAlarm(QVariant);//для визуализации
+    void s_alarm(QVariant);//для визуализации
     void s_alarmReseted();
     void s_modeChange(Unit *);
     void s_stateChange(Unit *);
@@ -144,8 +144,8 @@ public slots:
     void setExName( QString exName) { _exName = exName; }
     void writeCleanDelay(QVariant);
     void logging(Prom::MessType MessTypeID, QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
-    void connectToGUI(const QObject * GUI);
-    virtual void detectAlarm(QString Description);
+    bool connectToGUI(const QObject * GUI);
+    virtual void detectAlarm(QVariant Description);
     virtual void detectSubUnitAlarm(Unit * unit, QString Description);
 
 protected slots:

@@ -14,27 +14,7 @@ UnitPropItem {
     property alias tOutWater: tOutWater
     property alias pipeOutWtr1: pipeOutWtr1
     property alias tank: tank
-    //property int pipeThin: 3
-
-//    property alias tempOutWater:         tOutWater.valueText
-//    property alias tempOutWaterAlarmMax: tOutWater.valueMaxLvl
-//    property alias tempOutWaterAlarmMin: tOutWater.valueMinLvl
-
-//    property alias tempTop:         tTop.valueText
-//    property alias tempTopAlarmMax: tTop.valueMaxLvl
-//    property alias tempTopAlarmMin: tTop.valueMinLvl
-
-//    property alias pressTop:         pTop.valueText
-//    property alias pressTopAlarmMax: pTop.valueMaxLvl
-//    property alias pressTopAlarmMin: pTop.valueMinLvl
-
-//    property alias tempBottom:         tBottom.valueText
-//    property alias tempBottomAlarmMax: tBottom.valueMaxLvl
-//    property alias tempBottomAlarmMin: tBottom.valueMinLvl
-
-//    property alias pressBottom:         pTop.valueText
-//    property alias pressBottomAlarmMax: pBottom.valueMaxLvl
-//    property alias pressBottomAlarmMin: pBottom.valueMinLvl
+    property int colderDiametr: width * 0.7
 
     property int valveNameSize: 10
     property int pipePassThin: 4
@@ -48,30 +28,6 @@ UnitPropItem {
     property int pipeBorderWidth: 1
 
     property bool fullView: true
-    //    //property alias PIDpTopOn:pidPTop.
-    //    property alias PIDpTopShow: pidPTop.visible
-
-//    function setLevel(value) { level = value}
-
-//    function setTempOutWater(value)         { tempOutWater         = value}
-//    function setTempOutWaterAlarmMax(value) { tempOutWaterAlarmMax = value}
-//    function setTempOutWaterAlarmMin(value) { tempOutWaterAlarmMin = value}
-
-//    function setTempTop(value)         { tempTop = value}
-//    function setTempTopAlarmMax(value) { tempTopAlarmMax = value}
-//    function setTempTopAlarmMin(value) { tempTopAlarmMin = value}
-
-//    function setPressTop(value)         { pressTop = value}
-//    function setPressTopAlarmMax(value) { pressTopAlarmMax = value}
-//    function setPressTopAlarmMin(value) { pressTopAlarmMin = value}
-
-//    function setTempBottom(value)         { tempBottom = value}
-//    function setTempBottomAlarmMax(value) { tempBottomAlarmMax = value}
-//    function setTempBottomAlarmMin(value) { tempBottomAlarmMin = value}
-
-//    function setPessBottom(value)         { pressBottom = value}
-//    function setPessBottomAlarmMax(value) { pressBottomAlarmMax = value}
-//    function setPessBottomAlarmMin(value) { pressBottomAlarmMin = value}
 
     backgroundColor: "#d3d3d3"
 
@@ -97,13 +53,14 @@ UnitPropItem {
     }
     Tank {
         id: tank
+        width: 60
         radius: 10
         objectName:  "cube"
         anchors.fill: parent
         level: 90
         levelRatio: 0.2
         mainGradientColor: backgroundCurrentColor
-        borderWidth: borderWidth
+        borderWidth: parent.borderWidth
         borderColor: borderCurrentColor
     }
     PID_Win{
@@ -112,20 +69,30 @@ UnitPropItem {
         processName: "Давление верха " + root.name
         impactName: "Положение клапана охлаждающей воды"
         objectName:  "pTopPID"
-        onIsOnChanged: sbPTop.check = isOn
+        colorImpact: pipeOutWaterColor
+        colorProcess: "yellow"
+        impIsOut: false
+        mfuToProcess.valueReal: 3
+        mfuImpact.separCorrButtons: true
+        mfuKpOut.visible: false
+        mfuKiOut.visible:false
+        mfuKdOut.visible:false
+        kdRow.visible: false
+        onManOnChanged: sbPTop.checked = manOn
         Component.onCompleted: {
-            sbPTop.check = isOn
+            sbPTop.checked = manOn
         }
     }
     AnalogSignalVar2 {
         id: tTop
         objectName: "tTop"
-        width: 60
-        height: 15
+        height: 20
         anchors.left: parent.left
+        anchors.right: parent.right
         anchors.top: parent.top
-        anchors.topMargin: 55
-        anchors.leftMargin: -14
+        anchors.rightMargin: 4
+        anchors.topMargin: 53
+        anchors.leftMargin: -19
         backgroundColor: "transparent"
         colorShortName: "green"
         valueText: "999.9"
@@ -135,10 +102,12 @@ UnitPropItem {
         id: pTop
         objectName:  "pTop"
         width: 60
-        height: 15
+        height: 20
         anchors.left: parent.left
         anchors.top: tTop.bottom
-        anchors.leftMargin: -14
+        anchors.right: parent.right
+        anchors.rightMargin: 4
+        anchors.leftMargin: -19
         anchors.topMargin: 4
         backgroundColor: "transparent"
         colorShortName: "orange"
@@ -148,19 +117,20 @@ UnitPropItem {
         SimpleButton{
             id: sbPTop
             radius: height / 2
-            width: 16
-            height: 16
+            width: parent.height
+            height: parent.height
             checkable: true
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.left
             anchors.rightMargin: width / 5
-            pressCheckColor: "#8afda6"
+            pressCheckColor: "gray"
+            unPressCheckColor: "#8afda6"
             mouseArea.onClicked:{
                 if( mouse.button & Qt.RightButton ){
                     pidPTop.show()
                 }
             }
-            onCheckChanged: pidPTop.isOn = check
+            onCheckedChanged: pidPTop.manOn = checked
         }
     }
     AnalogSignalVar2 {
@@ -168,10 +138,12 @@ UnitPropItem {
         objectName:  "tBottom"
         y: 240
         width: 60
-        height: 15
+        height: 20
         anchors.left: parent.left
         anchors.bottom: pBottom.top
-        anchors.leftMargin: -14
+        anchors.right: parent.right
+        anchors.rightMargin: 4
+        anchors.leftMargin: -19
         anchors.bottomMargin: 4
         backgroundColor: "transparent"
         colorShortName: "green"
@@ -185,19 +157,30 @@ UnitPropItem {
         processName: "Давление в кубе " + root.name
         impactName: "Положение клапана пара"
         objectName:  "pBottomPID"
-        onIsOnChanged: { sbPrButt.check = isOn }
-        Component.onCompleted: sbPrButt.check = isOn
+        colorImpact: pipeSteamColor
+        colorProcess: "yellow"
+        impIsOut: false
+        mfuToProcess.valueReal: 3
+        mfuImpact.separCorrButtons: true
+        mfuKpOut.visible: false
+        mfuKiOut.visible: false
+        mfuKdOut.visible: false
+        kdRow.visible: false
+        onManOnChanged: { sbPrButt.checked = manOn }
+        Component.onCompleted: sbPrButt.checked = manOn
     }
     AnalogSignalVar2 {
         id: pBottom
         objectName:  "pBottom"
         y: 259
         width: 60
-        height: 15
+        height: 20
         anchors.left: parent.left
         anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.rightMargin: 4
         anchors.bottomMargin: 76
-        anchors.leftMargin: -14
+        anchors.leftMargin: -19
         backgroundColor: "transparent"
         colorShortName: "orange"
         shortNameText: "P"
@@ -206,19 +189,20 @@ UnitPropItem {
         SimpleButton{
             id: sbPrButt
             radius: height / 2
-            width: 16
-            height: 16
+            width: parent.height
+            height: parent.height
             checkable: true
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.left
             anchors.rightMargin: width / 5
-            pressCheckColor: "#8afda6"
+            pressCheckColor: "gray"
+            unPressCheckColor: "#8afda6"
             mouseArea.onClicked:{
                 if( mouse.button & Qt.RightButton ){
                     pidPBott.show()
                 }
             }
-            onCheckChanged: { pidPBott.isOn = check }
+            onCheckedChanged: { pidPBott.manOn = checked }
         }
     }
     Triangle {
@@ -234,8 +218,8 @@ UnitPropItem {
     }
     Pipe {
         id: pipeOutWtr1
-        x: -67
-        y: -11
+        x: -52
+        y: -10
         width: 57
         height: pipeOutWaterThin
         nActiveColor: pipeOutWaterColor
@@ -269,15 +253,15 @@ UnitPropItem {
     }
     AnalogSignalVar2 {
         id: tOutWater
-        objectName:  "tWater"
         width: 60
-        height: 15
+        objectName:  "tWater"
+        height: 20
         anchors.verticalCenter: pipeOutWtr01.verticalCenter
         anchors.left: pipeOutWtr01.horizontalCenter
-        anchors.leftMargin: -8
+        anchors.leftMargin: -10
         colorShortName: "#008000"
         tooltipText: "Температура отходящей воды"
-        valueText: "999.9"
+        valueText: "99.9"
         //shortNameText: "T"
     }
 }
@@ -287,6 +271,6 @@ UnitPropItem {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:1.5}
+    D{i:0;formeditorZoom:3}
 }
 ##^##*/

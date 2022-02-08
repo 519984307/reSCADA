@@ -229,7 +229,6 @@ bool ETag::resetAlarm()
   else {
     _logging(Prom::MessVerbose, _alarmStr + " - авария не сброшена", false);
     emit s_alarm("");
-    return false;
   }
   return false;
 }
@@ -286,7 +285,7 @@ void ETag::connectToGUI(QObject *guiItem, QObject *propWin)
   //QObject * tmpSgSt = propWin->findChild<QObject*>(est->fullTagName() + "_alarm");                                                //получил указатеть на созданную строку
   //-----подключил сигналы к авирии и игнору
   connect(this,SIGNAL(s_alarmReseted()            ), tmpSgSt, SLOT(alarmReseted()               ), Qt::QueuedConnection);
-  connect(this,SIGNAL(s_alarm(           QString )), tmpSgSt, SLOT(setAlarm()                 ), Qt::QueuedConnection);
+  connect(this,SIGNAL(s_alarm(           QVariant )), tmpSgSt, SLOT(setAlarm()                 ), Qt::QueuedConnection);
   connect(tmpSgSt,SIGNAL(changedIgnore(   bool    )), this, SLOT(writeIgnorAlarm(bool    )), Qt::QueuedConnection);
   connect(this,SIGNAL(s_ignorAlarmChd(QVariant)), tmpSgSt, SLOT(changeIgnore(   QVariant)), Qt::QueuedConnection);
   connect(this,SIGNAL(s_qualityChd(  QVariant)), tmpSgSt, SLOT(changeConnected(QVariant)), Qt::QueuedConnection);

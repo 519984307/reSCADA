@@ -373,7 +373,7 @@ void PromObject::init()
     }
     else{
         //qDebug() <<"QML routeWindow was not found!";
-        Logging(Prom::MessInfo, QDateTime::currentDateTime(), false, "SCADA", "QML-интерфейс пользователя не создался");
+        Logging(Prom::MessInfo, QDateTime::currentDateTime(), false, "SCADA", "QML-интерфейс маршрутов отсутствует");
     }
 
     QObject* logGui = _gui->findChild<QObject*>("log");
@@ -382,7 +382,7 @@ void PromObject::init()
     }
     else{
         //qDebug() <<"QML routeWindow was not found!";
-        Logging(Prom::MessInfo, QDateTime::currentDateTime(), false, "SCADA", "Лог-интерфейс пользователя не создался");
+        Logging(Prom::MessInfo, QDateTime::currentDateTime(), false, "SCADA", "Лог-интерфейс пользователя отсутствует");
     }
     foreach (Unit * unit, _units) {
         unit->loadParam();

@@ -9,7 +9,8 @@ Item {
     //property bool showPosition: true
     property int borderWidth: 2
     property color borderColor: "black"
-    property color backgroundColor: "steelblue"
+    property color backgroundColor: "black"
+    property color substanceColor: "steelblue"
     property bool nameOnLeft: true
     property bool nameOnTop: true
 
@@ -38,6 +39,7 @@ Item {
         border.width: borderWidth
         border.color: borderColor
         anchors.fill: parent
+        color: backgroundColor
         radius: width * 0.2
         Rectangle {
             id: rectColor
@@ -50,12 +52,12 @@ Item {
             anchors.leftMargin: parent.border.width
             anchors.topMargin: parent.border.width
             anchors.bottomMargin: parent.border.width
-            color: borderColor
+            color: backgroundColor
             Rectangle {
                 id: mSrc
                 anchors.fill: parent
                 radius: rectColor.radius - rectBody.border.width
-                color: borderColor
+                color: backgroundColor
             }
             layer.enabled: true
             layer.effect: OpacityMask {
@@ -72,7 +74,7 @@ Item {
                     var centreY = height / 2
 
                     ctx.beginPath()
-                    ctx.fillStyle = contItem.backgroundColor
+                    ctx.fillStyle = contItem.substanceColor
                     ctx.moveTo(centreX, centreY)
                     ctx.arc(centreX, centreY, width, Math.PI / 2,
                             contItem.position / 100 * 2 * Math.PI + Math.PI / 2, false)

@@ -5,11 +5,12 @@ UnitPropItem {
     id: contItem
     width: 40
     height: width
-
+    property alias regValve: regVal
     property alias valvePosition: mangWin.value
     property alias valveMaxRange: mangWin.valueMax
     property alias valveMinRange: mangWin.valueMin
-    property alias regValve: regVal
+    backgroundColor: "black"
+
     function setMinRange(value) {
         maxRange = Number(value)
     }

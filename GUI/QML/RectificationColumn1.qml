@@ -6,12 +6,12 @@ import QtGraphicalEffects 1.13
 //import LineComponent 1.0
 RectificationColumn0 {
     id: root
-    width: 50
+    width: 60
     height: 350
 
     pipeOutWtr1.anchors.bottom: upAng1.bottom
     pipeOutWtr1.anchors.right: upAng1.left
-    pipeOutWtr1.width: 65
+    pipeOutWtr1.width: 60
 
     //pipeOutWtr1.anchors.right: cl1.verticalCenter
     Rectangle {
@@ -52,7 +52,7 @@ RectificationColumn0 {
         id: cl1
         x: 11
         y: -55
-        width: parent.width * 0.7
+        width: parent.colderDiametr
         height: width
         color: parent.backgroundCurrentColor
         radius: width / 2
@@ -292,9 +292,9 @@ RectificationColumn0 {
         height: 20
         anchors.top: pipeSteam.bottom
         anchors.horizontalCenter: pipeSteam.horizontalCenter
-        regValve.nameTextPixSize: parent.valveNameSize
+        regValve.nameTextPixSize: valveNameSize
         regValve.position: 30
-        backgroundColor: parent.pipeSteamColor
+        regValve.substanceColor: pipeSteamColor
         regValve.nameOnLeft: false
         regValve.nameOnTop: true
     }
@@ -332,10 +332,11 @@ RectificationColumn0 {
         x: 68
         width: 20
         height: 20
-        anchors.top: pipeOutWtr4.top
+        anchors.top: colder.top
+        z: 10
         anchors.topMargin: 0
         regValve.position: 30
-        backgroundColor: pipeOutWaterColor
+        regValve.substanceColor: pipeOutWaterColor
         objectName: root.objectName + ".vWater"
         regValve.nameOnTop: true
         anchors.horizontalCenter: cl2.horizontalCenter
@@ -528,6 +529,6 @@ RectificationColumn0 {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:8}
+    D{i:0;formeditorZoom:2}
 }
 ##^##*/

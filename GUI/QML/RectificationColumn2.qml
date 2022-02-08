@@ -6,7 +6,7 @@ import QtGraphicalEffects 1.13
 //import LineComponent 1.0
 RectificationColumn0 {
     id: root
-    width: 50
+    width: 60
     height: 450
     property alias regulValveWater: regulValveWater
     property alias pipeV4: pipeV4
@@ -52,7 +52,7 @@ RectificationColumn0 {
 
     Rectangle {
         id: cl1
-        width: parent.width * 0.7
+        width: parent.colderDiametr
         height: width
         color: parent.backgroundCurrentColor
         radius: width / 2
@@ -221,7 +221,7 @@ RectificationColumn0 {
 
     Rectangle {
         id: cl3
-        width: parent.width * 0.7
+        width: parent.colderDiametr
         height: width
         color: parent.backgroundCurrentColor
         radius: width / 2
@@ -359,7 +359,7 @@ RectificationColumn0 {
         regValve.nameTextPixSize: parent.valveNameSize
         regValve.nameOnLeft: false
         objectName: root.objectName + ".vSteam"
-        backgroundColor: parent.pipeSteamColor
+        regValve.substanceColor: pipeSteamColor
         anchors.horizontalCenter: pipeSteam.horizontalCenter
         regValve.position: 30
         z: 50
@@ -395,7 +395,7 @@ RectificationColumn0 {
         height: 20
         anchors.top: cl3.top
         regValve.position: 30
-        backgroundColor: parent.pipeOutWaterColor
+        regValve.substanceColor: pipeOutWaterColor
         objectName: root.objectName + ".vWater"
         regValve.nameOnTop: true
         anchors.horizontalCenter: cl2.horizontalCenter
@@ -488,10 +488,12 @@ RectificationColumn0 {
 
     PipeAngle90 {
         id: upAng2
-        x: 32
-        y: -77
         width: 10
         height: 10
+        anchors.left: cl3.right
+        anchors.top: pipeOutWtr4.top
+        anchors.leftMargin: -parent.colderDiametr / 4
+        anchors.topMargin: 0
         rotation: 180
         nActiveColor: parent.pipeOutWaterColor
         borderWidth: parent.pipeBorderWidth
@@ -501,9 +503,10 @@ RectificationColumn0 {
     PipeAngle90 {
         id: upAng3
         x: 5
-        y: -14
-        width: 10
-        height: 10
+        width: upAng4.height
+        height: width
+        anchors.top: cl1.verticalCenter
+        anchors.topMargin: parent.colderDiametr /8
         nActiveColor: parent.pipeOutWaterColor
         borderWidth: parent.pipeBorderWidth
         pipeThin: parent.pipeOutWaterThin
@@ -525,10 +528,15 @@ RectificationColumn0 {
 
     PipeAngle180 {
         id: upAng4
-        x: 0
-        y: -45
-        width: 20
-        height: 10
+        x: -10
+        width: height *2
+        anchors.right: parent.horizontalCenter
+        //height: parent.colderDiametr
+        anchors.top: cl3.bottom
+        anchors.bottom: cl1.top
+        anchors.rightMargin: 0
+        anchors.topMargin:  -parent.colderDiametr /8
+        anchors.bottomMargin: -parent.colderDiametr /8
         rotation: 90
         borderWidth: parent.pipeBorderWidth
         pipeThin: parent.pipeOutWaterThin
@@ -543,6 +551,10 @@ RectificationColumn0 {
         color: parent.pipePassColor
         border.color: "black"
         border.width: parent.pipePassBorderWidth
+        anchors.verticalCenter: upAng5.verticalCenter
+        anchors.verticalCenterOffset: -4
+        anchors.horizontalCenterOffset: -3
+        anchors.horizontalCenter: upAng5.horizontalCenter
     }
     PipeAngle90 {
         id: upAng5
@@ -564,6 +576,6 @@ RectificationColumn0 {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:2}
+    D{i:0;formeditorZoom:2}D{i:41}D{i:42}D{i:44}
 }
 ##^##*/

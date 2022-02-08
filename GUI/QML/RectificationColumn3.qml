@@ -6,7 +6,8 @@ import QtGraphicalEffects 1.13
 //import LineComponent 1.0
 RectificationColumn0 {
     id: root
-    width: 50
+    width: 60
+
     height: 450
     property alias cl1: cl1
 
@@ -79,7 +80,7 @@ RectificationColumn0 {
 
     Rectangle {
         id: cl1
-        width: parent.width * 0.7
+        width: parent.colderDiametr
         height: width
         color: backgroundCurrentColor
         radius: width / 2
@@ -127,7 +128,9 @@ RectificationColumn0 {
         x: 46
         width: 10
         height: 10
+        anchors.right: pipeV1.right
         anchors.top: pipe1.top
+        anchors.rightMargin: 0
         nActiveColor: parent.pipePassColor
         pipeThin: parent.pipePassThin
         rotation: 270
@@ -214,7 +217,7 @@ RectificationColumn0 {
 
     Rectangle {
         id: cl3
-        width: parent.width * 0.7
+        width: parent.colderDiametr
         height: width
         color: backgroundCurrentColor
         radius: width / 2
@@ -260,7 +263,7 @@ RectificationColumn0 {
     Rectangle {
         id: cl4
         y: -163
-        width: parent.width * 0.7
+        width: parent.colderDiametr
         height: width
         color: backgroundCurrentColor
         radius: width / 2
@@ -359,7 +362,7 @@ RectificationColumn0 {
         regValve.nameOnLeft: false
         objectName: root.objectName + ".vSteam"
         anchors.topMargin: 32
-        backgroundColor: pipeSteamColor
+        regValve.substanceColor: pipeSteamColor
         anchors.horizontalCenter: pipeSteam.horizontalCenter
         regValve.position: 30
         z: 50
@@ -378,7 +381,7 @@ RectificationColumn0 {
         regValve.position: 30
         regValve.nameOnTop: true
         regValve.nameOnLeft: false
-        backgroundColor: pipeOutWaterColor
+        regValve.substanceColor: pipeOutWaterColor
         objectName: root.objectName + ".vWater"
         anchors.horizontalCenter: cl2.horizontalCenter
     }
@@ -389,6 +392,8 @@ RectificationColumn0 {
         height: parent.pipeOutWaterThin
         anchors.left: parent.horizontalCenter
         anchors.right: pipeOutWtrAng2.left
+        anchors.bottom: cl4.top
+        anchors.bottomMargin: parent.pipePassThin * 2
         anchors.rightMargin: 0
         anchors.leftMargin: 0
         borderWidth: pipeBorderWidth
@@ -506,12 +511,13 @@ RectificationColumn0 {
     }
     Pipe {
         id: pipeV1
-        x: 90
         z: 100
         width: parent.pipePassThin
-        height: 50
-        anchors.right: upAng.right
+        anchors.left: parent.right
+        anchors.top: upAng.bottom
         anchors.bottom: pipeH2.top
+        anchors.topMargin: 0
+        anchors.leftMargin: parent.pipePassThin / 4
         anchors.bottomMargin:  - parent.pipePassBorderWidth
         borderWidth: parent.pipePassBorderWidth
         nActiveColor: parent.pipePassColor
@@ -532,13 +538,13 @@ RectificationColumn0 {
     }
     Pipe {
         id: pipeV7
-        y: -26
         width: parent.pipePassThin
-        height: 127
         anchors.left: pipeV6.right
+        anchors.top: upAng2.bottom
         anchors.bottom: pipeH2.top
+        anchors.bottomMargin: - parent.pipePassBorderWidth
+        anchors.topMargin: 0
         anchors.leftMargin: parent.pipePassThin / 4
-        anchors.bottomMargin:  - parent.pipePassBorderWidth
         z: 100
         nActiveColor: parent.pipePassColor
         horOrVert: false
@@ -588,6 +594,20 @@ RectificationColumn0 {
         borderWidth: parent.pipePassBorderWidth
         nActiveColor: parent.pipePassColor
     }
+
+    Pipe {
+        id: pipe7
+        y: -32
+        height: parent.pipePassThin
+        anchors.verticalCenter: cl1.verticalCenter
+        anchors.left: cl1.right
+        anchors.right: upAng.left
+        nActiveColor: parent.pipePassColor
+        anchors.rightMargin: 0
+        borderWidth: parent.pipePassBorderWidth
+        anchors.leftMargin: -3
+        z: 0
+    }
 }
 
 
@@ -595,6 +615,6 @@ RectificationColumn0 {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:3}
+    D{i:0;formeditorZoom:1.1}D{i:12}D{i:37}D{i:39}D{i:43}
 }
 ##^##*/

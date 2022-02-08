@@ -7,6 +7,9 @@ Item {
     id: mfu
     width: 120
     height: 30
+    property alias minBtn: minBtn
+    property alias maxBtn: maxBtn
+
     property color backgroundColor: "white"
     property color borderColor: "black"
     property int borderWidth: 1
@@ -25,6 +28,11 @@ Item {
     property bool disappear: false
     //property alias valueText: valueLable.text
     property real valueReal: 999.9
+
+    property bool separCorrButtons: false
+
+    signal more(bool More)
+    signal less(bool Less)
 
     //property real extAlarmLevel: 0
     function setValue(value) {
@@ -62,9 +70,9 @@ Item {
     }
     onValueRealChanged: {
         if( String(valueReal) !== valueLable.text ){
-        //toFicsed округляет до нужной мантиссы, Number убирает ненужные нулитипа 12.32000
+            //toFicsed округляет до нужной мантиссы, Number убирает ненужные нулитипа 12.32000
             valueLable.text = Number(valueReal.toFixed(mantissa))
-           //console.log( objectName, valueReal )
+            //console.log( objectName, valueReal )
         }
         //console.log( "New valueReal - ", valueReal )
     }
@@ -111,34 +119,38 @@ Item {
         color: backgroundColor
         border.width: borderWidth
         border.color: borderColor
-        Text {
+        SimpleButton {
             id: minBtn
-            width: visible? height / 3 * 2 : 0
+            width: nameText.text.length * nameText.font.pixelSize * 0.7
             visible: mfu.correctingButtons
-            anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            color: valueLable.color
-            text: "-"
-            font.bold: true
-            font.pixelSize: height * 0.7
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
+            anchors.leftMargin: 0
+            anchors.bottomMargin: mfu.borderWidth
+            anchors.topMargin: mfu.borderWidth
+            unPressCheckColor: mfu.backgroundColor
+            nameText.text: "-"
+            nameText.font.pixelSize: valueLable.font.pixelSize
+            border.width: 0
+            anchors.left: parent.left
+            radius: 0
+            checkable: false
+            mouseArea.onClicked: {
+                if(!separCorrButtons){
                     if (timer.buffer == "")
                         timer.buffer = valueLable.text
                     setValueLimited(Number(valueLable.text) - step)
                     timer.start()
                 }
             }
+            onPressedChanged: less(pressed)
         }
+
 
         TextInput {
             id: valueLable
             property bool limit: true
-            text: "999.9"
+            text: "9.9"
             anchors.left: minBtn.right
             anchors.right: maxBtn.left
             anchors.top: parent.top
@@ -147,7 +159,7 @@ Item {
             verticalAlignment: Text.AlignVCenter
             anchors.rightMargin: 0
             anchors.leftMargin: 0
-            font.pixelSize: height * 0.7
+            font.pixelSize: mfu.height * 0.7
             font.family: "DSEG7 Classic"
             readOnly: false
             // Not Work
@@ -187,22 +199,24 @@ Item {
             }
         }
 
-        Text {
+        SimpleButton {
             id: maxBtn
-            width: visible? height / 3 * 2 : 0
+            width: nameText.text.length * nameText.font.pixelSize * 0.7
             visible: mfu.correctingButtons
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            color: valueLable.color
-            text: "+"
-            font.bold: true
-            font.pixelSize: height * 0.7
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
+            //anchors.rightMargin: mfu.borderWidth
+            anchors.bottomMargin: mfu.borderWidth
+            anchors.topMargin: mfu.borderWidth
+            unPressCheckColor: mfu.backgroundColor
+            nameText.text: "+"
+            nameText.font.pixelSize: valueLable.font.pixelSize
+            border.width: 0
+            radius: 0
+            checkable: false
+            mouseArea.onClicked: {
+                if(!separCorrButtons){
                     if (timer.buffer == "")
                         timer.buffer = valueLable.text
                     setValueLimited(Number(valueLable.text) + step)
@@ -210,6 +224,7 @@ Item {
                     timer.start()
                 }
             }
+            onPressedChanged: more( pressed )
         }
 
         ToolTip {
@@ -219,9 +234,6 @@ Item {
             visible: false
             text: tooltip
         }
-
-
-
     }
 
 
@@ -230,7 +242,7 @@ Item {
 
 /*##^##
 Designer {
-    D{i:0;height:35;width:102}
+    D{i:0;formeditorZoom:2;height:35;width:102}
 }
 ##^##*/
 

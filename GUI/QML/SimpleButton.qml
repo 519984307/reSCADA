@@ -11,22 +11,25 @@ Rectangle {
     property  alias nameText: nameText
 
     property bool checkable: true
-    property bool check: false
+    property bool checked: false
     property alias pressed: mA.pressed
     property color unPressCheckColor: "Gray"
-    property color pressCheckColor: "Yellow"
+    property color pressCheckColor: Qt.hsla(unPressCheckColor.hslHue,
+                                            unPressCheckColor.hslSaturation,
+                                            unPressCheckColor.hslLightness * 0.5,
+                                            unPressCheckColor.a)
     border.color: "black"
     border.width: 1
 
     Component.onCompleted: renewColor()
-    onCheckChanged: renewColor()
+    onCheckedChanged: renewColor()
     onCheckableChanged: renewColor()
     onPressCheckColorChanged: renewColor()
     onUnPressCheckColorChanged: renewColor()
 
     function renewColor(){
         if( checkable ){
-            if( check ) color = pressCheckColor
+            if( checked ) color = pressCheckColor
             else color = unPressCheckColor
         }
         else color = unPressCheckColor
@@ -52,7 +55,7 @@ Rectangle {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: {
-            if((mouse.button & Qt.LeftButton) && checkable) check = !check
+            if((mouse.button & Qt.LeftButton) && checkable) checked = !checked
         }
         onPressedChanged: {
             if( !checkable ){

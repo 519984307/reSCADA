@@ -240,10 +240,10 @@ PromObject *Unit::owner() const
 {
   return _owner;
 }
-
-void Unit::setOwner(PromObject *value)
+//------------------------------------------------------------------------------
+void Unit::setOwner(PromObject *Owner)
 {
-  _owner = value;
+  _owner = Owner;
 }
 
 //------------------------------------------------------------------------------
@@ -307,16 +307,16 @@ bool Unit::addSubUnit(Unit * unit)
     connect(unit, &Unit::s_alarmForAnderUnit, this, &Unit::detectSubUnitAlarm, Qt::QueuedConnection);
     connect(unit, &Unit::s_modeChange, this, &Unit::_updateSubUnitMode, Qt::QueuedConnection);
     connect(unit, &Unit::s_stateChange, this, &Unit::_updateSubUnitState, Qt::QueuedConnection);
-    if( _owner != nullptr ){
-      _owner->addSubUnit( unit );
-    }
+//    if( _owner != nullptr ){
+//      _owner->addSubUnit( unit );
+//    }
     return true;
   }
   return false;
 }
 
 //------------------------------------------------------------------------------
-void Unit::detectAlarm(QString Description)
+void Unit::detectAlarm(QVariant Description)
 {
   static QString Source;
   if(Description == ""){
@@ -327,16 +327,16 @@ void Unit::detectAlarm(QString Description)
   _alarm = true;
   //_mayResetAlarm = false;
   if(Prom::icvalModes(_currentMode, saveMode) && _currentMode != Prom::UnMdNoDef && ! _firstLoad) {
-    emit s_quitAlarm(objectName() + " - " +  Description);
-    logging(Prom::MessQuitAlarm, QDateTime::currentDateTime(), false, Source, Description);
+    emit s_quitAlarm(objectName() + " - " +  Description.toString());
+    logging(Prom::MessQuitAlarm, QDateTime::currentDateTime(), false, Source, Description.toString());
   }
   else {
-    emit s_alarm(objectName()  + " - " +  Description);
-    logging(Prom::MessAlarm, QDateTime::currentDateTime(), false, Source, Description);
+    emit s_alarm(objectName()  + " - " +  Description.toString());
+    logging(Prom::MessAlarm, QDateTime::currentDateTime(), false, Source, Description.toString());
   }
   if(!_firstLoad)
     _alarmDo();
-  emit s_alarmForAnderUnit(this, Description);
+  emit s_alarmForAnderUnit(this, Description.toString());
 }
 
 //------------------------------------------------------------------------------
@@ -425,20 +425,20 @@ void Unit::logging(Prom::MessType MessTypeID, QDateTime DateTime, bool UserOrSys
 }
 
 //------------------------------------------------------------------------------
-void Unit::connectToGUI(const QObject * GUI)
+bool Unit::connectToGUI(const QObject * GUI)
 {
   QObject * guiItem = GUI->findChild<QObject*>(this->tagPrefix);
   if(!guiItem){
     logging(Prom::MessInfo, QDateTime::currentDateTime(), false, "", "GUI не обнаружен");
-    return;
+    return false;
   }
   //Logging(Prom::MessChangeInfo, QDateTime::currentDateTime(), unit->objectName(), "GUI обнаружен");
   connect(this, SIGNAL(s_connected()), guiItem, SLOT(setConnected()), Qt::QueuedConnection);
   connect(this, SIGNAL(s_disconnected()), guiItem, SLOT(setDisconnected()), Qt::QueuedConnection);
   //TODO приделать обратно!!! connect(this, SIGNAL(SetInRoute(QVariant)), guiItem, SLOT(setRoute(QVariant)), Qt::QueuedConnection);
 
-  connect(this,    SIGNAL(s_alarm(QString)), guiItem, SLOT(setAlarm()), Qt::QueuedConnection);
-  connect(this,    SIGNAL(s_quitAlarm(QString)), guiItem, SLOT(setQuitAlarm()   ), Qt::QueuedConnection);
+  connect(this,    SIGNAL(s_alarm(QVariant)), guiItem, SLOT(setAlarm(QVariant)), Qt::QueuedConnection);
+  connect(this,    SIGNAL(s_quitAlarm(QVariant)), guiItem, SLOT(setQuitAlarm(QVariant)   ), Qt::QueuedConnection);
   connect(this,    SIGNAL(s_alarmReseted()      ), guiItem, SLOT(alarmReseted()), Qt::QueuedConnection);
   connect(guiItem, SIGNAL(resetAlarm()        ), this,    SLOT(resetAlarm()  ), Qt::QueuedConnection);
   QMetaObject::invokeMethod(guiItem, "setLinked", Qt::DirectConnection);
@@ -474,7 +474,14 @@ void Unit::connectToGUI(const QObject * GUI)
   foreach (ETag * ET , _tags) {
     ET->connectToGUI(guiItem, propWin);
   }
+  foreach (Unit * unit, _subUnits) {
+  //Если ГУЙ дочернего юнита не найден в ГУЙ родителя, то ищем в общем ГУЙ уровнем выше
+  //WRNING Возможны проблемы при совпадедии имён доченних объектов.
+    if( ! unit->connectToGUI(guiItem) )
+      unit->connectToGUI(GUI);
+  }
   reInitialise();
+  return true;
 }
 
 //------------------------------------------------------------------------------

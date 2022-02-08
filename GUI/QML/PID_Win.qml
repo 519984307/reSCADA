@@ -10,10 +10,24 @@ Window {
     flags:/* Qt.Window |*/ Qt.Dialog
     color: "#ced5d6"
 
+    property alias mfuFromImpact: mfuFromImpact
+    property alias mfuToImpact: mfuToImpact
+    property alias mfuFromProcess: mfuFromProcess
+    property alias mfuToProcess: mfuToProcess
+
+    property alias mfuKpOut: mfuKpOut
+    property alias mfuKiOut: mfuKiOut
+    property alias mfuKdOut: mfuKdOut
+
+    property alias mfuImpact: mfuImpact
+    property alias kdRow: kdRow
+    property alias kiRow: kiRow
+    property alias kpRow: kpRow
+
     property string processName: "Температура куба РК1"
     property string impactName: "Положение клапана подачи пара"
 
-    property alias isOn: switchOnOff.checked
+    property alias manOn: switchOnOff.checked
 
     property color colorProcess: "YellowGreen"
     property color colorSetPt: "black"
@@ -23,17 +37,49 @@ Window {
     property alias setPt: mfuSetPt.valueReal
     property alias impact: mfuImpact.valueReal
 
-    property alias kp: mfuProcess.valueReal
-    property alias ki: mfuSetPt.valueReal
-    property alias kd: mfuImpact.valueReal
+    property alias kp: mfuKp.valueReal
+    property alias ki: mfuKi.valueReal
+    property alias kd: mfuKd.valueReal
 
+    property alias kpOut: mfuKpOut.valueReal
+    property alias kiOut: mfuKiOut.valueReal
+    property alias kdOut: mfuKdOut.valueReal
+
+    property bool impIsOut: true
+
+    signal s_manOn( variant ManOn )
+    onManOnChanged: s_manOn( manOn )
+    function setManOn( ManOn ){ manOn = ManOn }
+
+    signal s_KpChanged( variant Kp )
+    onKpChanged: s_KpChanged( kp )
+    signal s_KiChanged( variant Ki )
+    onKiChanged: s_KiChanged( ki )
+    signal s_KdChanged( variant Kd )
+    onKdChanged: s_KdChanged( kd )
     function setKp( Kp ) { kp = Kp }
     function setKi( Ki ) { ki = Ki }
     function setKd( Kd ) { kd = Kd }
 
+    function setKpOut( KpOut ) { kpOut = KpOut }
+    function setKiOut( KiOut ) { kiOut = KiOut }
+    function setKdOut( KdOut ) { kdOut = KdOut }
+
     function setProcess ( Process  ) { process  = Process  }
+
+    signal s_setPtChanged( variant SetPt )
+    onSetPtChanged: s_setPtChanged( setPt )
     function setSetPt ( SetPt  ) { setPt  = SetPt  }
+
+    signal s_impactChanged( variant Impact )
+    onImpactChanged: s_impactChanged( impact )
     function setImpact( Impact ) { impact = Impact }
+
+    function setImpIsOut( ImpIsOut ){
+        impIsOut = ImpIsOut
+    }
+    signal impMore( variant More )
+    signal impLess( variant Less )
 
     Item{
         id: itemPr
@@ -107,7 +153,7 @@ Window {
             height: mfuToProcess.height
             anchors.left: parent.left
             anchors.bottom: parent.bottom
-            valueReal: 10
+            valueReal: 0
             correctingButtons: false
             anchors.bottomMargin: 0
             borderColor: "#000000"
@@ -126,24 +172,24 @@ Window {
         anchors.leftMargin: 5
         anchors.rightMargin: 5
         anchors.bottomMargin: 0
-        anchors.topMargin: 0
+        anchors.topMargin: parent.height * 0.01
         spacing: height * 0.012
         anchors.right: rectImpact.left
-        Switch {
+        SimpleButton {
             id: switchOnOff
+            width: parent.width * 0.3
             height: parent.height * 0.1
-            text: qsTr("Вкл.")
+            radius: height / 2
             anchors.horizontalCenter: parent.horizontalCenter
-            autoRepeat: false
-            autoExclusive: false
-            font.weight: Font.Bold
-            font.pointSize: 10
-            checked: false
+            checkable: true
+            pressCheckColor: "gray"
+            unPressCheckColor: "#8afda6"
+            nameText.text: "Вкл"
             onCheckedChanged: {
                 if (checked)
-                    text = "Вкл."
+                    nameText.text = "Откл"
                 else
-                    text = "Выкл."
+                    nameText.text = "Вкл"
             }
         }
         Text {
@@ -177,20 +223,20 @@ Window {
             tooltip: "Контролируемый параме"
             mantissa: 2
         }
-        Text {
-            id: textFrom1
-            height: parent.height * 0.07
-            text: "Задание:"
-            anchors.left: parent.left
-            anchors.right: parent.right
-            font.pixelSize: height * 0.8
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignBottom
-            fontSizeMode: Text.Fit
-            anchors.leftMargin: 0
-            anchors.rightMargin: 0
-            visible: false
-        }
+        //        Text {
+        //            id: textFrom1
+        //            height: parent.height * 0.07
+        //            text: "Задание:"
+        //            anchors.left: parent.left
+        //            anchors.right: parent.right
+        //            font.pixelSize: height * 0.8
+        //            horizontalAlignment: Text.AlignLeft
+        //            verticalAlignment: Text.AlignBottom
+        //            fontSizeMode: Text.Fit
+        //            anchors.leftMargin: 0
+        //            anchors.rightMargin: 0
+        //            visible: true
+        //        }
 
         MFUnit {
             id: mfuSetPt
@@ -210,6 +256,8 @@ Window {
             backgroundColor: colorSetPt
             textInput.color: "White"
             mantissa: 2
+            maxBtn.nameText.color: "white"
+            minBtn.nameText.color: "white"
             //textInput.text
         }
 
@@ -236,14 +284,15 @@ Window {
             visible: true
             anchors.right: parent.right
             anchors.rightMargin: 0
-            readOnly: switchOnOff.checked
-            correctingButtons: ! switchOnOff.checked
-            valueReal: 568
-            tooltip: "Воздействие"
+            readOnly: !impIsOut || ! manOn
+            correctingButtons: manOn
             checkLimit: false
             backgroundColor: colorImpact
             mantissa: 2
+            onMore: impMore(More)
+            onLess: impLess(Less)
         }
+
         Column{
             id: column
             height: parent.height * 0.2
@@ -253,6 +302,7 @@ Window {
             anchors.rightMargin: 0
             spacing: parent.width *0.015
             Row{
+                id: kpRow
                 height: parent.height * 0.3
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -300,6 +350,7 @@ Window {
                 }
             }
             Row{
+                id: kiRow
                 height: parent.height * 0.3
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -347,6 +398,7 @@ Window {
                 }
             }
             Row{
+                id: kdRow
                 height: parent.height * 0.3
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -395,8 +447,6 @@ Window {
             }
         }
     }
-
-
     Rectangle {
         id: rectImpact
         width: parent.width * 0.05
@@ -434,7 +484,7 @@ Window {
         tooltip: "Max"
         backgroundColor: mfuToProcess.backgroundColor
         readOnly: false
-        valueReal: 200
+        valueReal: 100
         borderColor: "Black"
     }
     MFUnit {
@@ -450,7 +500,7 @@ Window {
         tooltip: "Min"
         backgroundColor: mfuToProcess.backgroundColor
         readOnly: false
-        valueReal: 100
+        valueReal: 0
         borderColor: "Black"
     }
 }

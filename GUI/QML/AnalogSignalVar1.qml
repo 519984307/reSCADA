@@ -2,19 +2,24 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import "fap.js" as Fap
 
-Item {
+UnitItem {
     id: root
-    width: 180
-    height: 40
+    width: 60
+    height: 15
     property alias mouseArea: mAr
-    property alias backgroundColor: rectValue.color
     property color colorShortName: "green"
-    property color borderColor: Fap.border
-    property alias borderWidth: rectValue.border.width
     property alias shortNameText: nameLable.text
     property alias valueText: valueLable.text
     property alias tooltipText: tTip.text
     property int mantissa: 1
+    borderWidth: 1
+    backgroundColor: "transparent"
+    onAlarmDescrChanged: {
+        tooltipText = name
+        if( alarmDescr != ""){
+            tooltipText += "\n" + alarmDescr
+        }
+    }
 
     function setValue(value) {
         //уст значение
@@ -31,7 +36,7 @@ Item {
         width: parent.height
         border.width: borderWidth
         color: colorShortName
-        border.color: borderColor
+        border.color: borderCurrentColor
         Text {
             id: nameLable
             text: qsTr("T")
@@ -49,20 +54,28 @@ Item {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        border.color: borderColor
+        border.color: borderCurrentColor
+        border.width: borderWidth
+        color: backgroundCurrentColor
         Text {
             id: valueLable
+            text: qsTr("999.9")
             anchors.fill: parent
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
-            font.pixelSize: parent.height * 0.8
+            font.pixelSize: height * 0.7
             font.bold: true
             font.family: "DSEG7 Classic"
         }
         MouseArea {
             id: mAr
             anchors.fill: parent
-            //hoverEnabled: true
+            acceptedButtons: Qt.RightButton | Qt.LeftButton
+            hoverEnabled: true
+            onClicked: {
+                alarmNotify = false
+                notify = false
+            }
             onEntered: {
                 tTip.visible = true
             }
@@ -72,16 +85,19 @@ Item {
         }
         ToolTip {
             id: tTip
-            delay: 2000
-            timeout: 4000
+            delay: 500
+            timeout: 5000
             visible: false
+            text: name
         }
     }
 }
 
+
+
+
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:1.25}
+    D{i:0;formeditorZoom:6}
 }
 ##^##*/
-

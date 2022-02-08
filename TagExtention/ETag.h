@@ -82,7 +82,7 @@ protected:
 
 signals:
     void s_qualityChd(QVariant);
-    void s_alarm(QString Discription);
+    void s_alarm(QVariant Discription);
     void s_alarmReseted();
     void s_logging  (Prom::MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
 
