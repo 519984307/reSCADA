@@ -82,7 +82,7 @@ RectificationColumn0 {
         id: cl1
         width: parent.colderDiametr
         height: width
-        color: backgroundCurrentColor
+        color: unit.backgroundCurrentColor
         radius: width / 2
         border.width: parent.pipePassBorderWidth
         anchors.bottom: parent.top
@@ -104,7 +104,7 @@ RectificationColumn0 {
         anchors.leftMargin: parent.pipePassThin / 4
         nameText.text: ""
         showLevel: false
-        mainGradientColor: parent.backgroundCurrentColor
+        mainGradientColor: unit.backgroundCurrentColor
     }
 
     Pipe {
@@ -143,7 +143,7 @@ RectificationColumn0 {
         id: cl2
         width: colder.width
         height: width
-        color: backgroundCurrentColor
+        color: unit.backgroundCurrentColor
         radius: width / 2
         border.width: parent.borderWidth / 2
         anchors.left: colder.right
@@ -219,7 +219,7 @@ RectificationColumn0 {
         id: cl3
         width: parent.colderDiametr
         height: width
-        color: backgroundCurrentColor
+        color: unit.backgroundCurrentColor
         radius: width / 2
         border.width: parent.pipePassBorderWidth
         anchors.bottom: cl1.top
@@ -265,7 +265,7 @@ RectificationColumn0 {
         y: -163
         width: parent.colderDiametr
         height: width
-        color: backgroundCurrentColor
+        color: unit.backgroundCurrentColor
         radius: width / 2
         border.width: parent.pipePassBorderWidth
         anchors.bottom: cl3.top

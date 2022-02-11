@@ -207,7 +207,6 @@ void ETag::loadParam()
 bool ETag::resetAlarm()
 {
   //_alarmSetTime = false;
-  //if(_alarm){
   if(!connected()){
     _logging(Prom::MessAlarm, "сброс аварии запрещен: соединение разорванно", false);
   }

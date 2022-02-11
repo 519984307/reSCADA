@@ -25,7 +25,7 @@ public:
                    int *Id,
                    QString Name,
                    QString TagPrefix,
-                   bool Mover,
+                   bool Mover = false,//TODO Убрать в отдельный параметрдочерних классов!
                    Prom::UnitModes SaveMode = Prom::UnMdNoDef,
                    QSettings * Ini = nullptr);
 
@@ -152,7 +152,7 @@ protected slots:
     virtual bool _resetAlarm(bool upClassAlarm = false);
     virtual void _cleanTimeEnd(){};
     virtual void _sensorConnect();
-    virtual void _customConnectToGUI(QObject * guiItem, QObject * propWin) = 0;
+    virtual void _customConnectToGUI(QObject * guiItem, QObject * propWin = nullptr) = 0;
     virtual void _updateSubUnitState(Unit *){};
     virtual void _updateSubUnitMode(Unit *){};
     virtual void _updateStateAndMode() = 0;

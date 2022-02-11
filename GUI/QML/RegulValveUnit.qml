@@ -21,11 +21,11 @@ UnitPropItem {
         valvePosition = Number(value)
     }
 
-    //    onPositionChanged: {
-    //        positionChanged(String(position))
-    //        if (Number(mangWin.readValue) / 100 != position)
-    //            mangWin.setValue(position * 100)
-    //    }
+    signal s_openLtl( variant OpenLtl )
+    signal s_closeLtl( variant CloseLtl )
+    signal s_valvePosChanged( variant ValvePos )
+    onValvePositionChanged: s_valvePosChanged( valvePosition )
+
     Component.onCompleted: {
         regVal.position = valvePosition
     }
@@ -40,6 +40,10 @@ UnitPropItem {
     RegPersentWin {
         id: mangWin
         onValueChanged: regVal.position = value
+        sepCorBtn: true
+        readOnly: true
+        onS_moreVal: s_openLtl( More )
+        onS_lessVal: s_closeLtl( Less )
     }
 
     MouseArea {
@@ -53,9 +57,6 @@ UnitPropItem {
                 mangWin.show()
             }
         }
-        //        onPressAndHold: {
-        //            setLvl( position + 0.05 ) test
-        //        }
     }
 }
 

@@ -3,6 +3,9 @@ import QtGraphicalEffects 1.15
 
 Item {
     id: contItem
+    width: 80
+    height: 200
+    property alias mfuAlarmTopLevel: mfuAlarmTopLevel
     property int radius: 30
     property real level: 80
     property real levelRatio: 0.8
@@ -11,15 +14,31 @@ Item {
     property bool showSeam: true
     property bool showLevel: true
     property int borderWidth: 2
+    property bool showAlarmLevel: true
 
     property color borderColor: "black"
     property color mainGradientColor: "#d3d3d3"
     property color contentGradientColor: "steelblue"
     property int nameTopMargin: height * 0.4
     property int nameTextHeight: nameText.font.pixelSize
-    width: 80
-    height: 200
 
+    property alias alarmTopLevel: mfuAlarmTopLevel.valueReal
+    property alias alarmBottomLevel: mfuAlarmBottomLevel.valueReal
+    signal s_alarmTopLevelChanged( variant AlarmTopLevel )
+    onAlarmTopLevelChanged: s_alarmTopLevelChanged( alarmTopLevel )
+    signal s_alarmBottomLevelChanged( variant AlarmTopLevel )
+    onAlarmBottomLevelChanged: s_alarmBottomLevelChanged( alarmBottomLevel )
+
+    signal s_enableMouseArea( bool Enable)
+    function setLevel( Level ) {
+        level = Level
+    }
+    function setAlarmLevelTop(value) {
+        mfuAlarmTopLevel.setValue(value)
+    }
+    function setAlarmLevelBottom(value) {
+        mfuAlarmBottomLevel.setValue(value)
+    }
     Rectangle {
         id: rectBody
         border.width: borderWidth
@@ -126,7 +145,7 @@ Item {
         }
     }
     Rectangle {
-        id: capaciti
+        id: capacity
         width: parent.width / 2
         height: 3
         color: "#501212"
@@ -220,6 +239,51 @@ Item {
                 position: 1
                 color: "#6c6c6c"
             }
+        }
+    }
+    MFUnit {
+        id: mfuAlarmTopLevel
+        width: 54
+        objectName: "alarmTopLevel"
+        height: 20
+        backgroundColor: "#f03e3e"
+        tooltip: "Предельный верхний уровень"
+        readOnly: false
+        visible: showAlarmLevel
+        anchors.top: capacity.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: 0
+        valueFontSize.bold: false
+        disappear: showAlarmLevel
+        correctingButtons: true
+        onValueRealChanged: s_alarmTopLevelChanged(valueReal)
+        checkLimit: true
+        downLimit: 20
+        mouseArea.onContainsMouseChanged:{
+            s_enableMouseArea( !mainRect.visible )
+        }
+    }
+    MFUnit {
+        id: mfuAlarmBottomLevel
+        width: 54
+        height: 20
+        objectName: "alarmBottomLevel"
+        backgroundColor: "#f03e3e"
+        tooltip: "Предельный нижний уровень"
+        readOnly: false
+        visible: false//NOTE пока закрыл
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottomMargin: 0
+        valueFontSize.bold: false
+        disappear: false//NOTE пока закрыл
+        correctingButtons: true
+        onValueRealChanged: s_alarmBottomLevelChanged(valueReal)
+        checkLimit: true
+        upLimit: mfuAlarmTopLevel.valueReal
+        downLimit: 0
+                mouseArea.onContainsMouseChanged:{
+            s_enableMouseArea( !mainRect.visible )
         }
     }
 }

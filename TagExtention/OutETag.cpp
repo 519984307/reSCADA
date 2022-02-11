@@ -148,6 +148,7 @@ void OutETag::writeImit(bool setImit)
             if(_ok){
                 emit s_qualityChd(_tag->readQuality() == Prom::Good);
             }
+            else emit s_qualityChd(false);
         }
         if(_value != _imitVal) {
             emit s_valueChd(value());

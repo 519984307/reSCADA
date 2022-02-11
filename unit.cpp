@@ -307,9 +307,9 @@ bool Unit::addSubUnit(Unit * unit)
     connect(unit, &Unit::s_alarmForAnderUnit, this, &Unit::detectSubUnitAlarm, Qt::QueuedConnection);
     connect(unit, &Unit::s_modeChange, this, &Unit::_updateSubUnitMode, Qt::QueuedConnection);
     connect(unit, &Unit::s_stateChange, this, &Unit::_updateSubUnitState, Qt::QueuedConnection);
-//    if( _owner != nullptr ){
-//      _owner->addSubUnit( unit );
-//    }
+    //    if( _owner != nullptr ){
+    //      _owner->addSubUnit( unit );
+    //    }
     return true;
   }
   return false;
@@ -428,29 +428,32 @@ void Unit::logging(Prom::MessType MessTypeID, QDateTime DateTime, bool UserOrSys
 bool Unit::connectToGUI(const QObject * GUI)
 {
   QObject * guiItem = GUI->findChild<QObject*>(this->tagPrefix);
+  QObject * guiItemUnit = guiItem->findChild<QObject*>("unit");
+
   if(!guiItem){
     logging(Prom::MessInfo, QDateTime::currentDateTime(), false, "", "GUI не обнаружен");
     return false;
   }
+  if(!guiItemUnit) guiItemUnit = guiItem; //Если нет дочернего с .unit, то подключаем GUI как обычно к корневому.
   //Logging(Prom::MessChangeInfo, QDateTime::currentDateTime(), unit->objectName(), "GUI обнаружен");
-  connect(this, SIGNAL(s_connected()), guiItem, SLOT(setConnected()), Qt::QueuedConnection);
-  connect(this, SIGNAL(s_disconnected()), guiItem, SLOT(setDisconnected()), Qt::QueuedConnection);
-  //TODO приделать обратно!!! connect(this, SIGNAL(SetInRoute(QVariant)), guiItem, SLOT(setRoute(QVariant)), Qt::QueuedConnection);
+  connect(this, SIGNAL(s_connected()), guiItemUnit, SLOT(setConnected()), Qt::QueuedConnection);
+  connect(this, SIGNAL(s_disconnected()), guiItemUnit, SLOT(setDisconnected()), Qt::QueuedConnection);
+  //TODO приделать обратно!!! connect(this, SIGNAL(SetInRoute(QVariant)), guiItemUnit, SLOT(setRoute(QVariant)), Qt::QueuedConnection);
 
-  connect(this,    SIGNAL(s_alarm(QVariant)), guiItem, SLOT(setAlarm(QVariant)), Qt::QueuedConnection);
-  connect(this,    SIGNAL(s_quitAlarm(QVariant)), guiItem, SLOT(setQuitAlarm(QVariant)   ), Qt::QueuedConnection);
-  connect(this,    SIGNAL(s_alarmReseted()      ), guiItem, SLOT(alarmReseted()), Qt::QueuedConnection);
-  connect(guiItem, SIGNAL(resetAlarm()        ), this,    SLOT(resetAlarm()  ), Qt::QueuedConnection);
-  QMetaObject::invokeMethod(guiItem, "setLinked", Qt::DirectConnection);
+  connect(this,        SIGNAL(s_alarm(QVariant)),     guiItemUnit, SLOT(setAlarm(QVariant)), Qt::QueuedConnection);
+  connect(this,        SIGNAL(s_quitAlarm(QVariant)), guiItemUnit, SLOT(setQuitAlarm(QVariant)   ), Qt::QueuedConnection);
+  connect(this,        SIGNAL(s_alarmReseted() ),     guiItemUnit, SLOT(alarmReseted()), Qt::QueuedConnection);
+  connect(guiItemUnit, SIGNAL(s_resetAlarm()),          this,        SLOT(resetAlarm()  ), Qt::QueuedConnection);
+  //QMetaObject::invokeMethod(guiItemUnit, "setName", Qt::DirectConnection, Q_ARG(QVariant, this->objectName()));
+  QMetaObject::invokeMethod(guiItemUnit, "setLinked", Qt::DirectConnection);
 
-  QObject * propWin =  guiItem->findChild<QObject*>("propWindow");
-
+  QObject * propWin =  guiItemUnit->findChild<QObject*>("propWindow");
 
   QVariant ret;
   QObject * tmpSgSt, * engRow;
 
   if(this->mover){
-    connect(this, SIGNAL(Cleaning()         ), guiItem, SLOT(cleaningWork()), Qt::QueuedConnection);
+    connect(this, SIGNAL(Cleaning()         ), guiItemUnit, SLOT(cleaningWork()), Qt::QueuedConnection);
     //connect(this, SIGNAL(s_quitAlarm(QString)), this, SLOT(MoverAlarm()), Qt::QueuedConnection);
 
     QMetaObject::invokeMethod(propWin, "addEngRow", Qt::DirectConnection, Q_RETURN_ARG(QVariant, ret), Q_ARG(QVariant, this->objectName())); //создал строку меню задержки
@@ -472,13 +475,14 @@ bool Unit::connectToGUI(const QObject * GUI)
 
   _customConnectToGUI(guiItem, propWin);
   foreach (ETag * ET , _tags) {
-    ET->connectToGUI(guiItem, propWin);
+    ET->connectToGUI(guiItemUnit, propWin);
   }
   foreach (Unit * unit, _subUnits) {
-  //Если ГУЙ дочернего юнита не найден в ГУЙ родителя, то ищем в общем ГУЙ уровнем выше
-  //WRNING Возможны проблемы при совпадедии имён доченних объектов.
-    if( ! unit->connectToGUI(guiItem) )
+    //Если ГУЙ дочернего юнита не найден в ГУЙ родителя, то ищем в общем ГУЙ уровнем выше
+    //WRNING Возможны проблемы при совпадедии имён доченних объектов.
+    if( ! unit->connectToGUI(guiItem) ){
       unit->connectToGUI(GUI);
+    }
   }
   reInitialise();
   return true;
@@ -541,7 +545,6 @@ void Unit::_sensorConnect()
 {
   _sensorsConnected = true;
   foreach(ETag * tag, _tags){
-    if(tag->isOk())
       _sensorsConnected &= tag->connected();
   }
   if(_firstLoad){

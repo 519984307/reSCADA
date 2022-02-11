@@ -144,7 +144,8 @@ enum UnitType {
     TypeDryer3_Bunker,
     TypeCombustor,
     TypeDruer,
-    TypeRectnColumn
+    TypeRectnColumn,
+    TypePump
 };
 Q_ENUM_NS(UnitType)
 

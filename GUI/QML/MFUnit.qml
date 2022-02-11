@@ -7,6 +7,8 @@ Item {
     id: mfu
     width: 120
     height: 30
+    property alias mainRect: body
+    property alias mouseArea: mouseArea
     property alias minBtn: minBtn
     property alias maxBtn: maxBtn
 
@@ -31,8 +33,8 @@ Item {
 
     property bool separCorrButtons: false
 
-    signal more(bool More)
-    signal less(bool Less)
+    signal s_more(bool More)
+    signal s_less(bool Less)
 
     //property real extAlarmLevel: 0
     function setValue(value) {
@@ -77,6 +79,7 @@ Item {
         //console.log( "New valueReal - ", valueReal )
     }
 
+
     Timer {
         id: timer
         interval: 1000
@@ -92,6 +95,7 @@ Item {
         }
     }
     MouseArea {
+        id: mouseArea
         anchors.fill: parent
         //onClicked: mfu.notified()
         hoverEnabled: true
@@ -119,32 +123,6 @@ Item {
         color: backgroundColor
         border.width: borderWidth
         border.color: borderColor
-        SimpleButton {
-            id: minBtn
-            width: nameText.text.length * nameText.font.pixelSize * 0.7
-            visible: mfu.correctingButtons
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.leftMargin: 0
-            anchors.bottomMargin: mfu.borderWidth
-            anchors.topMargin: mfu.borderWidth
-            unPressCheckColor: mfu.backgroundColor
-            nameText.text: "-"
-            nameText.font.pixelSize: valueLable.font.pixelSize
-            border.width: 0
-            anchors.left: parent.left
-            radius: 0
-            checkable: false
-            mouseArea.onClicked: {
-                if(!separCorrButtons){
-                    if (timer.buffer == "")
-                        timer.buffer = valueLable.text
-                    setValueLimited(Number(valueLable.text) - step)
-                    timer.start()
-                }
-            }
-            onPressedChanged: less(pressed)
-        }
 
 
         TextInput {
@@ -198,7 +176,39 @@ Item {
                 limit = true //Чтобы не лимитировать значения от setValue
             }
         }
-
+        ToolTip {
+            id: ttip
+            delay: 2000
+            timeout: 2000
+            visible: false
+            text: tooltip
+        }
+        SimpleButton {
+            id: minBtn
+            width: nameText.text.length * nameText.font.pixelSize * 0.7
+            visible: mfu.correctingButtons
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 0
+            anchors.bottomMargin: mfu.borderWidth
+            anchors.topMargin: mfu.borderWidth
+            unPressCheckColor: mfu.backgroundColor
+            nameText.text: "-"
+            nameText.font.pixelSize: valueLable.font.pixelSize
+            border.width: 0
+            anchors.left: parent.left
+            radius: 0
+            checkable: false
+            mouseArea.onClicked: {
+                if(!separCorrButtons){
+                    if (timer.buffer == "")
+                        timer.buffer = valueLable.text
+                    setValueLimited(Number(valueLable.text) - step)
+                    timer.start()
+                }
+            }
+            onPressedChanged: s_less(pressed)
+        }
         SimpleButton {
             id: maxBtn
             width: nameText.text.length * nameText.font.pixelSize * 0.7
@@ -224,20 +234,9 @@ Item {
                     timer.start()
                 }
             }
-            onPressedChanged: more( pressed )
-        }
-
-        ToolTip {
-            id: ttip
-            delay: 2000
-            timeout: 2000
-            visible: false
-            text: tooltip
+            onPressedChanged: s_more( pressed )
         }
     }
-
-
-
 }
 
 /*##^##

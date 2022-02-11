@@ -11,7 +11,7 @@ class OneEngRouteUnit : public EngRouteUnit
 
 public:
     explicit OneEngRouteUnit(Prom::UnitType Type,
-                              int ID,
+                              int *Id,
                               QString Name,
                               QString TagPefix,
                               bool Mover,

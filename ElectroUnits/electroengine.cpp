@@ -193,7 +193,7 @@ void ElectroEngine::Stop()
 //------------------------------------------------------------------------------
 void ElectroEngine::CheckStateSTART1KM()
 {
-    QObject * S =  sender();
+    //QObject * S =  sender();
     EngineStates tmpSt = _nowState;
     if(startForward->isOn()) {
         if(KMforward->isDetected()) _nowState = EngForvard;

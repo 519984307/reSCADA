@@ -78,8 +78,8 @@ Window {
     function setImpIsOut( ImpIsOut ){
         impIsOut = ImpIsOut
     }
-    signal impMore( variant More )
-    signal impLess( variant Less )
+    signal s_impMore( variant More )
+    signal s_impLess( variant Less )
 
     Item{
         id: itemPr
@@ -89,7 +89,7 @@ Window {
         Rectangle {
             id: rectPros
             width: parent.width * 0.6
-            color: "#b2b2b8"
+            color: "#7a7a85"
             border.width: 1
             anchors.left: parent.left
             anchors.top: mfuToProcess.bottom
@@ -127,7 +127,7 @@ Window {
 
         Rectangle {
             id: rectSetPt
-            color: "#b2b2b8"
+            color: rectPros.color
             border.width: 1
             anchors.left: rectPros.right
             anchors.right: parent.right
@@ -187,9 +187,9 @@ Window {
             nameText.text: "Вкл"
             onCheckedChanged: {
                 if (checked)
-                    nameText.text = "Откл"
+                    nameText.text = "ОТКЛ"
                 else
-                    nameText.text = "Вкл"
+                    nameText.text = "ВКЛ"
             }
         }
         Text {
@@ -289,8 +289,8 @@ Window {
             checkLimit: false
             backgroundColor: colorImpact
             mantissa: 2
-            onMore: impMore(More)
-            onLess: impLess(Less)
+            onS_more: s_impMore(More)
+            onS_less: s_impLess(Less)
         }
 
         Column{
@@ -450,7 +450,7 @@ Window {
     Rectangle {
         id: rectImpact
         width: parent.width * 0.05
-        color: "#00ffffff"
+        color: rectPros.color
         border.width: 1
         anchors.right: parent.right
         anchors.top: mfuToImpact.bottom

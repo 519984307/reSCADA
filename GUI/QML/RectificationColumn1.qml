@@ -211,7 +211,7 @@ RectificationColumn0 {
         anchors.right: pipeSt1.left
         anchors.top: parent.bottom
         anchors.bottom: parent.bottom
-        anchors.topMargin: -parent.height * parent.tank.levelRatio
+        anchors.topMargin: -parent.height * parent/*.tank*/.levelRatio
         anchors.bottomMargin: -parent.width / 3
         z: 10
         radius: width /3

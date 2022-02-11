@@ -54,7 +54,7 @@ RectificationColumn0 {
         id: cl1
         width: parent.colderDiametr
         height: width
-        color: parent.backgroundCurrentColor
+        color: unit.backgroundCurrentColor
         radius: width / 2
         border.width: parent.pipePassBorderWidth
         anchors.bottom: parent.top
@@ -74,7 +74,7 @@ RectificationColumn0 {
         anchors.leftMargin: parent.pipePassThin / 4
         nameText.text: ""
         showLevel: false
-        mainGradientColor: parent.backgroundCurrentColor
+        mainGradientColor: unit.backgroundCurrentColor
     }
 
     Pipe {
@@ -223,7 +223,7 @@ RectificationColumn0 {
         id: cl3
         width: parent.colderDiametr
         height: width
-        color: parent.backgroundCurrentColor
+        color: unit.backgroundCurrentColor
         radius: width / 2
         border.width: parent.pipePassBorderWidth
         anchors.bottom: cl1.top
@@ -280,7 +280,7 @@ RectificationColumn0 {
         anchors.right: pipeSt1.left
         anchors.top: parent.bottom
         anchors.bottom: parent.bottom
-        anchors.topMargin: -parent.height * parent.tank.levelRatio
+        anchors.topMargin: -parent.height * parent./*tank.*/levelRatio
         anchors.bottomMargin: -parent.width / 3
         z: 10
         radius: width /3
@@ -368,7 +368,7 @@ RectificationColumn0 {
         id: cl2
         width: colder.width
         height: width
-        color: parent.backgroundCurrentColor
+        color: unit.backgroundCurrentColor
         radius: width / 2
         border.width: parent.borderWidth / 2
         anchors.left: colder.right
@@ -576,6 +576,6 @@ RectificationColumn0 {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:2}D{i:41}D{i:42}D{i:44}
+    D{i:0;formeditorZoom:2}
 }
 ##^##*/

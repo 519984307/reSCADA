@@ -5,17 +5,22 @@ import QtQuick.Controls 2.15
 Window {
     id: root
     width: 180
-    height: 170
+    height: 150
     title: "РК"
     flags: Qt.Window | Qt.Dialog
     minimumWidth: 180
     maximumHeight: 170
+    property alias sepCorBtn: curValue.separCorrButtons
 
     property alias value: curValue.valueReal
     property alias step: regStep.valueReal
 
     property alias valueMax: maxValue.valueReal
     property alias valueMin: minValue.valueReal
+    property alias readOnly: curValue.readOnly
+    property color mainColor: "#a3fa96"
+    property color scaleColor: "#1a6b14"
+
 
     //signal minRangeChanged(int value)
     //signal maxRangeChanged(int value)
@@ -34,6 +39,8 @@ Window {
     function setStep( Step ) {
         regStep.setValue(Step)
     }
+    signal s_moreVal( variant More )
+    signal s_lessVal( variant Less )
 
     onVisibleChanged: {
         if (visible == true) {
@@ -56,48 +63,24 @@ Window {
         verticalAlignment: Text.AlignVCenter
     }
     Rectangle {
-        anchors.fill: textFrom
         color: "#6e9ec8"
     }
-    Text {
-        id: textFrom
-        height: 20
-        text: "ОТ"
-        anchors.left: parent.left
-        anchors.right: parent.horizontalCenter
-        anchors.top: textWrkDp.bottom
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        font.pixelSize: height * 0.8
-    }
     Rectangle {
-        anchors.fill: textTo
         color: "#c36b6b"
-    }
-    Text {
-        id: textTo
-        height: 20
-        text: "ДО"
-        anchors.left: parent.horizontalCenter
-        anchors.right: parent.right
-        anchors.top: textWrkDp.bottom
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        font.pixelSize: height * 0.8
     }
 
     MFUnit {
         id: maxValue
         height: 20
-        valueReal: 80
+        valueReal: 100
         backgroundColor: "#c36b6b"
         borderColor: "#c36b6b"
-        tooltip: "Max"
+        tooltip: "максимальное значение"
         readOnly: false
         visible: true
         anchors.left: parent.horizontalCenter
         anchors.right: parent.right
-        anchors.top: textTo.bottom
+        anchors.top: textWrkDp.bottom
         correctingButtons: true
         //onValueRealChanged: maxRangeChanged(valueReal)
         checkLimit: true
@@ -106,15 +89,15 @@ Window {
     MFUnit {
         id: minValue
         height: 20
-        valueReal: 20
+        valueReal: 0
         backgroundColor: "#6e9ec8"
         borderColor: "#6e9ec8"
-        tooltip: "Min"
+        tooltip: "минимальное значение"
         readOnly: false
         visible: true
         anchors.left: parent.left
         anchors.right: parent.horizontalCenter
-        anchors.top: textFrom.bottom
+        anchors.top: textWrkDp.bottom
         correctingButtons: true
         //onValueRealChanged: minRangeChanged(valueReal)
         checkLimit: true
@@ -136,7 +119,7 @@ Window {
         }
         Rectangle {
             id: wrk
-            color: "#1a6b14"
+            color: scaleColor
             anchors.left: min.right
             anchors.right: max.left
             anchors.top: parent.top
@@ -155,11 +138,11 @@ Window {
             x: value / 100 * parent.width
             width: 2
             height: parent.height * 1.1
-            color: "#a3fa96"
+            color: mainColor
         }
     }
     Rectangle {
-        color: "#a3fa96"
+        color: mainColor
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: item1.bottom
@@ -168,7 +151,7 @@ Window {
     Text {
         id: textLvl
         height: 20
-        text: "ТЕКУЩЕЕ РАСКРЫТИЕ %"
+        text: "ТЕКУЩЕЕ ЗНАЧЕНИЕ %"
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: item1.bottom
@@ -180,8 +163,8 @@ Window {
         id: curValue
         height: 40
         valueReal: 60
-        backgroundColor: "#a3fa96"
-        borderColor: "#a3fa96"
+        backgroundColor: mainColor
+        borderColor: mainColor
         tooltip: "Min"
         readOnly: false
         visible: true
@@ -194,11 +177,14 @@ Window {
         upLimit: maxValue.valueReal
         downLimit: minValue.valueReal
         step: regStep.valueReal
+        onS_more: s_moreVal( More )
+        onS_less: s_lessVal( Less )
     }
     Text {
         id: stepTxt
         height: 20
         width: text.length * font.pixelSize * 0.7
+        visible: !curValue.readOnly
         text: "ШАГ РЕГУЛИРОВКИ -"
         anchors.left: parent.left
         anchors.top: curValue.bottom
@@ -210,8 +196,9 @@ Window {
         id: regStep
         valueReal: 1
         height: 20
-        backgroundColor: "#a3fa96"
-        borderColor: "#a3fa96"
+        visible: !curValue.readOnly
+        backgroundColor: mainColor
+        borderColor: mainColor
         anchors.left: stepTxt.right
         anchors.right: parent.right
         anchors.top: curValue.bottom
@@ -222,3 +209,9 @@ Window {
         //onValueRealChanged: stepChanged(valueReal)
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;formeditorZoom:2}
+}
+##^##*/

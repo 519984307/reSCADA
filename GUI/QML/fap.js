@@ -11,6 +11,7 @@ const blocked = "brown"
 const manual = "yellow"
 const middle = "lime"
 const notAvailable = "darkgray"
+const notLinked = "black"
 const alarm = "red"
 const notAlarm = "black"
 

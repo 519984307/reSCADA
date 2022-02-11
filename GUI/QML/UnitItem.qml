@@ -32,7 +32,8 @@ Item {
     //        linkColors()
     //        renewColors()
     //    }
-    signal resetAlarm()
+    signal s_resetAlarm()
+    signal s_test()
     //    function linkColors() {
     //        //backgroundColor = backgroundCurrentColor
     //        //borderColor = borderCurrentColor
@@ -92,8 +93,8 @@ Item {
         //        St = String(borderCurrentColor)
         if (!linked) {
             timer.stop()
-            backgroundCurrentColor = Fap.notAvailable
-            borderCurrentColor = Fap.notAvailable
+            backgroundCurrentColor = Fap.notLinked
+            borderCurrentColor = Fap.notLinked
             return
         }
         else if (!connected) {
@@ -158,6 +159,8 @@ Item {
     onBlockedChanged: renewColors()
     onLinkedChanged: renewColors()
     onConnectedChanged: renewColors()
+    onBackgroundColorChanged: renewColors()
+    onBorderColorChanged: renewColors()
 }
 
 /*##^##

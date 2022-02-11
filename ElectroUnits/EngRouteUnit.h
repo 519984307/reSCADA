@@ -9,7 +9,7 @@ class EngRouteUnit : public RouteUnit
 
 public:
     explicit EngRouteUnit(Prom::UnitType Type,
-                           int ID,
+                           int *Id,
                            QString Name,
                            QString TagPefix,
                            bool Mover,

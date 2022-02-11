@@ -3,14 +3,14 @@
 #include "InDiscretETag.h"
 
 EngRouteUnit::EngRouteUnit(Prom::UnitType Type,
-                            int ID,
+                            int *Id,
                             QString Name,
                             QString TagPefix,
                             bool Mover,
                             std::vector<QString>,
                             bool BlockedStop)
     : RouteUnit(Type,
-                 ID,
+                 Id,
                  Name,
                  TagPefix,
                  Mover,

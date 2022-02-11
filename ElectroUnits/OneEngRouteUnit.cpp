@@ -5,14 +5,14 @@
 #include "InDiscretETag.h"
 
 OneEngRouteUnit::OneEngRouteUnit(Prom::UnitType Type,
-                                  int ID,
+                                  int *Id,
                                   QString Name,
                                   QString TagPefix,
                                   bool Mover,
                                   std::vector<QString> EngSensorNames,
                                   bool BlockedStop)
     : EngRouteUnit(Type,
-                    ID,
+                    Id,
                     Name,
                     TagPefix,
                     Mover,

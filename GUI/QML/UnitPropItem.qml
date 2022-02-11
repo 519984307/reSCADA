@@ -18,7 +18,7 @@ UnitItem {
         id: propWindow
         objectName: "propWindow"
         winTitle: name
-        onResetAlarm: unitProp.resetAlarm()
+        onResetAlarm: unitProp.s_resetAlarm()
     }
 }
 

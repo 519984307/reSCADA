@@ -1,7 +1,7 @@
-﻿import QtQuick 2.12
+﻿import QtQuick 2.15
 import "fap.js" as Fap
 
-UnitItem {
+UnitPropItem {
     id: fan
     width: 30
     height: 30
@@ -27,25 +27,30 @@ UnitItem {
         std = true
         manual = false
         cleaning = false
+        backgroundColor = "Green"
     }
     function stoped() {
         stopComand()
         std = false
         manual = false
         cleaning = false
+        backgroundColor = Fap.ready
     }
     function startComand() {
         st = true
         manual = false
         cleaning = false
+        backgroundColor = "Lime"
     }
     function stopComand() {
         st = false
         manual = false
         cleaning = false
+        backgroundColor = "Lime"
     }
     function manualWork() {
         manual = true
+        backgroundColor = "Gold"
     }
 
     function cleaningWork() {
@@ -101,6 +106,27 @@ UnitItem {
         font.pointSize: 7
         visible: parent.visible
         wrapMode: Text.Wrap
+    }
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton | Qt.LeftButton
+        onDoubleClicked: {
+            if (st)
+                stop()
+            else
+                start()
+        }
+        onClicked: {
+            alarmNotify = false;
+            if (mouse.button & Qt.RightButton) {
+                openSettings()}
+            else if(mouse.modifiers & Qt.ShiftModifier){
+                addToCurrentRoteStoped()
+            }
+            else if(mouse.modifiers & Qt.ControlModifier){
+                addToCurrentRoteStarted()
+            }
+        }
     }
 }
 

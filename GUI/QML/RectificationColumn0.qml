@@ -4,7 +4,7 @@ import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.13
 
 //import LineComponent 1.0
-UnitPropItem {
+TankUnit {
     id: root
     width: 70
     height: 350
@@ -13,7 +13,7 @@ UnitPropItem {
 
     property alias tOutWater: tOutWater
     property alias pipeOutWtr1: pipeOutWtr1
-    property alias tank: tank
+    //property alias tank: tank
     property int colderDiametr: width * 0.7
 
     property int valveNameSize: 10
@@ -28,8 +28,20 @@ UnitPropItem {
     property int pipeBorderWidth: 1
 
     property bool fullView: true
-
-    backgroundColor: "#d3d3d3"
+    mainGradientColor:"#d3d3d3"
+    //backgroundColor: "#d3d3d3"
+    //Tank {
+    //   id: tank
+    //   width: 60
+    radius: 10
+    //objectName:  "cube"
+    //anchors.fill: parent
+    level: 90
+    levelRatio: 0.2
+    //    mainGradientColor: backgroundCurrentColor
+    //    borderWidth: parent.borderWidth
+    //    borderColor: borderCurrentColor
+    // }
 
     //++++++++ Test +++++++
     //    mouseArea.onPressAndHold: {
@@ -41,28 +53,16 @@ UnitPropItem {
     //        cl = backgroundCurrentColor
     //    }
     //------ Test ------
-    MouseArea {
-        id: mousAr
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton | Qt.LeftButton
-        onClicked: {
-            if (mouse.button & Qt.RightButton) {
-                openSettings()
-            }
-        }
-    }
-    Tank {
-        id: tank
-        width: 60
-        radius: 10
-        objectName:  "cube"
-        anchors.fill: parent
-        level: 90
-        levelRatio: 0.2
-        mainGradientColor: backgroundCurrentColor
-        borderWidth: parent.borderWidth
-        borderColor: borderCurrentColor
-    }
+//    MouseArea {
+//        id: mousAr
+//        anchors.fill: parent
+//        acceptedButtons: Qt.RightButton | Qt.LeftButton
+//        onClicked: {
+//            if (mouse.button & Qt.RightButton) {
+//                openSettings()
+//            }
+//        }
+//    }
     PID_Win{
         id: pidPTop
         title: "ПИД " + "давление верха " + root.name
@@ -271,6 +271,6 @@ UnitPropItem {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:3}
+    D{i:0;formeditorZoom:1.75}
 }
 ##^##*/
