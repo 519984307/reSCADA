@@ -46,6 +46,7 @@ Unit::Unit( Prom::UnitType Type,
     connect(_cleanTimer, &QTimer::timeout, this, &Unit::_cleanTimeEnd, Qt::QueuedConnection);
   }
   //LoadParam();
+  //
 }
 //------------------------------------------------------------------------------
 int Unit::id() const
