@@ -36,7 +36,10 @@ enum UnitModes {
     UnMdStorage,
     UnMdStopAndWait,
     UnMdPartStarted,
-    UnMdAutoStart
+    UnMdAutoStart,
+    UnMdWarmingUp,
+    UnMdCollingStoped
+
 };
 Q_ENUM_NS( UnitModes )
 
@@ -120,6 +123,7 @@ enum MessType {
 Q_ENUM_NS(MessType)
 
 enum UnitType {
+    TypeSimpUnit,
     TypeNoDef,
     TypeTransporter,
     TypeNoria,
@@ -199,8 +203,8 @@ Q_ENUM_NS(SetModeResp)
 
 enum ETagValConv{
     VCNo,
-    VCFloatInIntToDouble, //Число с плавающей точкой закодировано в целом числе - последний разряд десятые доли (256 = 25,6), преобразуем в обычное с плавающей точкой
-    VCFloat3InIntToDouble3
+    VCdiv10, //Число с плавающей точкой закодировано в целом числе - последний разряд десятые доли (256 = 25,6), преобразуем в обычное с плавающей точкой
+    VCdiv1000
 };
 Q_ENUM_NS(ETagValConv)
 

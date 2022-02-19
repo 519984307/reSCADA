@@ -6,14 +6,16 @@ import QtGraphicalEffects 1.13
 //import LineComponent 1.0
 RectificationColumn0 {
     id: root
-    width: 60
+    width: 70
     height: 450
-    property alias regulValveWater: regulValveWater
     property alias pipeV4: pipeV4
+    property int vWaterTopMarg: -200
+    property int vSteamBottomMarg: -200
 
-    pipeOutWtr1.anchors.bottom: upAng3.bottom
-    pipeOutWtr1.anchors.right: upAng3.left
-    pipeOutWtr1.width: 60
+//    tWater.shTop: false
+//    tWater.shBottom: true
+//    tWater.shLeft: true
+//    tWater.shRight: false
 
     Rectangle {
         id: rectTop
@@ -25,7 +27,7 @@ RectificationColumn0 {
         anchors.horizontalCenterOffset: 0
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: 0
-        anchors.bottomMargin: -2
+        anchors.bottomMargin: 0
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop {
@@ -54,12 +56,12 @@ RectificationColumn0 {
         id: cl1
         width: parent.colderDiametr
         height: width
-        color: unit.backgroundCurrentColor
+        color: backgroundColor
         radius: width / 2
         border.width: parent.pipePassBorderWidth
         anchors.bottom: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottomMargin: width / 10
+        anchors.bottomMargin: width / 50
         z: 1
     }
 
@@ -68,13 +70,14 @@ RectificationColumn0 {
         z: 10
         width: parent.width / 3
         height: width * 3
-        radius: 10
+        radius: 5
         anchors.left: pipeV6.right
         anchors.bottom: parent.top
+        showAlarmLevel: false
         anchors.leftMargin: parent.pipePassThin / 4
         nameText.text: ""
         showLevel: false
-        mainGradientColor: unit.backgroundCurrentColor
+        mainGradientColor: backgroundColor
     }
 
     Pipe {
@@ -89,16 +92,6 @@ RectificationColumn0 {
         borderWidth: parent.pipePassBorderWidth
         nActiveColor: parent.pipePassColor
         z: 0
-    }
-
-    Pipe {
-        id: pipeV1
-        x: 90
-        width: parent.pipePassThin
-        anchors.top: upAng.bottom
-        borderWidth: parent.pipePassBorderWidth
-        nActiveColor: parent.pipePassColor
-        horOrVert: false
     }
 
     PipeAngle90 {
@@ -208,10 +201,11 @@ RectificationColumn0 {
 
     Pipe {
         id: pipe3
-        y: 36
         height: parent.pipePassThin
         anchors.left: parent.right
         anchors.right: pipeAngBot6.left
+        anchors.top: parent.top
+        anchors.topMargin: parent.tank.radius
         anchors.rightMargin: 0
         anchors.leftMargin: 0
         nActiveColor: parent.pipePassColor
@@ -223,11 +217,11 @@ RectificationColumn0 {
         id: cl3
         width: parent.colderDiametr
         height: width
-        color: unit.backgroundCurrentColor
+        color: backgroundColor
         radius: width / 2
         border.width: parent.pipePassBorderWidth
         anchors.bottom: cl1.top
-        anchors.bottomMargin: width / 10
+        anchors.bottomMargin: width / 50
         anchors.horizontalCenter: parent.horizontalCenter
         z: 1
     }
@@ -238,7 +232,7 @@ RectificationColumn0 {
         height: parent.pipePassThin
         anchors.verticalCenter: cl3.verticalCenter
         anchors.left: cl3.right
-        anchors.right: upAng1.left
+        anchors.right: upAng10.left
         nActiveColor: parent.pipePassColor
         z: 0
         borderWidth: parent.pipePassBorderWidth
@@ -248,7 +242,7 @@ RectificationColumn0 {
         id: pipeV6
         width: parent.pipePassThin
         anchors.left: pipeV7.right
-        anchors.top: upAng1.bottom
+        anchors.top: upAng10.bottom
         anchors.bottom: pipe3.top
         anchors.bottomMargin: -parent.pipePassBorderWidth
         anchors.leftMargin: parent.pipePassThin / 4
@@ -259,7 +253,7 @@ RectificationColumn0 {
     }
 
     PipeAngle90 {
-        id: upAng1
+        id: upAng10
         x: 85
         width: 10
         height: 10
@@ -275,13 +269,13 @@ RectificationColumn0 {
     Tank {
         id: boler
         x: -41
-        y: 304
         width: parent.width / 2
+        height: 70
         anchors.right: pipeSt1.left
-        anchors.top: parent.bottom
-        anchors.bottom: parent.bottom
-        anchors.topMargin: -parent.height * parent./*tank.*/levelRatio
-        anchors.bottomMargin: -parent.width / 3
+        anchors.top: pipeSt1.top
+        anchors.topMargin: -radius
+        showAlarmLevel: false
+
         z: 10
         radius: width /3
         showLevel: false
@@ -291,12 +285,12 @@ RectificationColumn0 {
 
     Pipe {
         id: pipeSt1
-        width: parent.width / 10
-        height: parent.pipeSteamThin * 1.5
+        width: parent.width / 4
+        height: parent.pipeSteamThin * 2
         anchors.right: parent.left
-        anchors.top: boler.top
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: parent.tank.radius + 3
         borderWidth: parent.pipePassBorderWidth
-        anchors.topMargin: boler.height / 6
         nActiveColor: parent.pipeSteamColor
         z: 0
     }
@@ -331,44 +325,18 @@ RectificationColumn0 {
         width: parent.pipeSteamThin
         anchors.right: pipeStAng1.right
         anchors.top: pipeStAng1.bottom
-        anchors.bottom: boler.bottom
-        anchors.bottomMargin: -15
+        anchors.bottom: regulValveSteam.top
+        anchors.bottomMargin: 0
         borderWidth: parent.pipePassBorderWidth
         horOrVert: false
         nActiveColor: parent.pipeSteamColor
         z: 0
     }
-    Pipe {
-        id: pipeSt4
-        height: parent.pipeSteamThin
-        anchors.left: boler.horizontalCenter
-        anchors.right: pipeSteam.left
-        anchors.bottom: boler.bottom
-        borderWidth: parent.pipePassBorderWidth
-        anchors.rightMargin: -parent.borderWidth
-        nActiveColor: parent.pipeSteamColor
-        z: 0
-    }
-    RegulValveUnit {
-        id: regulValveSteam
-        name: root.name + ".КП"
-        width: 20
-        height: 20
-        anchors.top: pipeSteam.bottom
-        regValve.nameOnTop: true
-        regValve.nameTextPixSize: parent.valveNameSize
-        regValve.nameOnLeft: false
-        objectName: root.objectName + ".vSteam"
-        regValve.substanceColor: pipeSteamColor
-        anchors.horizontalCenter: pipeSteam.horizontalCenter
-        regValve.position: 30
-        z: 50
-    }
     Rectangle {
         id: cl2
         width: colder.width
         height: width
-        color: unit.backgroundCurrentColor
+        color: backgroundColor
         radius: width / 2
         border.width: parent.borderWidth / 2
         anchors.left: colder.right
@@ -386,21 +354,6 @@ RectificationColumn0 {
         anchors.rightMargin: -cl2.border.width
         borderWidth: parent.pipePassBorderWidth
         z: 0
-    }
-    RegulValveUnit {
-        id: regulValveWater
-        name: root.name + ".КВ"
-        x: 68
-        width: 20
-        height: 20
-        anchors.top: cl3.top
-        regValve.position: 30
-        regValve.substanceColor: pipeOutWaterColor
-        objectName: root.objectName + ".vWater"
-        regValve.nameOnTop: true
-        anchors.horizontalCenter: cl2.horizontalCenter
-        regValve.nameOnLeft: false
-        regValve.nameTextPixSize: parent.valveNameSize
     }
     Pipe {
         id: pipeOutWtr4
@@ -499,18 +452,6 @@ RectificationColumn0 {
         borderWidth: parent.pipeBorderWidth
         pipeThin: parent.pipeOutWaterThin
     }
-
-    PipeAngle90 {
-        id: upAng3
-        x: 5
-        width: upAng4.height
-        height: width
-        anchors.top: cl1.verticalCenter
-        anchors.topMargin: parent.colderDiametr /8
-        nActiveColor: parent.pipeOutWaterColor
-        borderWidth: parent.pipeBorderWidth
-        pipeThin: parent.pipeOutWaterThin
-    }
     Pipe {
         id: pipeV7
         x: 46
@@ -542,40 +483,197 @@ RectificationColumn0 {
         pipeThin: parent.pipeOutWaterThin
         nActiveColor: parent.pipeOutWaterColor
     }
-    Rectangle {
-        x: 38
-        y: 27
-        width: parent.pipePassThin * 2
-        height: width
-        radius: 5
-        color: parent.pipePassColor
-        border.color: "black"
-        border.width: parent.pipePassBorderWidth
-        anchors.verticalCenter: upAng5.verticalCenter
-        anchors.verticalCenterOffset: -4
-        anchors.horizontalCenterOffset: -3
-        anchors.horizontalCenter: upAng5.horizontalCenter
+
+    Pipe {
+        id: pipeSteam2
+        height: parent.pipeSteamThin
+        anchors.left: pipeStAng3.right
+        anchors.right: pipeSteam.left
+        anchors.bottom: boler.bottom
+        anchors.bottomMargin: boler.height * 0.3
+        nActiveColor: parent.pipeSteamColor
+        borderWidth: parent.pipeBorderWidth
+        anchors.leftMargin: 0
+        z: 0
+        anchors.rightMargin: -parent.borderWidth
     }
+
     PipeAngle90 {
-        id: upAng5
-        x: 34
-        y: 30
-        width: 10
-        height: 10
-        anchors.right: pipe3.left
-        anchors.bottom: pipe3.bottom
+        id: pipeStAng2
+        width: 7
+        height: 7
+        anchors.right: pipeSteam1.right
+        anchors.bottom: pipeSteam1.top
+        nActiveColor: parent.pipeSteamColor
+        borderWidth: parent.pipeBorderWidth
+        z: 0
+        pipeThin: parent.pipeSteamThin
+        rotation: 270
         anchors.bottomMargin: 0
         anchors.rightMargin: 0
-        nActiveColor: parent.pipePassColor
-        rotation: 90
-        borderWidth: parent.pipePassBorderWidth
-        pipeThin: parent.pipePassThin
+    }
+
+    Pipe {
+        id: pipeSteam1
+        x: -32
+        width: parent.pipeSteamThin
+        anchors.top: pipeSt1.bottom
+        anchors.bottom: pipeStAng3.top
+        anchors.topMargin: boler.height / 6
+        horOrVert: false
+        nActiveColor: parent.pipeSteamColor
+        borderWidth: parent.pipeBorderWidth
         z: 0
+        anchors.horizontalCenter: pipeSt1.horizontalCenter
+        anchors.bottomMargin: 0
+    }
+
+    PipeAngle90 {
+        id: pipeStAng3
+        y: 378
+        width: 7
+        height: 7
+        anchors.left: pipeSteam1.left
+        anchors.bottom: pipeSteam2.bottom
+        nActiveColor: parent.pipeSteamColor
+        borderWidth: parent.pipeBorderWidth
+        anchors.leftMargin: 0
+        z: 0
+        pipeThin: parent.pipeSteamThin
+        anchors.bottomMargin: 0
+        rotation: 90
+    }
+
+    Pipe {
+        id: pipeSteam3
+        height: parent.pipeSteamThin
+        anchors.left: boler.right
+        anchors.right: pipeStAng2.left
+        anchors.top: pipeStAng2.top
+        anchors.topMargin: 0
+        nActiveColor: parent.pipeSteamColor
+        borderWidth: parent.pipeBorderWidth
+        anchors.leftMargin: 0
+        z: 0
+        anchors.rightMargin: 0
+    }
+
+    PipeAngle180 {
+        id: upAng11
+        x: -14
+        y: -16
+        width: parent.width /2
+        height: width /2
+        anchors.bottom: parent.top
+        z: 0
+        nActiveColor: parent.pipeOutWaterColor
+        anchors.bottomMargin: 1
+        anchors.horizontalCenter: parent.horizontalCenter
+        borderWidth: parent.pipeBorderWidth
+        pipeThin: parent.pipeOutWaterThin
+        anchors.horizontalCenterOffset: - parent.width /2
+    }
+
+    Pipe {
+        id: pipeOutWtr81
+        width: parent.pipeOutWaterThin
+        visible: parent.fullView
+        anchors.left: upAng11.left
+        anchors.top: cl1.verticalCenter
+        anchors.bottom: upAng11.top
+        z: 0
+        horOrVert: false
+        nActiveColor: parent.pipeOutWaterColor
+        anchors.bottomMargin: 0
+        borderWidth: parent.pipeBorderWidth
+        anchors.leftMargin: 0
+        anchors.topMargin: 0
+    }
+
+    PipeAngle180 {
+        id: upAng21
+        x: -5
+        y: -39
+        width: 24
+        height: width /2
+        anchors.right: pipeOutWtr81.right
+        anchors.bottom: pipeOutWtr81.top
+        z: 0
+        nActiveColor: parent.pipeOutWaterColor
+        anchors.bottomMargin: 0
+        rotation: 180
+        anchors.rightMargin: 0
+        borderWidth: parent.pipeBorderWidth
+        pipeThin: parent.pipeOutWaterThin
+    }
+
+    Triangle {
+        x: 94
+        width: parent.pipeOutWaterThin * 2.5
+        height: width
+        anchors.top: pipeOutWtr91.bottom
+        nActiveColor: parent.pipeOutWaterColor
+        anchors.horizontalCenter: pipeOutWtr91.horizontalCenter
+        borderWidth: parent.pipeBorderWidth
+        anchors.topMargin: 0
+        anchors.horizontalCenterOffset: 0
+    }
+
+    Pipe {
+        id: pipeOutWtr91
+        width: parent.pipeOutWaterThin
+        visible: parent.fullView
+        anchors.left: upAng21.left
+        anchors.top: upAng21.bottom
+        anchors.bottom: upAng11.top
+        z: 0
+        horOrVert: false
+        nActiveColor: parent.pipeOutWaterColor
+        rotation: 0
+        anchors.bottomMargin: 0
+        borderWidth: parent.pipeBorderWidth
+        anchors.leftMargin: 0
+        anchors.topMargin: 0
+    }
+
+    RegulValveUnit {
+        id: regulValveSteam
+        name: root.name + ".КП"
+        width: 20
+        height: 20
+        anchors.bottom: parent.bottom
+        regValve.substanceColor: pipeSteamColor
+        z: 50
+        regValve.position: 30
+        objectName: root.objectName + ".vSteam"
+        anchors.bottomMargin: vSteamBottomMarg
+        regValve.nameOnTop: true
+        anchors.horizontalCenter: pipeSteam.horizontalCenter
+        regValve.nameOnLeft: false
+        regValve.nameTextPixSize: valveNameSize
+    }
+
+    RegulValveUnit {
+        id: regulValveWater
+        name: root.name + ".КВ"
+        x: 68
+        width: 20
+        height: 20
+        anchors.top: parent.top
+        regValve.substanceColor: pipeOutWaterColor
+        z: 10
+        regValve.position: 30
+        objectName: root.objectName + ".vWater"
+        anchors.topMargin: vWaterTopMarg
+        regValve.nameOnTop: true
+        anchors.horizontalCenter: cl2.horizontalCenter
+        regValve.nameOnLeft: false
+        regValve.nameTextPixSize: parent.valveNameSize
     }
 }
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:2}
+    D{i:0;formeditorZoom:1.66}
 }
 ##^##*/

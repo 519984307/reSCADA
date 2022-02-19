@@ -5,40 +5,36 @@ Item {
     id: contItem
     width: 80
     height: 200
+    property alias levelText: levelDig
+    property alias levelTextBottMarg: levelDig.anchors.bottomMargin
+    property alias levelTextHorOffset: levelDig.anchors.horizontalCenterOffset
     property alias mfuAlarmTopLevel: mfuAlarmTopLevel
     property int radius: 30
     property real level: 80
     property real levelRatio: 0.8
     property alias nameText: nameText
     property alias nameTextPixSize: nameText.font.pixelSize
+    property alias nameTextHorOffset: nameText.anchors.horizontalCenterOffset
+    property int nameBottMargin: height * 0.4
     property bool showSeam: true
     property bool showLevel: true
     property int borderWidth: 2
     property bool showAlarmLevel: true
-
     property color borderColor: "black"
     property color mainGradientColor: "#d3d3d3"
     property color contentGradientColor: "steelblue"
-    property int nameTopMargin: height * 0.4
-    property int nameTextHeight: nameText.font.pixelSize
-
     property alias alarmTopLevel: mfuAlarmTopLevel.valueReal
     property alias alarmBottomLevel: mfuAlarmBottomLevel.valueReal
+
     signal s_alarmTopLevelChanged( variant AlarmTopLevel )
-    onAlarmTopLevelChanged: s_alarmTopLevelChanged( alarmTopLevel )
     signal s_alarmBottomLevelChanged( variant AlarmTopLevel )
-    onAlarmBottomLevelChanged: s_alarmBottomLevelChanged( alarmBottomLevel )
 
     signal s_enableMouseArea( bool Enable)
     function setLevel( Level ) {
-        level = Level
+        level = Level.toFixed(1)
     }
-    function setAlarmLevelTop(value) {
-        mfuAlarmTopLevel.setValue(value)
-    }
-    function setAlarmLevelBottom(value) {
-        mfuAlarmBottomLevel.setValue(value)
-    }
+    function setAlarmLevelTop(value) { mfuAlarmTopLevel.setValue(value) }
+    function setAlarmLevelBottom(value) {mfuAlarmBottomLevel.setValue(value) }
     Rectangle {
         id: rectBody
         border.width: borderWidth
@@ -157,27 +153,26 @@ Item {
     }
     Text {
         id: nameText
-        height: nameTextHeight
-        anchors.right: parent.right
-        anchors.rightMargin: parent.width / 20
-        anchors.left: parent.left
-        anchors.leftMargin: parent.width / 20
-        anchors.top: parent.top
-        anchors.topMargin: nameTopMargin
+        width: parent.width * 0.9
+        anchors.bottom: parent.bottom
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         text: qsTr("ЁМКОСТЬ")
         font.bold: true
         wrapMode: Text.WordWrap
+        anchors.horizontalCenterOffset: 0
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottomMargin: parent.nameBottMargin
         minimumPixelSize: 1
     }
     Text {
         id: levelDig
-        text: qsTr(contItem.level + "%")
-        anchors.bottom: seam2.top
+        text: contItem.level + "%"
+        anchors.bottom: parent.bottom
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        anchors.bottomMargin: 0
+        anchors.horizontalCenterOffset: 0
+        //anchors.bottomMargin: parent.height * levelRatio - height
         anchors.horizontalCenter: parent.horizontalCenter
         maximumLineCount: 0
         fontSizeMode: Text.Fit
@@ -257,11 +252,12 @@ Item {
         disappear: showAlarmLevel
         correctingButtons: true
         onValueRealChanged: s_alarmTopLevelChanged(valueReal)
-        checkLimit: true
+        limited: true
         downLimit: 20
         mouseArea.onContainsMouseChanged:{
             s_enableMouseArea( !mainRect.visible )
         }
+        onValueChanged: s_alarmTopLevelChanged( Value )
     }
     MFUnit {
         id: mfuAlarmBottomLevel
@@ -279,12 +275,13 @@ Item {
         disappear: false//NOTE пока закрыл
         correctingButtons: true
         onValueRealChanged: s_alarmBottomLevelChanged(valueReal)
-        checkLimit: true
+        limited: true
         upLimit: mfuAlarmTopLevel.valueReal
         downLimit: 0
                 mouseArea.onContainsMouseChanged:{
             s_enableMouseArea( !mainRect.visible )
         }
+        onValueChanged:  s_alarmBottomLevelChanged( Value )
     }
 }
 

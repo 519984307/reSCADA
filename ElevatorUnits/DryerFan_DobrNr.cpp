@@ -19,7 +19,7 @@ DryerFan_DobrNr::DryerFan_DobrNr( int ID,
                                true, false, false, false );
     _OnFC->onlyChange();
 
-    _T = new InETag( this, Prom::TpIn, "Датчик t°C", ".T", true, 30, 5, false, false, false, false, true, Prom::VCFloatInIntToDouble );
+    _T = new InETag( this, Prom::TpIn, "Датчик t°C", ".T", true, 30, 5, false, false, false, false, true, Prom::VCdiv10 );
     _T->needBeUndetectedAlarm();
 
 }

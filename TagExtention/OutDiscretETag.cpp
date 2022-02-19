@@ -71,7 +71,7 @@ bool OutDiscretETag::setValue(QVariant Value, bool notImit)
         }
     }
     else{
-        _logging(Prom::MessError, Value.toString() + " - не допустимое значение для этого дискретного выхода", _imit);
+        _logging(Prom::MessError, QString::number(Value.toDouble())+ " - не допустимое значение для этого дискретного выхода", _imit);
     }
     return  false;
 

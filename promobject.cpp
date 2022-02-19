@@ -165,7 +165,7 @@ void PromObject::GlobalRescan()
 //------------------------------------------------------------------------------
 void PromObject::Logging(Prom::MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message)
 {
-    if(MessTypeID == Prom::MessAlarm || MessTypeID == Prom::MessQuitAlarm  || MessTypeID == Prom::MessWarning)
+    if(MessTypeID == Prom::MessAlarm /*|| MessTypeID == Prom::MessQuitAlarm  || MessTypeID == Prom::MessWarning*/)
         emit s_addMessage(DateTime.toString("yyyy.MM.dd"), DateTime.toString("hh:mm:ss"), Source, Message);
     emit s_logging(MessTypeID, DateTime, UserOrSys ? "Оператор" : "Система", Source, Message);
     //qDebug()<< DateTime << Source + Message;

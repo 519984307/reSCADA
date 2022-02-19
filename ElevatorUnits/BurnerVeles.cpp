@@ -13,9 +13,9 @@ BurnerVeles::BurnerVeles( int ID,
            false,
            Prom::UnMdStop )
 {
-    _setT = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка t°C", ".setTemp", false, false, false, true, Prom::VCFloatInIntToDouble, true );
+    _setT = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка t°C", ".setTemp", false, false, false, true, Prom::VCdiv10, true );
 
-    _T = new InETag( this, Prom::TpIn, "Датчик t°C", ".temp", true, 90, 5, false, false, true, false, true, Prom::VCFloatInIntToDouble );
+    _T = new InETag( this, Prom::TpIn, "Датчик t°C", ".temp", true, 90, 5, false, false, true, false, true, Prom::VCdiv10 );
     _T->needBeUndetectedAlarm();
     //connect( _T, &InETag::s_valueChd, this, &BurnerVeles::SetCurrentTemp );
 

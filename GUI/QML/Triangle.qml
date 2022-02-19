@@ -3,12 +3,12 @@ import "fap.js" as Fap
 
 Item {
     property bool active: false
-    property int borderWidth: 10
+    property int borderWidth: 1
     property color activeColor: Fap.ready
     property color nActiveColor: Fap.defaultColor
     property color borderColor: Fap.border
-    width: 200
-    height: 200
+    width: 20
+    height: 20
     visible: true
     antialiasing: false
     onActiveChanged: pipe.requestPaint()

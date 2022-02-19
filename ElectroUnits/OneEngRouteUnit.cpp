@@ -10,14 +10,16 @@ OneEngRouteUnit::OneEngRouteUnit(Prom::UnitType Type,
                                   QString TagPefix,
                                   bool Mover,
                                   std::vector<QString> EngSensorNames,
-                                  bool BlockedStop)
+                                  bool BlockedStop,
+                                  Prom::UnitModes SaveMode)
     : EngRouteUnit(Type,
                     Id,
                     Name,
                     TagPefix,
                     Mover,
                     EngSensorNames,
-                    BlockedStop)
+                    BlockedStop,
+                    SaveMode)
 {
     _engine = new ElectroEngine(this , EngSensorNames);
     connect(_engine, &ElectroEngine::Alarm, this, &Unit::detectAlarm, Qt::QueuedConnection);

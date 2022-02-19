@@ -43,21 +43,21 @@ Dryer3VSM_Kromy::Dryer3VSM_Kromy(int ID,
     _as        = new InDiscretETag(this, "Кнопка стоп", ".AS", true, false, true, false);
     _as->needBeUndetectedAlarm();
 
-    _temp1    = new InETag(this, TpIn, "Датчик t°C 1",  ".temp1.temp",  true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp2    = new InETag(this, TpIn, "Датчик t°C 2",  ".temp2.temp",  true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp3    = new InETag(this, TpIn, "Датчик t°C 3",  ".temp3.temp",  true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp4    = new InETag(this, TpIn, "Датчик t°C 4",  ".temp4.temp",  true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp5    = new InETag(this, TpIn, "Датчик t°C 5",  ".temp5.temp",  true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp6    = new InETag(this, TpIn, "Датчик t°C 6",  ".temp6.temp",  true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp7    = new InETag(this, TpIn, "Датчик t°C 7",  ".temp7.temp",  true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp8    = new InETag(this, TpIn, "Датчик t°C 8",  ".temp8.temp",  true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp9    = new InETag(this, TpIn, "Датчик t°C 9",  ".temp9.temp",  true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp10   = new InETag(this, TpIn, "Датчик t°C 10", ".temp10.temp", true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp11   = new InETag(this, TpIn, "Датчик t°C 11", ".temp11.temp", true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp12   = new InETag(this, TpIn, "Датчик t°C 12", ".temp12.temp", true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp13   = new InETag(this, TpIn, "Датчик t°C 13", ".temp13.temp", true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp14   = new InETag(this, TpIn, "Датчик t°C 14", ".temp14.temp", true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _temp15   = new InETag(this, TpIn, "Датчик t°C 15", ".temp15.temp", true, 30, 5, false, false, false, false, true, VCFloatInIntToDouble);
+    _temp1    = new InETag(this, TpIn, "Датчик t°C 1",  ".temp1.temp",  true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp2    = new InETag(this, TpIn, "Датчик t°C 2",  ".temp2.temp",  true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp3    = new InETag(this, TpIn, "Датчик t°C 3",  ".temp3.temp",  true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp4    = new InETag(this, TpIn, "Датчик t°C 4",  ".temp4.temp",  true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp5    = new InETag(this, TpIn, "Датчик t°C 5",  ".temp5.temp",  true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp6    = new InETag(this, TpIn, "Датчик t°C 6",  ".temp6.temp",  true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp7    = new InETag(this, TpIn, "Датчик t°C 7",  ".temp7.temp",  true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp8    = new InETag(this, TpIn, "Датчик t°C 8",  ".temp8.temp",  true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp9    = new InETag(this, TpIn, "Датчик t°C 9",  ".temp9.temp",  true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp10   = new InETag(this, TpIn, "Датчик t°C 10", ".temp10.temp", true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp11   = new InETag(this, TpIn, "Датчик t°C 11", ".temp11.temp", true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp12   = new InETag(this, TpIn, "Датчик t°C 12", ".temp12.temp", true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp13   = new InETag(this, TpIn, "Датчик t°C 13", ".temp13.temp", true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp14   = new InETag(this, TpIn, "Датчик t°C 14", ".temp14.temp", true, 30, 5, false, false, false, false, true, VCdiv10);
+    _temp15   = new InETag(this, TpIn, "Датчик t°C 15", ".temp15.temp", true, 30, 5, false, false, false, false, true, VCdiv10);
 
 
     _needLoad      = new OutDiscretETag(this, PreSet, "Нужна загрузка", ".NeedLoad");
@@ -70,8 +70,8 @@ Dryer3VSM_Kromy::Dryer3VSM_Kromy(int ID,
     //connect( _needCircul, &OutDiscretETag::s_valueChd, this, &Dryer3VSM_Kromy::_loadUnloadCireculManag, Qt::QueuedConnection );
 
 
-    _inHumidity   = new InETag(this, TpIn, "Вх. влагомер", ".hrIn", false, 1000, 5, false, false, false, false, true, VCFloatInIntToDouble);
-    _outHumidity  = new InETag(this, TpIn, "Вых. влагомер", ".hrOut", false, 1000, 5, false, false, false, false, true, VCFloatInIntToDouble, 120);
+    _inHumidity   = new InETag(this, TpIn, "Вх. влагомер", ".hrIn", false, 1000, 5, false, false, false, false, true, VCdiv10);
+    _outHumidity  = new InETag(this, TpIn, "Вых. влагомер", ".hrOut", false, 1000, 5, false, false, false, false, true, VCdiv10, 120);
 
     connect( _outHumidity, &InETag::s_valueChd, this, &Dryer3VSM_Kromy::_loadUnloadCireculManag, Qt::QueuedConnection );
 
@@ -91,21 +91,21 @@ Dryer3VSM_Kromy::Dryer3VSM_Kromy(int ID,
     _temp14->needBeUndetectedAlarm();
     _temp15->needBeUndetectedAlarm();
 
-    _alarmTemp1  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 1",  ".temp1.setTemp",  false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp2  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 2",  ".temp2.setTemp",  false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp3  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 3",  ".temp3.setTemp",  false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp4  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 4",  ".temp4.setTemp",  false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp5  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 5",  ".temp5.setTemp",  false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp6  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 6",  ".temp6.setTemp",  false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp7  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 7",  ".temp7.setTemp",  false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp8  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 8",  ".temp8.setTemp",  false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp9  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 9",  ".temp9.setTemp",  false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp10 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 10", ".temp10.setTemp", false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp11 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 11", ".temp11.setTemp", false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp12 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 12", ".temp12.setTemp", false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp13 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 13", ".temp13.setTemp", false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp14 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 14", ".temp14.setTemp", false, false, false, true, VCFloatInIntToDouble, true);
-    _alarmTemp15 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 15", ".temp15.setTemp", false, false, false, true, VCFloatInIntToDouble, true);
+    _alarmTemp1  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 1",  ".temp1.setTemp",  false, false, false, true, VCdiv10, true);
+    _alarmTemp2  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 2",  ".temp2.setTemp",  false, false, false, true, VCdiv10, true);
+    _alarmTemp3  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 3",  ".temp3.setTemp",  false, false, false, true, VCdiv10, true);
+    _alarmTemp4  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 4",  ".temp4.setTemp",  false, false, false, true, VCdiv10, true);
+    _alarmTemp5  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 5",  ".temp5.setTemp",  false, false, false, true, VCdiv10, true);
+    _alarmTemp6  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 6",  ".temp6.setTemp",  false, false, false, true, VCdiv10, true);
+    _alarmTemp7  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 7",  ".temp7.setTemp",  false, false, false, true, VCdiv10, true);
+    _alarmTemp8  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 8",  ".temp8.setTemp",  false, false, false, true, VCdiv10, true);
+    _alarmTemp9  = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 9",  ".temp9.setTemp",  false, false, false, true, VCdiv10, true);
+    _alarmTemp10 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 10", ".temp10.setTemp", false, false, false, true, VCdiv10, true);
+    _alarmTemp11 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 11", ".temp11.setTemp", false, false, false, true, VCdiv10, true);
+    _alarmTemp12 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 12", ".temp12.setTemp", false, false, false, true, VCdiv10, true);
+    _alarmTemp13 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 13", ".temp13.setTemp", false, false, false, true, VCdiv10, true);
+    _alarmTemp14 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 14", ".temp14.setTemp", false, false, false, true, VCdiv10, true);
+    _alarmTemp15 = new OutETag(this, TpOut, PreSet, "Уставка порога t°C 15", ".temp15.setTemp", false, false, false, true, VCdiv10, true);
 
     connect(_alarmTemp1 , &OutETag::s_valueChd, _temp1 , &InETag::setDetectLevel);
     connect(_alarmTemp2 , &OutETag::s_valueChd, _temp2 , &InETag::setDetectLevel);

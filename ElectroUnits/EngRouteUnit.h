@@ -14,7 +14,8 @@ public:
                            QString TagPefix,
                            bool Mover,
                            std::vector<QString> EngSensorNames,
-                           bool BlockedStop = false);
+                           bool BlockedStop = false,
+                           Prom::UnitModes SaveMode = Prom::UnMdStop);
 
 protected:
 

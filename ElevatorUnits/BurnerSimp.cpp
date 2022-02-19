@@ -27,12 +27,12 @@ BurnerSimp::BurnerSimp( int ID,
     connect( _startedLG, &InDiscretETag::s_qualityChd, this, &BurnerSimp::updateState );
     connect( _startedLG, &InDiscretETag::s_valueChd, this, &BurnerSimp::updateState );
 
-    _setT = new OutETag( this, Prom::TpOut, Prom::PreSet, "Необходимая t°C теплоносителя после горелки", ".setTemp", false, false, false, true, Prom::VCFloatInIntToDouble, true );
+    _setT = new OutETag( this, Prom::TpOut, Prom::PreSet, "Необходимая t°C теплоносителя после горелки", ".setTemp", false, false, false, true, Prom::VCdiv10, true );
 
-    _T = new InETag( this, Prom::TpIn, "t°C теплоносителя после горелки", ".temp", true, 90, 1, false, false, false, false, true, Prom::VCFloatInIntToDouble );
+    _T = new InETag( this, Prom::TpIn, "t°C теплоносителя после горелки", ".temp", true, 90, 1, false, false, false, false, true, Prom::VCdiv10 );
     _T->needBeUndetectedAlarm();
 
-    _TAlarmLvl  = new OutETag( this, Prom::TpOut, Prom::PreSet, "t°C перегрева теплоносителя после горелки",  ".tempAlarmLvl",  false, false, false, true, Prom::VCFloatInIntToDouble, true );
+    _TAlarmLvl  = new OutETag( this, Prom::TpOut, Prom::PreSet, "t°C перегрева теплоносителя после горелки",  ".tempAlarmLvl",  false, false, false, true, Prom::VCdiv10, true );
     connect( _TAlarmLvl, &OutETag::s_valueChd,  _T, &InETag::setDetectLevel );
     _alarmLG = new InDiscretETag( this, "Авария горелки", ".alarmLG", true, false, true, false, false, false );
     _alarmLG->needBeUndetectedAlarm();
@@ -44,9 +44,9 @@ BurnerSimp::BurnerSimp( int ID,
     _step = new InDiscretETag( this, "Работа 2-й ступени", ".step", true, false, true, false, false, false );
     _step->onlyChange();
 
-    _P = new OutETag( this, Prom::TpOut, Prom::PreSet, "ПИД - пропорциональная часть", ".PID_P", false, false, false, true, Prom::VCFloatInIntToDouble, false, true );
+    _P = new OutETag( this, Prom::TpOut, Prom::PreSet, "ПИД - пропорциональная часть", ".PID_P", false, false, false, true, Prom::VCdiv10, false, true );
     _I = new OutETag( this, Prom::TpOut, Prom::PreSet, "ПИД - интегральная часть"    , ".PID_I", false, false, false, true, Prom::VCNo, false, true );
-    _D = new OutETag( this, Prom::TpOut, Prom::PreSet, "ПИД - дифференциальная часть", ".PID_D", false, false, false, true, Prom::VCFloatInIntToDouble, false, true );
+    _D = new OutETag( this, Prom::TpOut, Prom::PreSet, "ПИД - дифференциальная часть", ".PID_D", false, false, false, true, Prom::VCdiv10, false, true );
 }
 
 //------------------------------------------------------------------------------

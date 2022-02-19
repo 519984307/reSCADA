@@ -12,18 +12,17 @@ UnitPropItem {
     property alias freqMinRange: regPersWin.valueMin
 
     function setMinRange(value) {
-        reqMaxRange = Number(value)
+        regPersWin.setValueMinRange( value )
     }
     function setMaxRange(value) {
-        freqMinRange  = Number(value)
+        regPersWin.setValueMaxRange( value )
     }
     function setFreq(value) {
-        freq = Number(value)
+        regPersWin.setValue(value)
     }
     signal s_moreLtl( variant MoreLtl )
     signal s_lessLtl( variant LessLtl )
     signal s_freqChanged( variant ValvePos )
-    onFreqChanged: s_freqChanged( freq )
 
     property bool st: false
     property bool std: false
@@ -60,6 +59,7 @@ UnitPropItem {
         id: regVal
         anchors.fill: parent
         border.color: borderCurrentColor
+        border.width: borderCurrentWidth
         color: backgroundCurrentColor
         Text{
             text: "ЧП"
@@ -83,6 +83,7 @@ UnitPropItem {
         readOnly: false
         onS_moreVal: s_moreLtl( More )
         onS_lessVal: s_lessLtl( Less )
+        onS_valueChenged: s_freqChanged( Value )
         mainColor: "#09aad4"
         scaleColor: "#1a6b14"
     }

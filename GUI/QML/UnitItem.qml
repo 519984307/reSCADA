@@ -14,26 +14,26 @@ Item {
     property bool allovAlarmBlinck: true
 
     property bool blocked: false
-    property bool linked: false
-    property bool connected: false
+    property bool linked: true
+    property bool connected: true
 
     property color backgroundCurrentColor: Fap.defaultColor
     property color backgroundColor: Fap.ready
     property color backgroundAlarmColor: Fap.alarm
     property color backgroundAlarmBlinkColor: Fap.alarm
 
-    property int borderWidth: 2
+    property int   borderWidth: 1
+    property int   borderWidthNotify: 3
+    property int   borderCurrentWidth: 1
     property color borderCurrentColor: Fap.border
     property color borderColor: Fap.border
     property color borderAlarmColor: Fap.borderAlarm
     property color borderNotifyBlincColor: Fap.borderNotify
 
-    //    Component.onCompleted: {
-    //        linkColors()
-    //        renewColors()
-    //    }
+        Component.onCompleted: {
+            renewColors()
+        }
     signal s_resetAlarm()
-    signal s_test()
     //    function linkColors() {
     //        //backgroundColor = backgroundCurrentColor
     //        //borderColor = borderCurrentColor
@@ -67,11 +67,11 @@ Item {
         alarmDescr = ""
     }
     function setNotify() {
-        //вкл мигание
+        //РІРєР» РјРёРіР°РЅРёРµ
         notify = true
     }
     function setNotified() {
-        //прекр мигание
+        //РїСЂРµРєСЂ РјРёРіР°РЅРёРµ
         notify = false
     }
     function setLinked() {
@@ -98,7 +98,7 @@ Item {
             return
         }
         else if (!connected) {
-            backgroundCurrentColor = Fap.notAvailable
+            backgroundCurrentColor = Fap.notConnected
         }
         else if (blocked) {
             backgroundCurrentColor = Fap.blocked
@@ -108,9 +108,11 @@ Item {
 
         if (alarm || alarmNotify) {
             borderCurrentColor = borderAlarmColor
+            borderCurrentWidth = borderWidthNotify
         }
         else {
             borderCurrentColor = borderColor
+            borderCurrentWidth = borderWidth
         }
     }
 
@@ -160,7 +162,6 @@ Item {
     onLinkedChanged: renewColors()
     onConnectedChanged: renewColors()
     onBackgroundColorChanged: renewColors()
-    onBorderColorChanged: renewColors()
 }
 
 /*##^##
@@ -168,4 +169,3 @@ Designer {
     D{i:0;autoSize:true;height:480;width:640}
 }
 ##^##*/
-

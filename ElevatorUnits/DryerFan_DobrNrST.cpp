@@ -12,7 +12,7 @@ DryerFan_DobrNrST::DryerFan_DobrNrST( int ID,
                         TagPefix,
                         EngSensorNames )
 {
-    _setT = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C", ".setT", false, false, false, true, Prom::VCFloatInIntToDouble, true );
+    _setT = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C", ".setT", false, false, false, true, Prom::VCdiv10, true );
     connect( _setT, &OutETag::s_valueChd, _T, &InETag::setDetectLevel, Qt::QueuedConnection );
 }
 

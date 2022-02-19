@@ -326,7 +326,7 @@ void Unit::detectAlarm(QVariant Description)
     Source = sender()->objectName();
   _alarm = true;
   //_mayResetAlarm = false;
-  if(Prom::icvalModes(_currentMode, saveMode) && _currentMode != Prom::UnMdNoDef && ! _firstLoad) {
+  if(!Prom::icvalModes(_currentMode, saveMode) && _currentMode != Prom::UnMdNoDef && ! _firstLoad) {
     emit s_quitAlarm(objectName() + " - " +  Description.toString());
     logging(Prom::MessQuitAlarm, QDateTime::currentDateTime(), false, Source, Description.toString());
   }
@@ -346,7 +346,7 @@ void Unit::detectSubUnitAlarm(Unit * unit, QString Description)
     return;
   }
   _alarm = true;
-  if(Prom::icvalModes(_currentMode, saveMode) && _currentMode != Prom::UnMdNoDef && ! _firstLoad) {
+  if(!Prom::icvalModes(_currentMode, saveMode) && _currentMode != Prom::UnMdNoDef && ! _firstLoad) {
     emit s_quitAlarm(objectName() + " - " +  Description);
     //        Logging(Prom::MessQuitAlarm, QDateTime::currentDateTime(), false, "", "Авария внутреннего юнита "
     //                 + unit->objectName());
@@ -364,16 +364,16 @@ void Unit::detectSubUnitAlarm(Unit * unit, QString Description)
 //------------------------------------------------------------------------------
 void Unit::_alarmDo()
 {
-  setMode(Prom::UnMdStop, false);
+  //(Prom::UnMdStop, false);
 }
 
 //------------------------------------------------------------------------------
 void Unit::_alarmSubUnitDo( Unit *)
 {
-  setMode(Prom::UnMdStop, false);
-  foreach (Unit * unit, _subUnits) {
-    unit->setMode(unit->saveMode, false);
-  }
+  //setMode(Prom::UnMdStop, false);
+  //foreach (Unit * unit, _subUnits) {
+  //  unit->setMode(unit->saveMode, false);
+  //}
 }
 
 //------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ Item {
     property alias textInput: valueLable
     property string tooltip: ""
 
-    property bool checkLimit: false
+    property bool limited: false
     property bool correctingButtons: true
     property alias readOnly: valueLable.readOnly
     property real step: 0.5
@@ -29,56 +29,58 @@ Item {
     property alias valueFontSize: valueLable.font
     property bool disappear: false
     //property alias valueText: valueLable.text
-    property real valueReal: 999.9
+    property real valueReal: 0
 
     property bool separCorrButtons: false
+    property bool setFromCore: false
 
     signal s_more(bool More)
     signal s_less(bool Less)
 
     //property real extAlarmLevel: 0
     function setValue(value) {
-        if (valueLable.text != value) {//!=выбран осознанно, т.к. text строка, а value число
-            value = value.toFixed(mantissa)
-            valueLable.limit = false
-            valueLable.text = value
-        }
+        setFromCore = true
+        valueReal = Number(value)
+        //        if (valueLable.text != value) {//!=выбран осознанно, т.к. text строка, а value число
+        //            value = value.toFixed(mantissa)
+        //            value = Number(value)
+        //            valueLable.limit = false
+        //            valueLable.text = value
+        //        }
     }
-    function setValueLimited(value) {
+    function checkLimits(value) {
         //уст с учетом лимитов
         value = Number(value)
-        if (checkLimit) {
-            if (value < mfu.downLimit) {
-                value = mfu.downLimit
-                setValue(value)
-                valueStringChanged(value)
-            }
-            else if (value > mfu.upLimit) {
-                value = mfu.upLimit
-                setValue(value)
-                valueStringChanged(value)
-            }
-            else setValue(value)
+        value.toFixed(mantissa)
+        value = Number(value)
+        if( setFromCore || !limited )return value
+        if (value < mfu.downLimit) {
+            return mfu.downLimit
         }
-        else {
-            setValue(value)
+        else if (value > mfu.upLimit) {
+            return mfu.upLimit
         }
+        else return value
     }
-
-    signal valueStringChanged(string value)
-    onValueStringChanged: {
-        //console.log( "New value - ", value )
-        valueReal =  Number(value)
-    }
+    signal valueChanged(variant Value)
+    //onValueChanged: console.log( "valueChanged", valueReal )
     onValueRealChanged: {
+        //console.log( "onValueRealChanged1", valueReal )
         if( String(valueReal) !== valueLable.text ){
             //toFicsed округляет до нужной мантиссы, Number убирает ненужные нулитипа 12.32000
-            valueLable.text = Number(valueReal.toFixed(mantissa))
-            //console.log( objectName, valueReal )
+            valueLable.text = checkLimits(valueReal)
+            if(setFromCore) setFromCore = false
+            //            if(setFromCore){
+            //                console.log( "onValueRealChanged_setFromCore", valueReal )
+            //                setFromCore = false
+            //            }
+            //            else if(valueLable.loaded){
+            //            console.log( "onValueRealChanged_NosetFromCore", valueReal )
+            //                valueChanged(valueReal)
+            //            }
         }
-        //console.log( "New valueReal - ", valueReal )
-    }
 
+    }
 
     Timer {
         id: timer
@@ -88,8 +90,7 @@ Item {
         property string buffer: ""
         onTriggered: {
             if (valueLable.text != buffer) {
-                valueStringChanged(valueLable.text)
-                //valueReal =  Number(valueLable.text)
+                valueLable.editingFinished()
             }
             buffer = ""
         }
@@ -128,7 +129,12 @@ Item {
         TextInput {
             id: valueLable
             property bool limit: true
-            text: "9.9"
+            property bool loaded: false
+            property bool chdByUsr: false
+            Component.onCompleted: {
+                text = checkLimits(valueReal.toFixed(mantissa))
+                loaded = true
+            }
             anchors.left: minBtn.right
             anchors.right: maxBtn.left
             anchors.top: parent.top
@@ -138,7 +144,7 @@ Item {
             anchors.rightMargin: 0
             anchors.leftMargin: 0
             font.pixelSize: mfu.height * 0.7
-            font.family: "DSEG7 Classic"
+            //font.family: "DSEG7 Classic"
             readOnly: false
             // Not Work
             //            validator: DoubleValidator {
@@ -146,12 +152,15 @@ Item {
             //                locale: "RU"
             //            }
             onEditingFinished: {
-                if (checkLimit && Number(text) < downLimit) {
-                    text = downLimit
+                //console.log( "onEditingFinished", valueReal )
+                text = checkLimits(text)
+                if (text != valueReal) {//!=выбран осознанно, т.к. text строка, а value число
+                    valueReal =  text
+                    valueChanged(valueReal)
                 }
-                valueStringChanged(text)
             }
             onTextChanged: {
+                //console.log( "onTextChanged", valueReal )
                 if( text.charAt(text.length - 1) === ',' ){
                     remove(text.length - 1, text.length)
                     text += "."
@@ -170,7 +179,7 @@ Item {
                     undo()
                     return
                 }
-                if (checkLimit && newVal > upLimit && limit) {
+                if (limited && (newVal > upLimit) && limit) {
                     remove(text.length - 1, text.length)
                 }
                 limit = true //Чтобы не лимитировать значения от setValue
@@ -201,9 +210,11 @@ Item {
             checkable: false
             mouseArea.onClicked: {
                 if(!separCorrButtons){
-                    if (timer.buffer == "")
+                    if (timer.buffer == ""){
                         timer.buffer = valueLable.text
-                    setValueLimited(Number(valueLable.text) - step)
+                    }
+                    valueLable.text = checkLimits( Number(valueLable.text) - step )
+                    timer.stop()
                     timer.start()
                 }
             }
@@ -227,9 +238,10 @@ Item {
             checkable: false
             mouseArea.onClicked: {
                 if(!separCorrButtons){
-                    if (timer.buffer == "")
+                    if (timer.buffer == ""){
                         timer.buffer = valueLable.text
-                    setValueLimited(Number(valueLable.text) + step)
+                    }
+                    valueLable.text = checkLimits( Number(valueLable.text) + step )
                     timer.stop()
                     timer.start()
                 }

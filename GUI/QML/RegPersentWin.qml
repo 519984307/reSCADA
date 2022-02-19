@@ -27,20 +27,15 @@ Window {
     //signal valueChanged   (int value)
     //signal stepChanged    (int value)
 
-    function setValueMinRange( MinRg ) {
-        minValue.setValue( MinRg )
-    }
-    function setValueMaxRange( MaxRg ) {
-        maxValue.setValue( MaxRg )
-    }
-    function setValue(Value) {
-        curValue.setValue( Value )
-    }
-    function setStep( Step ) {
-        regStep.setValue(Step)
-    }
+    function setValueMinRange( MinRg ) { minValue.setValue( MinRg ) }
+    function setValueMaxRange( MaxRg ) { maxValue.setValue( MaxRg ) }
+    function setValue(Value) { curValue.setValue( Value ) }
+    function setStep( Step ) { regStep.setValue(Step)}
     signal s_moreVal( variant More )
     signal s_lessVal( variant Less )
+    signal s_valueChenged(variant Value)
+    signal s_valueMaxChenged(variant Value)
+    signal s_valueMinChenged(variant Value)
 
     onVisibleChanged: {
         if (visible == true) {
@@ -83,8 +78,9 @@ Window {
         anchors.top: textWrkDp.bottom
         correctingButtons: true
         //onValueRealChanged: maxRangeChanged(valueReal)
-        checkLimit: true
+        limited: true
         downLimit: 0//minValue.valueReal + 1
+        onValueChanged: s_valueMaxChenged( Value )
     }
     MFUnit {
         id: minValue
@@ -100,8 +96,9 @@ Window {
         anchors.top: textWrkDp.bottom
         correctingButtons: true
         //onValueRealChanged: minRangeChanged(valueReal)
-        checkLimit: true
+        limited: true
         upLimit: 100//maxValue.valueReal - 1
+        onValueChanged: s_valueMinChenged( Value )
     }
     Item {
         id: item1
@@ -173,12 +170,13 @@ Window {
         anchors.top: textLvl.bottom
         correctingButtons: true
         //onValueRealChanged: valueChanged(valueReal)
-        checkLimit: true
+        limited: true
         upLimit: maxValue.valueReal
         downLimit: minValue.valueReal
         step: regStep.valueReal
         onS_more: s_moreVal( More )
         onS_less: s_lessVal( Less )
+        onValueChanged: s_valueChenged( Value )
     }
     Text {
         id: stepTxt

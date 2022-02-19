@@ -12,19 +12,17 @@ UnitPropItem {
     backgroundColor: "black"
 
     function setMinRange(value) {
-        maxRange = Number(value)
+        mangWin.setValueMinRange( value )
     }
     function setMaxRange(value) {
-        minRange  = Number(value)
+        mangWin.setValueMaxRange( value )
     }
     function setValvePosition(value) {
-        valvePosition = Number(value)
+        mangWin.setValue(value)
     }
-
     signal s_openLtl( variant OpenLtl )
     signal s_closeLtl( variant CloseLtl )
     signal s_valvePosChanged( variant ValvePos )
-    onValvePositionChanged: s_valvePosChanged( valvePosition )
 
     Component.onCompleted: {
         regVal.position = valvePosition
@@ -34,6 +32,7 @@ UnitPropItem {
         anchors.fill: parent
         borderColor: borderCurrentColor
         backgroundColor: backgroundCurrentColor
+        borderWidth: borderCurrentWidth
         nameText.text: name
         //position: mangWin.value
     }
@@ -44,6 +43,7 @@ UnitPropItem {
         readOnly: true
         onS_moreVal: s_openLtl( More )
         onS_lessVal: s_closeLtl( Less )
+        onS_valueChenged: s_valvePosChanged(Value)
     }
 
     MouseArea {

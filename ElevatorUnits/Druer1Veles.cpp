@@ -29,20 +29,20 @@ Druer1VSM_Veles::Druer1VSM_Veles( int ID,
     _alarmIn   = new InDiscretETag( this, "Авария вх.", ".alarm", true, false, true, false );
     _alarmIn->needBeUndetectedAlarmNoTime();
 
-    _tempHL    = new InETag( this, Prom::TpIn, "Датчик t°C верх",                    ".tempHL",  true, 30, 5, false, false, false, false, true, Prom::VCFloatInIntToDouble );
-    _tempML    = new InETag( this, Prom::TpIn, "Датчик t°C середина",                ".tempML",  true, 30, 5, false, false, false, false, true, Prom::VCFloatInIntToDouble );
-    _tempLL    = new InETag( this, Prom::TpIn, "Датчик t°C зона охлаждения",         ".tempLL",  true, 30, 5, false, false, false, false, true, Prom::VCFloatInIntToDouble );
-    _tempEx    = new InETag( this, Prom::TpIn, "Датчик t°C теплоносителя на выходе", ".tempEx",  true, 30, 5, false, false, false, false, true, Prom::VCFloatInIntToDouble );
+    _tempHL    = new InETag( this, Prom::TpIn, "Датчик t°C верх",                    ".tempHL",  true, 30, 5, false, false, false, false, true, Prom::VCdiv10 );
+    _tempML    = new InETag( this, Prom::TpIn, "Датчик t°C середина",                ".tempML",  true, 30, 5, false, false, false, false, true, Prom::VCdiv10 );
+    _tempLL    = new InETag( this, Prom::TpIn, "Датчик t°C зона охлаждения",         ".tempLL",  true, 30, 5, false, false, false, false, true, Prom::VCdiv10 );
+    _tempEx    = new InETag( this, Prom::TpIn, "Датчик t°C теплоносителя на выходе", ".tempEx",  true, 30, 5, false, false, false, false, true, Prom::VCdiv10 );
 
     _tempHL->needBeUndetectedAlarm();
     _tempML->needBeUndetectedAlarm();
     _tempLL->needBeUndetectedAlarm();
     _tempEx->needBeUndetectedAlarm();
 
-    _overTempHL  = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C верх",                     ".overTempHL",  false, false, false, true, Prom::VCFloatInIntToDouble, true );
-    _overTempML  = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C середина",                 ".overTempML",  false, false, false, true, Prom::VCFloatInIntToDouble, true );
-    _overTempLL  = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C зона охлаждения",          ".overTempLL",  false, false, false, true, Prom::VCFloatInIntToDouble, true );
-    _overTempEx  = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C теплоносителя на выходе",  ".overTempEx",  false, false, false, true, Prom::VCFloatInIntToDouble, true );
+    _overTempHL  = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C верх",                     ".overTempHL",  false, false, false, true, Prom::VCdiv10, true );
+    _overTempML  = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C середина",                 ".overTempML",  false, false, false, true, Prom::VCdiv10, true );
+    _overTempLL  = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C зона охлаждения",          ".overTempLL",  false, false, false, true, Prom::VCdiv10, true );
+    _overTempEx  = new OutETag( this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C теплоносителя на выходе",  ".overTempEx",  false, false, false, true, Prom::VCdiv10, true );
 
     connect( _overTempHL , &OutETag::s_valueChd, _tempHL , &InETag::setDetectLevel );
     connect( _overTempML , &OutETag::s_valueChd, _tempML , &InETag::setDetectLevel );

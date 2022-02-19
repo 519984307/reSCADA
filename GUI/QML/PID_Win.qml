@@ -27,57 +27,61 @@ Window {
     property string processName: "Температура куба РК1"
     property string impactName: "Положение клапана подачи пара"
 
-    property alias manOn: switchOnOff.checked
+    property alias manOnOff: switchOnOff.checked
 
     property color colorProcess: "YellowGreen"
     property color colorSetPt: "black"
     property color colorImpact: "DarkGoldenRod"
 
-    property alias process: mfuProcess.valueReal
-    property alias setPt: mfuSetPt.valueReal
-    property alias impact: mfuImpact.valueReal
+//    property alias process: mfuProcess.valueReal
+//    property alias setPt: mfuSetPt.valueReal
+//    property alias impact: mfuImpact.valueReal
 
-    property alias kp: mfuKp.valueReal
-    property alias ki: mfuKi.valueReal
-    property alias kd: mfuKd.valueReal
+//    property alias kp: mfuKp.valueReal
+//    property alias ki: mfuKi.valueReal
+//    property alias kd: mfuKd.valueReal
 
-    property alias kpOut: mfuKpOut.valueReal
-    property alias kiOut: mfuKiOut.valueReal
-    property alias kdOut: mfuKdOut.valueReal
+//    property alias kpOut: mfuKpOut.valueReal
+//    property alias kiOut: mfuKiOut.valueReal
+//    property alias kdOut: mfuKdOut.valueReal
 
     property bool impIsOut: true
 
     signal s_manOn( variant ManOn )
-    onManOnChanged: s_manOn( manOn )
-    function setManOn( ManOn ){ manOn = ManOn }
+    onS_manOn: {
+        if( switchOnOff.checked !==  ManOn ){
+            switchOnOff.checked =  ManOn
+        }
+    }
+
+    function setManOn( ManOn ){ switchOnOff.checked = ManOn }
 
     signal s_KpChanged( variant Kp )
-    onKpChanged: s_KpChanged( kp )
+
     signal s_KiChanged( variant Ki )
-    onKiChanged: s_KiChanged( ki )
+
     signal s_KdChanged( variant Kd )
-    onKdChanged: s_KdChanged( kd )
-    function setKp( Kp ) { kp = Kp }
-    function setKi( Ki ) { ki = Ki }
-    function setKd( Kd ) { kd = Kd }
 
-    function setKpOut( KpOut ) { kpOut = KpOut }
-    function setKiOut( KiOut ) { kiOut = KiOut }
-    function setKdOut( KdOut ) { kdOut = KdOut }
+    function setKp( Kp ) { mfuKp.setValue(Kp) }
+    function setKi( Ki ) { mfuKi.setValue(Ki) }
+    function setKd( Kd ) { mfuKd.setValue(Kd) }
 
-    function setProcess ( Process  ) { process  = Process  }
+    function setKpOut( KpOut ) { mfuKpOut.setValue(KpOut) }
+    function setKiOut( KiOut ) { mfuKiOut.setValue(KiOut) }
+    function setKdOut( KdOut ) { mfuKdOut.setValue(KdOut) }
+
+    function setProcess ( Process  ) { mfuProcess.setValue(Process) }
 
     signal s_setPtChanged( variant SetPt )
-    onSetPtChanged: s_setPtChanged( setPt )
-    function setSetPt ( SetPt  ) { setPt  = SetPt  }
+
+    function setSetPt ( SetPt  ) { mfuSetPt.setValue(SetPt) }
 
     signal s_impactChanged( variant Impact )
-    onImpactChanged: s_impactChanged( impact )
-    function setImpact( Impact ) { impact = Impact }
 
-    function setImpIsOut( ImpIsOut ){
-        impIsOut = ImpIsOut
-    }
+    function setImpact( Impact ) { mfuImpact.setValue(Impact) }
+
+    function setImpIsOut( ImpIsOut ){ impIsOut = ImpIsOut }
+
     signal s_impMore( variant More )
     signal s_impLess( variant Less )
 
@@ -120,7 +124,7 @@ Window {
             correctingButtons: false
             borderColor: "#000000"
             readOnly: false
-            checkLimit: false
+            limited: false
             tooltip: "Max"
             backgroundColor: "#e6e6e6"
         }
@@ -153,13 +157,12 @@ Window {
             height: mfuToProcess.height
             anchors.left: parent.left
             anchors.bottom: parent.bottom
-            valueReal: 0
             correctingButtons: false
             anchors.bottomMargin: 0
             borderColor: "#000000"
             readOnly: false
             anchors.leftMargin: 0
-            checkLimit: false
+            limited: false
             tooltip: "Min"
             backgroundColor: mfuToProcess.backgroundColor
         }
@@ -185,6 +188,7 @@ Window {
             pressCheckColor: "gray"
             unPressCheckColor: "#8afda6"
             nameText.text: "Вкл"
+            onS_chackedUserChanged: s_manOn(Chacked)
             onCheckedChanged: {
                 if (checked)
                     nameText.text = "ОТКЛ"
@@ -214,9 +218,8 @@ Window {
             anchors.right: parent.right
             anchors.rightMargin: 0
             anchors.leftMargin: 0
-            valueReal: 85
             backgroundColor: colorProcess
-            checkLimit: false
+            limited: false
             readOnly: true
             borderColor: "Black"
             correctingButtons: false
@@ -249,15 +252,15 @@ Window {
             anchors.leftMargin: 0
             readOnly: false
             correctingButtons: true
-            valueReal: 60
             borderColor: "Black"
             tooltip: "Задание"
-            checkLimit: false
+            limited: false
             backgroundColor: colorSetPt
             textInput.color: "White"
             mantissa: 2
             maxBtn.nameText.color: "white"
             minBtn.nameText.color: "white"
+            onValueChanged:  s_setPtChanged( Value )
             //textInput.text
         }
 
@@ -284,15 +287,15 @@ Window {
             visible: true
             anchors.right: parent.right
             anchors.rightMargin: 0
-            readOnly: !impIsOut || ! manOn
-            correctingButtons: manOn
-            checkLimit: false
+            readOnly: !impIsOut || ! manOnOff
+            correctingButtons: manOnOff
+            limited: false
             backgroundColor: colorImpact
             mantissa: 2
             onS_more: s_impMore(More)
             onS_less: s_impLess(Less)
+            onValueChanged: s_impactChanged( Value )
         }
-
         Column{
             id: column
             height: parent.height * 0.2
@@ -315,13 +318,13 @@ Window {
                     anchors.bottom: parent.bottom
                     readOnly: false
                     correctingButtons: false
-                    valueReal: 999.99
-                    checkLimit: false
+
+                    limited: false
                     backgroundColor: "#ffffff"
                     mantissa: 4
                     tooltip: "Коэфициент пропорциональности"
+                    onValueChanged:s_KpChanged(Value)
                 }
-
                 Text {
                     width: parent.width *0.1
                     anchors.top: parent.top
@@ -343,8 +346,8 @@ Window {
                     anchors.bottomMargin: 0
                     readOnly: true
                     correctingButtons: false
-                    valueReal: 999.99
-                    checkLimit: false
+
+                    limited: false
                     backgroundColor: "#ffffff"
                     tooltip: "Пропорциональная составляющая воздействия"
                 }
@@ -363,11 +366,12 @@ Window {
                     anchors.bottom: parent.bottom
                     readOnly: false
                     correctingButtons: false
-                    valueReal: 999.99
-                    checkLimit: false
+
+                    limited: false
                     backgroundColor: "#ffffff"
                     mantissa: 4
                     tooltip: "Интегральный коэфициент"
+                    onValueChanged: s_KiChanged( Value )
                 }
 
                 Text {
@@ -391,8 +395,8 @@ Window {
                     anchors.bottomMargin: 0
                     readOnly: true
                     correctingButtons: false
-                    valueReal: 999.99
-                    checkLimit: false
+
+                    limited: false
                     backgroundColor: "#ffffff"
                     tooltip: "Интегральная составляющая воздействия"
                 }
@@ -411,11 +415,12 @@ Window {
                     anchors.bottom: parent.bottom
                     readOnly: false
                     correctingButtons: false
-                    valueReal: 999.99
-                    checkLimit: false
+
+                    limited: false
                     backgroundColor: "#ffffff"
                     mantissa: 4
                     tooltip: "Дифференциальный коэфициент"
+                    onValueChanged: s_KdChanged( Value )
                 }
 
                 Text {
@@ -439,8 +444,8 @@ Window {
                     anchors.bottomMargin: 0
                     readOnly: true
                     correctingButtons: false
-                    valueReal: 999.99
-                    checkLimit: false
+
+                    limited: false
                     backgroundColor: "#ffffff"
                     tooltip: "Дифференциаьная составляющая воздействия"
                 }
@@ -478,13 +483,12 @@ Window {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.rightMargin: 0
-        checkLimit: false
+        limited: false
         anchors.topMargin: 0
         correctingButtons: false
         tooltip: "Max"
         backgroundColor: mfuToProcess.backgroundColor
         readOnly: false
-        valueReal: 100
         borderColor: "Black"
     }
     MFUnit {
@@ -495,12 +499,11 @@ Window {
         anchors.bottom: parent.bottom
         anchors.rightMargin: 0
         anchors.bottomMargin: 0
-        checkLimit: false
+        limited: false
         correctingButtons: false
         tooltip: "Min"
         backgroundColor: mfuToProcess.backgroundColor
         readOnly: false
-        valueReal: 0
         borderColor: "Black"
     }
 }

@@ -60,9 +60,12 @@ UnitPropItem {
     onStChanged: canvas.requestPaint()
     onStdChanged: canvas.requestPaint()
     onAlarmChanged: canvas.requestPaint()
+    onAlarmNotifyChanged: canvas.requestPaint()
+    onNotifyChanged: canvas.requestPaint()
     onBlockedChanged: canvas.requestPaint()
     onLinkedChanged: canvas.requestPaint()
     onManualChanged: canvas.requestPaint()
+
 
     Canvas {
         id: canvas
@@ -80,19 +83,19 @@ UnitPropItem {
             context.clearRect(0, 0, width, height)
             context.strokeStyle = borderCurrentColor
             context.fillStyle = backgroundCurrentColor
-            context.lineWidth = borderWidth * 2
+            context.lineWidth = borderCurrentWidth * 2
             context.beginPath()
-            context.moveTo(width * 0.85, borderWidth)
+            context.moveTo(width * 0.85, borderCurrentWidth)
             context.lineTo(width * 0.85, height - width / 2)
-            context.lineTo(width - borderWidth, height - width / 2)
-            context.lineTo(width - borderWidth, borderWidth)
+            context.lineTo(width - borderCurrentWidth, height - width / 2)
+            context.lineTo(width - borderCurrentWidth, borderCurrentWidth)
             context.closePath()
             context.stroke()
             context.fill()
             //Круг
             context.beginPath()
             context.arc(width / 2, height - width / 2, Math.max(
-                            width, height) / 2 - borderWidth, 0, 2 * Math.PI)
+                            width, height) / 2 - borderCurrentWidth, 0, 2 * Math.PI)
             context.stroke()
             context.fill()
         }

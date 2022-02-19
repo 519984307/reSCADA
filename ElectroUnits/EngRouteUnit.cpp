@@ -8,13 +8,14 @@ EngRouteUnit::EngRouteUnit(Prom::UnitType Type,
                             QString TagPefix,
                             bool Mover,
                             std::vector<QString>,
-                            bool BlockedStop)
+                            bool BlockedStop,
+                            Prom::UnitModes SaveMode)
     : RouteUnit(Type,
                  Id,
                  Name,
                  TagPefix,
                  Mover,
-                 Prom::UnMdStop),
+                 SaveMode),
       _blockedStop(BlockedStop)
 {
 

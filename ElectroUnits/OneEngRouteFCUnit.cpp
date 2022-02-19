@@ -19,16 +19,16 @@ OneEngRouteFCUnit::OneEngRouteFCUnit(Prom::UnitType Type,
 {
     _SetFR = new OutETag(this, Prom::TpOut, Prom::PreSet,
                           "Установка частоты ЧП",
-                          ".SetFR", false, false, false, true, Prom::VCFloatInIntToDouble, true);
+                          ".SetFR", false, false, false, true, Prom::VCdiv10, true);
     //connect(_SetFR, &OutETag::s_valueChd ,this, &OneEngRouteFCUnit::SetSpeed, Qt::QueuedConnection);
     _OutFR = new InETag(this, Prom::TpIn,
                          "Выходная частота ЧП",
-                         ".OutFR", true, 0, 2, false, false, false, false, true, Prom::VCFloatInIntToDouble);
+                         ".OutFR", true, 0, 2, false, false, false, false, true, Prom::VCdiv10);
     _OutFR->onlyChange();
 
     _SetedFR = new InETag(this, Prom::TpIn,
                            "Установленная частота ЧП",
-                           ".SetedFR", true, 0, 2, false, false, false, false, true, Prom::VCFloatInIntToDouble );
+                           ".SetedFR", true, 0, 2, false, false, false, false, true, Prom::VCdiv10 );
     _SetedFR->onlyChange();
 }
 

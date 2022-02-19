@@ -105,7 +105,7 @@ void Log::bufferToDB()
       else
       {
         // QMessageBox::warning (nullptr, "Критическая ошибка!", "Отсутствует база данных журнала событий и создать её не возможно,\r\n"
-        //                                                        "т.к. файл db.sql не найден.", QMessageBox::Ok);
+        //                                                        "т.к. файл  не найден.", QMessageBox::Ok);
         Logging(Prom::MessAlarm, QDateTime::currentDateTime(), "SYSTEM", "LogSYS",
                 "отсутствует база данных журнала событий и создать её не возможно");
         timer->stop();

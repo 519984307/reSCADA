@@ -17,12 +17,12 @@ BurnerVSM_Kromy::BurnerVSM_Kromy(int ID,
 {
     _start = new OutDiscretETag(this, Prom::PreSet, "Пуск", ".start");
 
-    _targetTemp = new OutETag(this, Prom::TpOut, Prom::PreSet,"Уставка t°C", ".setTemp", false, false, false, true, Prom::VCFloatInIntToDouble);
+    _targetTemp = new OutETag(this, Prom::TpOut, Prom::PreSet,"Уставка t°C", ".setTemp", false, false, false, true, Prom::VCdiv10);
     connect( _targetTemp, &OutETag::s_valueChd, this, &BurnerVSM_Kromy::s_targetTempChd, Qt::QueuedConnection );
-    _alarmTemp  = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка аврийного порога t°C", ".setOverheat", false, false, false, true, Prom::VCFloatInIntToDouble);
+    _alarmTemp  = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка аврийного порога t°C", ".setOverheat", false, false, false, true, Prom::VCdiv10);
     connect( _alarmTemp, &OutETag::s_valueChd, this, &BurnerVSM_Kromy::s_alarmTempChd, Qt::QueuedConnection );
 
-    _temp = new InETag(this, Prom::TpIn, "Датчик t°C", ".temp", true, _alarmTemp->value(), 5, false, false, false, false, true, Prom::VCFloatInIntToDouble);
+    _temp = new InETag(this, Prom::TpIn, "Датчик t°C", ".temp", true, _alarmTemp->value(), 5, false, false, false, false, true, Prom::VCdiv10);
     _temp->setDetectLevel(_alarmTemp->value());
     connect(_alarmTemp, & OutETag::s_valueChd, _temp, &InETag::setDetectLevel, Qt::QueuedConnection);
     _temp->needBeUndetectedAlarm();

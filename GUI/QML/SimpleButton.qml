@@ -26,7 +26,7 @@ Rectangle {
     onCheckableChanged: renewColor()
     onPressCheckColorChanged: renewColor()
     onUnPressCheckColorChanged: renewColor()
-
+    signal s_chackedUserChanged(variant Chacked)
     function renewColor(){
         if( checkable ){
             if( checked ) color = pressCheckColor
@@ -55,7 +55,10 @@ Rectangle {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onClicked: {
-            if((mouse.button & Qt.LeftButton) && checkable) checked = !checked
+            if((mouse.button & Qt.LeftButton) && checkable) {
+                checked = !checked
+                s_chackedUserChanged(checked)
+            }
         }
         onPressedChanged: {
             if( !checkable ){

@@ -36,15 +36,15 @@ Druer1VSM_Rostok::Druer1VSM_Rostok(int ID,
     _fireS  = new InDiscretETag(this, "Сигнал 'ПОЖАР'", ".fireS", true, false, true, false, false, false);
     _fireS->onlyChange();
 
-    _coolingTemp  = new OutETag(this, Prom::TpOut, Prom::PreSet, "t°C продувки", ".coolingTemp", false, false, false, true, Prom::VCFloatInIntToDouble, false, true);
+    _coolingTemp  = new OutETag(this, Prom::TpOut, Prom::PreSet, "t°C продувки", ".coolingTemp", false, false, false, true, Prom::VCdiv10, false, true);
     _coolingDelay = new OutETag(this, Prom::TpOut, Prom::PreSet, "Задержка продувки сек.", ".coolingDelay", false, false, false, true, Prom::VCNo, false, true);
     _brsStartDelay= new OutETag(this, Prom::TpOut, Prom::PreSet, "Задержка старта горелки сек.", ".brsStartDelay", false, false, false, true, Prom::VCNo, false, true);
     _CFstartDelay = new OutETag(this, Prom::TpOut, Prom::PreSet, "Задержка старта циклофенов сек.", ".CFstartDelay", false, false, false, true, Prom::VCNo, false, true);
 
-    _tempHL    = new InETag(this, Prom::TpIn, "t°C верх",                    ".temp3",  true, 30, 1, false, false, false, false, true, Prom::VCFloatInIntToDouble);
-    _tempML    = new InETag(this, Prom::TpIn, "t°C середина",                ".temp2",  true, 30, 1, false, false, false, false, true, Prom::VCFloatInIntToDouble);
-    _tempLL    = new InETag(this, Prom::TpIn, "t°C зона охлаждения",         ".temp1",  true, 30, 1, false, false, false, false, true, Prom::VCFloatInIntToDouble);
-    _tempOut    = new InETag(this, Prom::TpIn, "t°C теплоносителя на выходе", ".tempOut",  true, 30, 1, false, false, false, false, true, Prom::VCFloatInIntToDouble);
+    _tempHL    = new InETag(this, Prom::TpIn, "t°C верх",                    ".temp3",  true, 30, 1, false, false, false, false, true, Prom::VCdiv10);
+    _tempML    = new InETag(this, Prom::TpIn, "t°C середина",                ".temp2",  true, 30, 1, false, false, false, false, true, Prom::VCdiv10);
+    _tempLL    = new InETag(this, Prom::TpIn, "t°C зона охлаждения",         ".temp1",  true, 30, 1, false, false, false, false, true, Prom::VCdiv10);
+    _tempOut    = new InETag(this, Prom::TpIn, "t°C теплоносителя на выходе", ".tempOut",  true, 30, 1, false, false, false, false, true, Prom::VCdiv10);
     //    _tempIn    = new InETag(this, Prom::TpIn, "t°C теплоносителя на входе",  ".tempIn",  true, 30, 1, false, false, false, false, true, Prom::VCFloatInIntToDouble);
 
     _tempHL->needBeUndetectedAlarm();
@@ -52,10 +52,10 @@ Druer1VSM_Rostok::Druer1VSM_Rostok(int ID,
     _tempLL->needBeUndetectedAlarm();
     _tempOut->needBeUndetectedAlarm();
 
-    _tempHLAlarmLvl  = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C верх",                     ".temp3AlarmLvl",  false, false, false, true, Prom::VCFloatInIntToDouble, true);
-    _tempMLAlarmLvl  = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C середина",                 ".temp2AlarmLvl",  false, false, false, true, Prom::VCFloatInIntToDouble, true);
-    _tempLLAlarmLvl  = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C зона охлаждения",          ".temp1AlarmLvl",  false, false, false, true, Prom::VCFloatInIntToDouble, true);
-    _tempOutAlarmLvl = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C теплоносителя на выходе",  ".tempOutAlarmLvl",  false, false, false, true, Prom::VCFloatInIntToDouble, true);
+    _tempHLAlarmLvl  = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C верх",                     ".temp3AlarmLvl",  false, false, false, true, Prom::VCdiv10, true);
+    _tempMLAlarmLvl  = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C середина",                 ".temp2AlarmLvl",  false, false, false, true, Prom::VCdiv10, true);
+    _tempLLAlarmLvl  = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C зона охлаждения",          ".temp1AlarmLvl",  false, false, false, true, Prom::VCdiv10, true);
+    _tempOutAlarmLvl = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C теплоносителя на выходе",  ".tempOutAlarmLvl",  false, false, false, true, Prom::VCdiv10, true);
     //    _tempInAlarmLvl  = new OutETag(this, Prom::TpOut, Prom::PreSet, "Уставка порога t°C теплоносителя на выходе",  ".tempInAlarmLvl",  false, false, false, true, Prom::VCFloatInIntToDouble, true);
 
     connect(_tempHLAlarmLvl , &OutETag::s_valueChd, _tempHL , &InETag::setDetectLevel);

@@ -16,9 +16,7 @@ AnalogSignalVar1 {
     property int oldZ: 0
 
     signal s_maxLimitChanged( variant Limit )
-    function setMaxLimit( Limit ){
-        maxLvl.setValue( Limit )
-    }
+    function setMaxLimit( Limit ){ maxLvl.setValue( Limit ) }
 
     Component.onCompleted: oldZ = z
 
@@ -46,8 +44,8 @@ AnalogSignalVar1 {
         readOnly: false
         visible: false
         correctingButtons: true
-        checkLimit: false
-        onValueRealChanged: s_maxLimitChanged( valueReal )
+        limited: false
+        onValueChanged: s_maxLimitChanged( Value )
     }
 //    MFUnit {
 //        id: minLvl
@@ -61,7 +59,7 @@ AnalogSignalVar1 {
 //        readOnly: false
 //        visible: false
 //        correctingButtons: true
-//        checkLimit: false
+//        limited: false
 //    }
 }
 

@@ -17,7 +17,7 @@ public:
                     QVariant Hi = true,
                     QVariant Low = false,
                     bool Save = false,
-                    bool LoadDefault = true,
+                    bool LoadDefault = false,
                     QVariant DefaultValue = false,
                     bool MenuChanged = false,
                     bool TunableSetTime = false,

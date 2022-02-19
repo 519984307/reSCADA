@@ -20,7 +20,7 @@ public:
             bool InGUI = true,
             Prom::ETagValConv Convertion = Prom::VCNo,
             bool Save = false,
-            bool LoadDefault = true,
+            bool LoadDefault = false,
             QVariant DefaultValue = 0,
             bool MenuChanged = false,
             quint8   LimitFlag = OUT_LIM_NO,

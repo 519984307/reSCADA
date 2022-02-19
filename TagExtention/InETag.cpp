@@ -2,6 +2,7 @@
 #include <QDebug>
 #include "unit.h"
 #include <QSettings>
+#include <cmath>
 
 using Prom::MessType;
 //using Prom::PropType;
@@ -61,7 +62,13 @@ void InETag::loadParam()
 void InETag::_acceptValue(QVariant Value)
 {
     ETag::_acceptValue(Value);
-    _logging(Prom::MessInfo, "значение " + _value.toString(), false);
+    if( fabs( _value.toDouble() - _preValue.toDouble() ) >= _changeStep.toDouble() ){
+        _logging(Prom::MessInfo, "значение " + QString::number(_value.toDouble()), false);
+    }
+//    _logging(Prom::MessInfo, "значение " + QString::number(_value.toDouble())
+//    + "прошлое " + QString::number( _preValue.toDouble())
+//    + ", разность - " + QString::number(_value.toDouble() - _preValue.toDouble())
+//    + ", шаг  - " +  QString::number(_changeStep.toDouble()), false);
 }
 //------------------------------------------------------------------------------
 void InETag::reInitialise()
@@ -123,6 +130,7 @@ void InETag::writeImit(bool setImit)
 void InETag::writeImitVal(QVariant setVal)
 {
     if(_imitVal != setVal){
+        _preValue = _imitVal;
         _imitVal = setVal;
         _logging(Prom::MessInfo, "имитация значения - " +  setVal.toString(), false);
         if(_imit){
@@ -335,7 +343,7 @@ void InETag::_checkVal()
         _detect = _checkDetect();
         if(value() != _preValue){
             ChDt = 1;
-            _preValue = value();
+            //_preValue = value();
         }
     }
     if(_preDetect != _detect) {

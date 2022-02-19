@@ -70,7 +70,8 @@ QString Prom::modeToString(Prom::UnitModes UnitModeInt)
     switch (UnitModeInt) {
     case UnMdNoDef    : return "Не определено";
     case UnMdStop     : return "Остановить";
-    case UnMdCollingStop: return "Остановлен с охлаждением";
+    case UnMdCollingStop: return "Охлаждение для остановки";
+    case UnMdCollingStoped: return "Остановлен с охлаждением";
     case UnMdStart    : return "Запустить";
     case UnMdCleanStart : return "Очистка";
     case UnMdCleanStop: return "Остановить после чистки";
@@ -95,6 +96,7 @@ QString Prom::modeToString(Prom::UnitModes UnitModeInt)
     case UnMdStopAndWait  : return "Стоп до разрешения";
     case UnMdPartStarted  : return "Запущен частично";
     case UnMdAutoStart  : return "Запущен в автоматическом режиме";
+    case UnMdWarmingUp  : return "Прогрев";
     }
     return "";
 }

@@ -43,7 +43,7 @@ Item {
             horizontalAlignment: Text.AlignHCenter
         }
         TableViewColumn {
-            width: 90
+            width: 300
             title: "Объект"
             role: "unit"
             resizable: true
