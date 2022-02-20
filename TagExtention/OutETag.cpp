@@ -22,7 +22,8 @@ OutETag::OutETag(Unit * Owner,
     quint8   LimitFlag,
     QVariant HiLimit,
     QVariant LowLimit,
-    bool TunableImpulseTime )
+    bool TunableImpulseTime,
+    QVariant ChageStep )
     : ETag(Owner,
         Type,
         Name,
@@ -31,7 +32,8 @@ OutETag::OutETag(Unit * Owner,
         TunablePulseTime,
         EgnorableAlarm,
         InGUI,
-        Convertion),
+        Convertion,
+        ChageStep),
     saveValue(Save), loadDefalt(LoadDefault),
     tunableImpulseTime(TunableImpulseTime), _setType(SetType),
     _defaultValue(DefaultValue), _menuChanged(MenuChanged), _hiLimit(HiLimit),
@@ -127,7 +129,7 @@ void OutETag::_checkVal()
                 _owner->ini->setValue(_owner->tagPrefix+ "/" + _DBName + ".value", _value);
         }
         else{
-            _logging(Prom::MessAlarm,"не удалось установить требуемое значение (получили - " + QString::number( _value.toDouble()) + ", нужно - " + QString::number(_setedValue.toDouble()) + ")", _imit);
+            //_logging(Prom::MessAlarm,"не удалось установить требуемое значение (получили - " + QString::number( _value.toDouble()) + ", нужно - " + QString::number(_setedValue.toDouble()) + ")", _imit);
         }
         //NOTE может и сломаться!!!_preValue = _value;
         emit s_valueChd(_value);
@@ -165,7 +167,7 @@ void OutETag::writeImitVal(QVariant setVal)
     if(_imitVal != setVal){
         _preValue = _imitVal;
             if(_imit) {
-            setValue(setVal.toDouble());
+            setValue(setVal);
         }
         else {
             _imitVal = setVal;

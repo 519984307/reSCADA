@@ -271,6 +271,8 @@ void OutDiscretETag::reInitialise()
     //    if(tunableImpulseTime){
     //        qDebug() << _DBName << _impTimer->interval();
     //    }
+    if(_OnOff) emit s_on();
+    else emit s_off();
     emit ChangeImpulseDelay(_impTimer->interval() / 1000);
     OutETag::reInitialise();
 }

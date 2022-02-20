@@ -19,13 +19,13 @@ UnitPropItem {
     signal s_stop()
 
     function started() {
-        startComand()
+        //startComand()
         std = true
         manual = false
         backgroundColor = colorRun
     }
     function stoped() {
-        stopComand()
+        //stopComand()
         std = false
         manual = false
         backgroundColor = colorStopReady

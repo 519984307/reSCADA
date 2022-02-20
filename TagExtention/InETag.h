@@ -40,8 +40,7 @@ protected:
     bool _onlyChange = true;
     bool _detect = false;
     bool _highOrLow;
-    QVariant _detectLevel = 0 ;
-    QVariant _changeStep = 0;
+    QVariant _detectLevel = 0;
     double _correction = 0;
     bool _alarmOn = false;
     bool _DnotU = false;
@@ -95,9 +94,6 @@ protected slots:
     void _checkPulse() override;
     void _timeMaxStep();
 
-    // ETag interface
-protected slots:
-    void _acceptValue(QVariant Value) override;
 };
 
 #endif // INLESTAG_H

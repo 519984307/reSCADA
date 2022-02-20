@@ -227,7 +227,7 @@ RectificationColumn0 {
         anchors.bottomMargin: parent.tank.radius + 3
         borderWidth: parent.pipePassBorderWidth
         nActiveColor: parent.pipeSteamColor
-        z: 0
+        z: -1
     }
 
     Pipe {
@@ -457,13 +457,12 @@ RectificationColumn0 {
         id: pipeV1
         x: 90
         width: parent.pipePassThin
+        height: 40
         visible: parent.fullView
         anchors.right: upAng.right
-        anchors.top: pipe1.top
         anchors.bottom: pipe4.top
-        anchors.topMargin: upAng.height
-        anchors.bottomMargin: - parent.pipePassBorderWidth
-        z: 100
+        anchors.bottomMargin: -1
+        z: 5
         borderWidth: parent.pipePassBorderWidth
         nActiveColor: parent.pipePassColor
         horOrVert: false

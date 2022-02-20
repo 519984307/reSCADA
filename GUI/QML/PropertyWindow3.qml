@@ -7,6 +7,7 @@ import "fap.js" as Fap
 Window {
     id: wind
     visible: false
+    color: Fap.menuBackground
     width: 300
     height: windowContent.height
 
@@ -24,7 +25,7 @@ Window {
     //        addEngRow("rty")
     //    }
 
-    signal resetAlarm()
+    signal s_resetAlarm()
 
     function addAlarm(objname, symname, ignorable) {
         alarms.insert(alarms.index, propertyAlarm.createObject(alarms))
@@ -86,8 +87,8 @@ Window {
             }
             property int indicatorSize: 16
             property string alarmName: "Unknown alarm"
-            property color colorAlarm: "red"
-            property color colorNormal: "white"
+            property color colorAlarm: Fap.alarm
+            property color colorNormal: Fap.menuBackground
 
             signal changedIgnore(bool status)
             function changeIgnore(status) {
@@ -203,7 +204,7 @@ Window {
                             radius: width / 2
                             x: parent.leftPadding / 2
                             y: (parent.height - height) / 2
-                            border.color: "#bdbdbd"
+                            border.color: Fap.buttonsBorder
                         }
                     }
                 }
@@ -251,10 +252,13 @@ Window {
                         anchors.top: parent.top
                         anchors.topMargin: (rowSize - 16) / 2
                         text: "0"
-                        onEditingFinished: changedImVal(parseInt(imitVal.text,
-                                                                 10))
+                        onTextChanged: {
+                            text = text.replace(',', '.')
+                        }
+                        onEditingFinished: parent.changedImVal(parseFloat(imitVal.text,
+                                                                          10))
                         validator: RegExpValidator {
-                            regExp: /[0-9]+/
+                            regExp: /(\d{1,10})([.,]\d{0,10})?$/
                         }
                         padding: 1
                         Keys.onPressed: {
@@ -353,7 +357,7 @@ Window {
                         clip: true
                         padding: 1
                         text: "0"
-                        maximumLength: 15
+                        //maximumLength: 15
                         enabled: timer.running
                         readOnly: true
                         Timer {
@@ -381,6 +385,7 @@ Window {
                         id: textField
                         onTextChanged: {
                             textFieldNow.value = reversed ? text : "0"
+                            text = text.replace(',', '.')
                         }
                         height: 16
                         width: parent.width * parent.ratio / (timed ? 2 : 1)
@@ -389,12 +394,13 @@ Window {
                         clip: true
                         padding: 1
                         text: "0"
-                        maximumLength: 5
+                        //maximumLength: 5
                         onEditingFinished: {
-                            commit()
+                            parent.commit()
                         }
                         validator: RegExpValidator {
-                            regExp: /([0-9]+)([.]?)([0-9]*)/
+                            //regExp: /([0-9]+)([.]?)([0-9]*)/
+                            regExp:/(\d{1,10})([.,]\d{0,10})?$/
                         }
                         Keys.onPressed: {
                             if (event.key === 16777220
@@ -440,11 +446,25 @@ Window {
         id: engSignals
         property int index: 0
     }
-
+    SimpleButton{
+        id:resAlarmBtn
+        height: 20
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.topMargin: 2
+        anchors.leftMargin: 3
+        anchors.rightMargin: 3
+        nameText.text: "Сброс аварий"
+        onPressedChanged: if(pressed)wind.s_resetAlarm()
+    }
     Flickable {
         id: sview
-        anchors.fill: parent
-        anchors.topMargin: 0
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: resAlarmBtn.bottom
+        anchors.bottom: parent.bottom
+        anchors.topMargin: 2
         ScrollBar.horizontal: ScrollBar {
             id: hbar
             active: vbar.active
@@ -462,6 +482,7 @@ Window {
         Column {
             id: windowContent
             width: parent.width
+
             Frame {
                 id: areaAlarm
                 width: parent.width
@@ -470,7 +491,7 @@ Window {
                 property bool alarm: false
                 property bool alarmNotify: false
                 property color alarmColor: Fap.alarm
-                property color normalColor: Fap.contrBackground
+                property color normalColor: Fap.menuBackground
                 background: Rectangle {
                     color: parent.alarm ? parent.alarmColor : parent.normalColor
                 }
@@ -509,23 +530,23 @@ Window {
                             model: alarms
                         }
                     }
-                    Item {
-                        id: alarmButtons
-                        width: parent.width
-                        height: 20
-                        Button {
-                            id: buttonResetAlarm
-                            anchors.fill: parent
-                            text: "Сбросить аварии"
-                            onClicked: {
-                                wind.resetAlarm()
-                                // root.addAlarm("test1", "test", false)
-                                //root.addEngRow("test2").addPropertySetting("test3", "test3", 0).changeVal(123)
-//                                wind.addEngRow("test2").addPropertySignal(
-//                                            "test3", "test3")
-                            }
-                        }
-                    }
+                    //                    Item {
+                    //                        id: alarmButtons
+                    //                        width: parent.width
+                    //                        height: 20
+                    //                        Button {
+                    //                            id: buttonResetAlarm
+                    //                            anchors.fill: parent
+                    //                            text: "Сбросить аварии"
+                    //                            onClicked: {
+                    //                                wind.s_resetAlarm()
+                    //                                // root.addAlarm("test1", "test", false)
+                    //                                //root.addEngRow("test2").addPropertySetting("test3", "test3", 0).changeVal(123)
+                    ////                                wind.addEngRow("test2").addPropertySignal(
+                    ////                                            "test3", "test3")
+                    //                            }
+                    //                        }
+                    //                    }
                 }
             }
             Column {
@@ -589,3 +610,9 @@ Window {
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;formeditorZoom:1.33}
+}
+##^##*/

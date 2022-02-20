@@ -4,6 +4,7 @@
 #include "promobject.h"
 #include "TSP/tsp.h"
 #include <QDebug>
+#include <cmath>
 
 using Prom::MessType;
 //using Prom::PropType;
@@ -17,17 +18,20 @@ ETag::ETag(Unit * Owner,
     bool TunablePulseTime,
     bool EgnorableAlarm,
     bool InGUI,
-    Prom::ETagValConv Convertion)
+    Prom::ETagValConv Convertion,
+    QVariant ChageStep)
     : QObject(Owner),
     ttype(Type),
     tunableSetTime(TunableSetTime),
     tunablePulseTime (TunablePulseTime),
     ignorableAlarm(EgnorableAlarm),
     inGUI(InGUI),
+    _changeStep(ChageStep),
     _owner(Owner),
     _name(Name),
     _DBName(DBName),
     _conv(Convertion)
+
 {
     extern TSP * g_TSP;
 
@@ -62,6 +66,8 @@ ETag::ETag(Unit * Owner,
         _logging (Prom::MessAlarm, _alarmStr, false);
     }
     _owner->addETag(this);
+    _timeLog.setInterval(60000);
+    connect(&_timeLog, &QTimer::timeout, this, &ETag::_logValChange);
 }
 
 //------------------------------------------------------------------------------
@@ -121,6 +127,10 @@ void ETag::_qualityChangedSlot()
     if(_tag->readQuality() == Prom::Good){
         emit s_qualityChd(true);
         _logging (Prom::MessAlarm, "соединение восстановлено", false);
+        if(!_imit){
+            _logValChange();
+            _timeLog.start();
+        }
     }
     else  {
         emit s_qualityChd(false);
@@ -128,9 +138,12 @@ void ETag::_qualityChangedSlot()
             _logging (Prom::MessVerbose, "соединение разорванно", true);
         }
         else{
+            _logValChange();
+            _timeLog.stop();
             _alarm = true;
             emit s_alarm("соединение разорванно");
         }
+
     }
     //    Logging (Prom::MessVerbose, "смена состояния соединения на " + QString::number(_tag->ReadQuality()), false);
 }
@@ -154,6 +167,9 @@ void ETag::_acceptValue(QVariant Val)
     if( ! _imit )
         _preValue = _value;
     _value = Val.toDouble();
+    if( std::fabs( _value.toDouble() - _preValue.toDouble() ) >= _changeStep.toDouble() ){
+        _logValChange();
+    }
     if(! _imit){
         if(_pulse){
             _checkPulse();
@@ -165,6 +181,11 @@ void ETag::_acceptValue(QVariant Val)
     // }
     emit s_liveValueChd(Val);
 
+}
+//------------------------------------------------------------------------------
+void ETag::_logValChange()
+{
+    _logging(Prom::MessInfo, "значение " + QString::number(_value.toDouble()), false);
 }
 
 //------------------------------------------------------------------------------
@@ -209,10 +230,7 @@ void ETag::loadParam()
 bool ETag::resetAlarm()
 {
     //_alarmSetTime = false;
-    if(!connected()){
-        _logging(Prom::MessAlarm, "сброс аварии запрещен: соединение разорванно", false);
-    }
-    else if( _mayResetAlarm ){
+    if( _mayResetAlarm ){
         if( _alarm ){
             _logging(Prom::MessAlarm, "сброшена авария - " + _alarmStr, false);
             _alarm = false;

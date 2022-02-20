@@ -151,8 +151,8 @@ void PromObject::MegaRescan()
 void PromObject::alarmDo()
 {
     if(_alarmSoundF && _alarmSoundF->isFinished()) {
-//        _alarmSoundF->setLoops(3);
-//        _alarmSoundF->play();
+        _alarmSoundF->setLoops(3);
+        _alarmSoundF->play();
     }
 }
 

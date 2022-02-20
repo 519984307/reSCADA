@@ -1,8 +1,10 @@
 ﻿const version = "3.6.0"
 
 const headBackground = "gainsboro"
-const background = "gainsboro"
-const contrBackground = "white"
+const background = "fcfcfc"
+const menuBackground = "#f0f0f0"
+const buttonsBackground = "#e1e1e1"
+const buttonsBorder = "#abadb3"
 
 const defaultColor = "white"
 const run = "green" //"limegreen"

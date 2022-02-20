@@ -1,9 +1,9 @@
 ﻿import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.13
-
+//import QtQuick.Window 2.12
+//import QtQuick.Controls 2.15
 //import LineComponent 1.0
+import "fap.js" as Fap
+
 UnitPropItem {
     id: root
     width: 70
@@ -72,6 +72,7 @@ UnitPropItem {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
+        z: 0
         shWidth: 5
         //shHeight: 15
         anchors.leftMargin: 0
@@ -90,6 +91,8 @@ UnitPropItem {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: tTop.bottom
+        z: 0
+        limitStep: 0.05
         shWidth: 5
         //shHeight: 15
         anchors.leftMargin: 0
@@ -104,14 +107,18 @@ UnitPropItem {
         SimpleButton{
             id: sbPTop
             radius: height / 2
+            border.color: "#000000"
             width: parent.height * 1.5
             height: width
             checkable: true
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.right
+            nameText.text: "A"
+            nameText.verticalAlignment: Text.AlignVCenter
+            nameText.horizontalAlignment: Text.AlignHCenter
             anchors.leftMargin: -4
             pressCheckColor: "gray"
-            unPressCheckColor: "#8afda6"
+            unPressCheckColor: Fap.run
             mouseArea.onClicked:{
                 if( mouse.button & Qt.RightButton ){
                     pidPTop.show()
@@ -141,24 +148,6 @@ UnitPropItem {
         onManOnOffChanged: sbPTop.checked = manOnOff
         Component.onCompleted: sbPTop.checked = manOnOff
     }
-    AnalogSignalVar2 {
-        id: tBottom
-        objectName:  "tBottom"
-        y: 240
-        height: indicHeigth
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        shWidth: 5
-        //shHeight: 15
-        anchors.leftMargin: 0
-        anchors.rightMargin: 0
-        anchors.bottomMargin: cube.height * cube.levelRatio + 5
-        backgroundColor: indicColor
-        colorShortName: "green"
-        postfix: "°c"
-        tooltipText: "Температура в кубе"
-    }
 
     PID_Win{
         id: pidPBott
@@ -186,6 +175,7 @@ UnitPropItem {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: tBottom.top
+        limitStep: 0.05
         shWidth: 5
         //shHeight: 15
         anchors.leftMargin: 0
@@ -200,14 +190,18 @@ UnitPropItem {
         SimpleButton{
             id: sbPrButt
             radius: height / 2
+            border.color: "#000000"
             width: parent.height * 1.5
             height: width
             checkable: true
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.right
+            nameText.text: "A"
+            nameText.verticalAlignment: Text.AlignVCenter
+            nameText.horizontalAlignment: Text.AlignHCenter
             anchors.leftMargin: -4
             pressCheckColor: "gray"
-            unPressCheckColor: "#8afda6"
+            unPressCheckColor: Fap.run
             mouseArea.onClicked:{
                 if( mouse.button & Qt.RightButton ){
                     pidPBott.show()
@@ -234,6 +228,25 @@ UnitPropItem {
 //        shLeft: false
 //        shRight: false
 //        shTop: true
+    }
+    AnalogSignalVar2 {
+        id: tBottom
+        objectName:  "tBottom"
+        y: 240
+        height: indicHeigth
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        z: 5
+        shWidth: 5
+        //shHeight: 15
+        anchors.leftMargin: 0
+        anchors.rightMargin: 0
+        anchors.bottomMargin: cube.height * cube.levelRatio + 5
+        backgroundColor: indicColor
+        colorShortName: "green"
+        postfix: "°c"
+        tooltipText: "Температура в кубе"
     }
 }
 

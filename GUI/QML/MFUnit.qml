@@ -7,6 +7,7 @@ Item {
     id: mfu
     width: 120
     height: 30
+    property alias body: body
     property alias mainRect: body
     property alias mouseArea: mouseArea
     property alias minBtn: minBtn
@@ -21,15 +22,16 @@ Item {
     property bool limited: false
     property bool correctingButtons: true
     property alias readOnly: valueLable.readOnly
-    property real step: 0.5
-    property real upLimit: 100
-    property real downLimit: 0
+    property double step: 0.5
+    property double upLimit: 100
+    property double downLimit: 0
 
     property int mantissa: 1
     property alias valueFontSize: valueLable.font
     property bool disappear: false
     //property alias valueText: valueLable.text
-    property real valueReal: 0
+    property double valueReal: 0
+    property double valueRealTmp: 0
 
     property bool separCorrButtons: false
     property bool setFromCore: false
@@ -53,7 +55,8 @@ Item {
         value = Number(value)
         value.toFixed(mantissa)
         value = Number(value)
-        if( setFromCore || !limited )return value
+        if( setFromCore || !limited )
+            return value
         if (value < mfu.downLimit) {
             return mfu.downLimit
         }

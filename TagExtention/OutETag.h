@@ -26,7 +26,8 @@ public:
             quint8   LimitFlag = OUT_LIM_NO,
             QVariant HiLimit = 0,
             QVariant LowLimit = 0,
-            bool TunableImpulseTime = false);
+            bool TunableImpulseTime = false,
+            QVariant ChageStep = 0);
 
     bool saveValue = false;
     bool loadDefalt {true};

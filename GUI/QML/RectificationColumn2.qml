@@ -292,7 +292,7 @@ RectificationColumn0 {
         anchors.bottomMargin: parent.tank.radius + 3
         borderWidth: parent.pipePassBorderWidth
         nActiveColor: parent.pipeSteamColor
-        z: 0
+        z: -1
     }
 
     Pipe {

@@ -2,7 +2,6 @@
 #include <QDebug>
 #include "unit.h"
 #include <QSettings>
-#include <cmath>
 
 using Prom::MessType;
 //using Prom::PropType;
@@ -31,13 +30,11 @@ InETag::InETag(Unit * Owner,
         TunablePulseTime,
         EgnorableAlarm,
         InGUI,
-        Convertion),
+        Convertion,
+        ChageStep),
     tunabDetectLevel(TunabDetectLevel),
     _highOrLow(HighOrLow),
-    _detectLevel(DetectLevel),
-    _changeStep(ChageStep)
-
-
+    _detectLevel(DetectLevel)
 {
     _timeMax = new QTimerExt(this);
     _timeMax->setInterval(TimeMax * 1000);
@@ -58,18 +55,7 @@ void InETag::loadParam()
         _detectLevel = _owner->ini->value(_owner->tagPrefix+ "/" + _DBName + ".detectLevel", 0).toDouble();
     ETag::loadParam();
 }
-//------------------------------------------------------------------------------
-void InETag::_acceptValue(QVariant Value)
-{
-    ETag::_acceptValue(Value);
-    if( fabs( _value.toDouble() - _preValue.toDouble() ) >= _changeStep.toDouble() ){
-        _logging(Prom::MessInfo, "значение " + QString::number(_value.toDouble()), false);
-    }
-//    _logging(Prom::MessInfo, "значение " + QString::number(_value.toDouble())
-//    + "прошлое " + QString::number( _preValue.toDouble())
-//    + ", разность - " + QString::number(_value.toDouble() - _preValue.toDouble())
-//    + ", шаг  - " +  QString::number(_changeStep.toDouble()), false);
-}
+
 //------------------------------------------------------------------------------
 void InETag::reInitialise()
 {

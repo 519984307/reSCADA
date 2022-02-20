@@ -26,7 +26,8 @@ public:
                     bool TunablePulseTime = false,
                     bool EgnorableAlarm = true,
                     bool InGUI = true,
-                    Prom::ETagValConv Convertion = Prom::VCNo);
+                    Prom::ETagValConv Convertion = Prom::VCNo,
+                    QVariant ChageStep = 0);
 
     const Prom::ESTagType ttype;
 
@@ -55,6 +56,7 @@ public:
 protected:
     QVariant _value = 0;
     QVariant _preValue = 0;
+    QVariant _changeStep = 0;
     Unit * _owner;
     Tag * _tag = nullptr;
     QString _name;
@@ -79,6 +81,7 @@ protected:
     bool _ferstLoad = true;
     virtual void _customConnectToGUI(QObject *,  QObject *){};
     int _pulseDuration{0};
+    QTimer _timeLog;
 
 signals:
     void s_qualityChd(QVariant);
@@ -99,6 +102,7 @@ protected slots:
     virtual void _qualityChangedSlot();
     virtual void _acceptValue(QVariant Value);
     virtual void _checkPulse() = 0;
+    void _logValChange();
 
 public slots:
     virtual void writeImit(bool setImit) = 0;

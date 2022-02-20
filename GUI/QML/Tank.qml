@@ -25,6 +25,8 @@ Item {
     property color contentGradientColor: "steelblue"
     property alias alarmTopLevel: mfuAlarmTopLevel.valueReal
     property alias alarmBottomLevel: mfuAlarmBottomLevel.valueReal
+    property string postfix:"%"
+    property double volume:0
 
     signal s_alarmTopLevelChanged( variant AlarmTopLevel )
     signal s_alarmBottomLevelChanged( variant AlarmTopLevel )
@@ -99,7 +101,12 @@ Item {
             Rectangle {
                 id: rectLevel
                 width: parent.width
-                height: parent.height * contItem.level / 100 * levelRatio
+                height: {
+                    if(contItem.volume > 0)
+                        parent.height * contItem.level/contItem.volume * levelRatio
+                    else
+                        parent.height * contItem.level / 100 * levelRatio
+                }
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 0
                 visible: showLevel
@@ -167,7 +174,7 @@ Item {
     }
     Text {
         id: levelDig
-        text: contItem.level + "%"
+        text: "<b>" + contItem.level +"</b>" + postfix
         anchors.bottom: parent.bottom
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

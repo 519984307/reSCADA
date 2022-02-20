@@ -1,24 +1,25 @@
 import QtQuick 2.15
 //import QtGraphicalEffects 1.15
 import QtQuick.Controls 2.15
+import "fap.js" as Fap
 
 Rectangle {
     id: rectBody
     width: 100
     height: 50
-    radius: 5
+    radius: 0
     property  alias mouseArea: mA
     property  alias nameText: nameText
 
-    property bool checkable: true
+    property bool checkable: false
     property bool checked: false
     property alias pressed: mA.pressed
-    property color unPressCheckColor: "Gray"
+    property color unPressCheckColor: Fap.buttonsBackground
     property color pressCheckColor: Qt.hsla(unPressCheckColor.hslHue,
                                             unPressCheckColor.hslSaturation,
-                                            unPressCheckColor.hslLightness * 0.5,
+                                            unPressCheckColor.hslLightness * 0.9,
                                             unPressCheckColor.a)
-    border.color: "black"
+    border.color: Fap.buttonsBorder
     border.width: 1
 
     Component.onCompleted: renewColor()
@@ -37,23 +38,26 @@ Rectangle {
 
     Text {
         id: nameText
-        text: qsTr("A")
+        text: qsTr("Button")
         anchors.fill: parent
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         wrapMode: Text.WordWrap
-        anchors.rightMargin: Math.max(radius / 2, parent.width/ 20)
-        anchors.leftMargin: Math.max(radius / 2, parent.width/ 20)
-        minimumPointSize: 5
+        anchors.bottomMargin: Math.max(2, parent.height/ 30)
+        anchors.topMargin: anchors.bottomMargin
+        anchors.rightMargin: Math.max(parent.radius / 2, parent.width/ 20)
+        anchors.leftMargin: Math.max(parent.radius / 2, parent.width/ 20)
         minimumPixelSize: 5
-        font.pixelSize: 300
-        font.bold: true
+        font.pixelSize: 400
         fontSizeMode: Text.Fit
     }
     MouseArea{
         id: mA
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
+        hoverEnabled: true
+        onEntered: border.width++
+        onExited: border.width--
         onClicked: {
             if((mouse.button & Qt.LeftButton) && checkable) {
                 checked = !checked
