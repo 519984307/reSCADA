@@ -8,7 +8,7 @@
 struct SimAddress{
   Area memArea;
   WordLenght type;
-  int DBNumb{-1};
+  int DBNumb{0};
   struct {
     int memSlot{-1};//Это может быть байт, слово, двойное слово и т.д.
     int bit{-1};//Номер бита для булевых тэгов, у остальных всегда 0

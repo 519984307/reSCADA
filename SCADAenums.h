@@ -9,6 +9,22 @@ const quint8 OUT_LIM_NO   = 0b0;//0000 0000 Тег не лимитирован
 const quint8 OUT_LIM_MIN  = 0b01;//0000 0001 Тег лимитирован на максимум
 const quint8 OUT_LIM_MAX  = 0b10;//0000 0010 Тег лимитирован на минимум
 
+const char ALL_8OPT_ON = 0b11111111;
+
+namespace EEopt {
+const  char KM_ALARM_ON =     0b00000001; // шестнадцатеричный литерал для 0000 0001
+//const  char kI =     0b00000010;
+//const  char kD =     0b00000100;
+//const  char allImp = 0b00111000;
+//const  char kPimp  = 0b00001000;
+//const  char kIimp  = 0b00010000;
+//const  char kDimp  = 0b00100000;
+//const  char manImp = 0b01000000;
+//const  char impIn  = 0b10000000;
+//  option8 = 0b10000000
+//};
+}
+
 enum UnitModes {
     UnMdNoDef = 0,
     UnMdStop,
@@ -224,6 +240,7 @@ const std::vector <QString> EF_S1KMplQ       = { "Пуск|.start",   "",       
 const std::vector <QString> EF_S1KMQ         = { "Пуск|.start",   "",             "Контактор|.KM|1",                    "", "Защитный автомат|.QK|1" };
 const std::vector <QString> EF_S1KMQF        = { "Пуск|.start",   "",             "Контактор|.KM|1",                    "", "Защитный автомат|.QF|1" };
 const std::vector <QString> EF_S1KMq         = { "Пуск|.start",   "",             "Контактор|.KM|1",                    "", "Защитный автомат|.QK|0" };
+const std::vector <QString> EF_S1KMqf        = { "Пуск|.start",   "",             "Контактор|.KM|1",                    "", "Защитный автомат|.QF|0" };
 const std::vector <QString> EF_S1KMQS        = { "Пуск|.start",   "",             "Контактор|.KM|1",                    "", "Защитный автомат|.QK|1", "Аварийный стоп|.AS|1" };
 const std::vector <QString> EF_S1KMQFS       = { "Пуск|.start",   "",             "Контактор|.KM|1",                    "", "Защитный автомат|.QF|1", "Аварийный стоп|.AS|1" };
 const std::vector <QString> EF_Sl1SdlQF      = { "Пуск|.startLG",   "",           "Работа|.startedLG|1",                "", "Защитный автомат|.QF|1" };

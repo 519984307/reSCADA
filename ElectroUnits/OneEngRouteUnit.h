@@ -17,7 +17,8 @@ public:
                               bool Mover,
                               std::vector<QString> EngSensorNames,
                               bool BlockedStop = false,
-                              Prom::UnitModes SaveMode = Prom::UnMdStop);
+                              Prom::UnitModes SaveMode = Prom::UnMdStop,
+                              char Option = Prom::ALL_8OPT_ON);
 
 protected:
     ElectroEngine * _engine = nullptr;

@@ -10,90 +10,94 @@
 using namespace Prom;
 
 
-ElectroEngine::ElectroEngine(Unit *Owner, std::vector<QString> SensorsNames, QString MultiEnginePrefix)
+ElectroEngine::ElectroEngine(Unit *Owner, std::vector<QString> SensorsNames, QString MultiEnginePrefix, char Option )
     :QObject(Owner), _owner(Owner)
 {
     setObjectName(Owner->objectName() + MultiEnginePrefix + " эл.двигатель");
+    bool kmAlarmON = Option & EEopt::KM_ALARM_ON;
 
     if(SensorsNames.size() > 0) {
         if(SensorsNames[1] == "") { //---------------------------------------------- НЕ реверсивный двигатель
             //            bool B = SensorsNames[0].section('|', 2, 1) == "i";
             //            QString S = SensorsNames[0].section('|', 2, 1);
             startForward = new OutDiscretETag(_owner, Prom::PreSet, SensorsNames[0].section('|', 0, 0),
-                    MultiEnginePrefix + SensorsNames[0].section('|', 1, 1),
-                    true, false, false, true, false, false, false,false,
-                    SensorsNames[0].section('|', 2, 2) == "i"); //,
+                MultiEnginePrefix + SensorsNames[0].section('|', 1, 1),
+                true, false, false, false, false, false, false,false,
+                SensorsNames[0].section('|', 2, 2) == "i"); //,
 
             KMforward = new InDiscretETag(_owner, SensorsNames[2].section('|', 0, 0),
-                    MultiEnginePrefix + SensorsNames[2].section('|', 1, 1),
-                    true, false, SensorsNames[2].section('|', 2, 2).toInt()); //
+                MultiEnginePrefix + SensorsNames[2].section('|', 1, 1),
+                true, false, SensorsNames[2].section('|', 2, 2).toInt(), kmAlarmON, false); //
 
-            connect(startForward, &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSTART1KM,     Qt::QueuedConnection);
-            connect(KMforward,    &InDiscretETag::s_valueChd,  this,      &ElectroEngine::CheckStateSTART1KM,     Qt::QueuedConnection);
-            connect(startForward, &OutDiscretETag::s_on,      KMforward, &InDiscretETag::needBeDetectedAlarm,     Qt::QueuedConnection);
-            connect(startForward, &OutDiscretETag::s_off,     KMforward, &InDiscretETag::needBeUndetectedNoAlarm, Qt::QueuedConnection);
-            connect(_owner,       &Unit::s_connected,         this,      &ElectroEngine::CheckStateSTART1KM,      Qt::QueuedConnection);
-            if(startForward->isOn())
-                KMforward->needBeDetectedAlarm();
-            else
-                KMforward->needBeUndetectedNoAlarm();
+            connect(startForward, &OutDiscretETag::s_valueChd, this, &ElectroEngine::CheckStateSTART1KM, Qt::QueuedConnection);
+            connect(KMforward,    &InDiscretETag::s_valueChd,  this, &ElectroEngine::CheckStateSTART1KM, Qt::QueuedConnection);
+            connect(_owner,       &Unit::s_connected,          this, &ElectroEngine::CheckStateSTART1KM, Qt::QueuedConnection);
+            if( kmAlarmON ){
+                connect(startForward, &OutDiscretETag::s_on,  KMforward, &InDiscretETag::needBeDetectedAlarm,     Qt::QueuedConnection);
+                connect(startForward, &OutDiscretETag::s_off, KMforward, &InDiscretETag::needBeUndetectedNoAlarm, Qt::QueuedConnection);
+                if(startForward->isOn())
+                    KMforward->needBeDetectedAlarm();
+                else
+                    KMforward->needBeUndetectedNoAlarm();
+            }
         }
         else if(SensorsNames[1].contains(".stop")) {   //---------------------------------------------- НЕ реверсивный двигатель с раздельными Старт и Стоп сигналами
 
             startForward = new OutDiscretETag(_owner, Prom::PreSet,
-                                              SensorsNames[0].section('|', 0, 0),
-                    MultiEnginePrefix + SensorsNames[0].section('|', 1, 1),
-                    true, false, false, true, false, false, false,false,
-                    SensorsNames[0].section('|', 2, 2) == "i"); //
+                SensorsNames[0].section('|', 0, 0),
+                MultiEnginePrefix + SensorsNames[0].section('|', 1, 1),
+                true, false, false, false, false, false, false,false,
+                SensorsNames[0].section('|', 2, 2) == "i"); //
 
 
             if(SensorsNames[ 2 ] == ""){
 
                 stop = new OutDiscretETag(_owner, Prom::PreSet,
-                                          SensorsNames[1].section('|',0, 0),
-                        MultiEnginePrefix + SensorsNames[1].section('|', 1, 1)); //,
+                    SensorsNames[1].section('|',0, 0),
+                    MultiEnginePrefix + SensorsNames[1].section('|', 1, 1)); //,
                 connect(startForward, &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSartStop,   Qt::QueuedConnection);
                 connect(stop,         &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSartStop,   Qt::QueuedConnection);
                 connect(_owner,       &Unit::s_connected,          this,      &ElectroEngine::CheckStateSartStop,   Qt::QueuedConnection);
             }
             else{
                 stop = new OutDiscretETag(_owner, Prom::PreSet,
-                                          SensorsNames[1].section('|',0, 0),
-                        MultiEnginePrefix + SensorsNames[1].section('|', 1, 1),
-                        true, false, false, true, false, false, false,false,
-                        SensorsNames[1].section('|', 2, 2) == "i"); //,
-                KMforward = new InDiscretETag(_owner, SensorsNames[2].section('|', 0, 0), MultiEnginePrefix + SensorsNames[2].section('|', 1, 1), 1, 0, SensorsNames[2].section('|', 2, 2).toInt()); //,
+                    SensorsNames[1].section('|',0, 0),
+                    MultiEnginePrefix + SensorsNames[1].section('|', 1, 1),
+                    true, false, false, false, false, false, false,false,
+                    SensorsNames[1].section('|', 2, 2) == "i"); //,
+                KMforward = new InDiscretETag(_owner, SensorsNames[2].section('|', 0, 0), MultiEnginePrefix + SensorsNames[2].section('|', 1, 1), 1, 0, SensorsNames[2].section('|', 2, 2).toInt(), kmAlarmON, false); //,
 
                 connect(startForward, &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSartStop1KM,   Qt::QueuedConnection);
                 connect(stop,         &OutDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateSartStop1KM,   Qt::QueuedConnection);
                 connect(KMforward,    &InDiscretETag::s_valueChd,  this,      &ElectroEngine::CheckStateSartStop1KM,   Qt::QueuedConnection);
-                connect(startForward, &OutDiscretETag::s_on,       KMforward, &InDiscretETag::needBeDetectedAlarm,     Qt::QueuedConnection);
+
                 if(startForward->tunableImpulseTime)
                     connect(stop, &OutDiscretETag::s_on, KMforward, &InDiscretETag::needBeUndetectedNoAlarm, Qt::QueuedConnection);
                 else
                     connect(startForward, &OutDiscretETag::s_off, KMforward, &InDiscretETag::needBeUndetectedNoAlarm, Qt::QueuedConnection);
-
                 connect(_owner,       &Unit::s_connected,         this,      &ElectroEngine::CheckStateSartStop1KM, Qt::QueuedConnection);
-                if(startForward->isOn())KMforward->needBeDetectedAlarm();
-                else KMforward->needBeUndetectedNoAlarm();
-
+                if( kmAlarmON ){
+                    connect(startForward, &OutDiscretETag::s_on,       KMforward, &InDiscretETag::needBeDetectedAlarm,     Qt::QueuedConnection);
+                    if(startForward->isOn())KMforward->needBeDetectedAlarm();
+                    else KMforward->needBeUndetectedNoAlarm();
+                }
             }
         }
         else if( SensorsNames[1] != "") {   //++++++++++++++++++++++++++++++++++++++ реверсивный двигатель
 
             startForward = new OutDiscretETag(_owner, Prom::PreSet,
-                                              SensorsNames[0].section('|', 0, 0),
-                    MultiEnginePrefix + SensorsNames[0].section('|', 1, 1)); //,
+                SensorsNames[0].section('|', 0, 0),
+                MultiEnginePrefix + SensorsNames[0].section('|', 1, 1)); //,
 
             //+++++++++ тег обратного вращения
             startBackward = new OutDiscretETag(_owner, Prom::PreSet,
-                                               SensorsNames[1].section('|', 0, 0),
-                    MultiEnginePrefix + SensorsNames[1].section('|', 1, 1)); //,
+                SensorsNames[1].section('|', 0, 0),
+                MultiEnginePrefix + SensorsNames[1].section('|', 1, 1)); //,
 
             if(SensorsNames[2] != "" && SensorsNames[3] == "") { // +++++++ если контактор один
                 KM = new InDiscretETag(_owner, SensorsNames[2].section('|', 0, 0),
-                        MultiEnginePrefix + SensorsNames[2].section('|', 1, 1),
-                        true, false, SensorsNames[2].section('|', 2, 2).toInt()); //,
+                    MultiEnginePrefix + SensorsNames[2].section('|', 1, 1),
+                    true, false, SensorsNames[2].section('|', 2, 2).toInt(), kmAlarmON, false); //,
 
 
 
@@ -116,28 +120,32 @@ ElectroEngine::ElectroEngine(Unit *Owner, std::vector<QString> SensorsNames, QSt
             else if (SensorsNames[2] != "" && SensorsNames[3] != "") {   //+++++ если контакторов два
 
                 KMforward = new InDiscretETag(_owner,SensorsNames[2].section('|', 0, 0),
-                        MultiEnginePrefix + SensorsNames[2].section('|', 1, 1),
-                        true, false, SensorsNames[2].section('|', 2, 2).toInt()); //,
+                    MultiEnginePrefix + SensorsNames[2].section('|', 1, 1),
+                    true, false, SensorsNames[2].section('|', 2, 2).toInt(), kmAlarmON, false); //,
 
                 connect(KMforward,    &InDiscretETag::s_valueChd, this,      &ElectroEngine::CheckStateREVERSE2KM, Qt::QueuedConnection);
-                connect(startForward, &OutDiscretETag::s_on,  KMforward, &InDiscretETag::needBeDetectedAlarm, Qt::QueuedConnection);
-                connect(startForward, &OutDiscretETag::s_off, KMforward, &InDiscretETag::needBeUndetectedNoAlarm, Qt::QueuedConnection);
-                if(startForward->isOn())KMforward->needBeDetectedAlarm();
-                else KMforward->needBeUndetectedNoAlarm();
+                if( kmAlarmON ){
+                    connect(startForward, &OutDiscretETag::s_on,  KMforward, &InDiscretETag::needBeDetectedAlarm, Qt::QueuedConnection);
+                    connect(startForward, &OutDiscretETag::s_off, KMforward, &InDiscretETag::needBeUndetectedNoAlarm, Qt::QueuedConnection);
+                    if(startForward->isOn())KMforward->needBeDetectedAlarm();
+                    else KMforward->needBeUndetectedNoAlarm();
+                }
                 //----
                 KMbackward = new InDiscretETag(_owner,  SensorsNames[3].section('|', 0, 0),
-                        MultiEnginePrefix + SensorsNames[3].section('|', 1, 1),
-                        true, false, SensorsNames[3].section('|', 2, 2).toInt()); //,
+                    MultiEnginePrefix + SensorsNames[3].section('|', 1, 1),
+                    true, false, SensorsNames[3].section('|', 2, 2).toInt(), kmAlarmON, false); //,
 
                 connect(KMbackward,    &InDiscretETag::s_valueChd, this,       &ElectroEngine::CheckStateREVERSE2KM, Qt::QueuedConnection);
-                connect(startBackward, &OutDiscretETag::s_on,  KMbackward, &InDiscretETag::needBeDetectedAlarm, Qt::QueuedConnection);
-                connect(startBackward, &OutDiscretETag::s_off, KMbackward, &InDiscretETag::needBeUndetectedNoAlarm, Qt::QueuedConnection);
-
                 connect(startForward, &OutDiscretETag::s_valueChd, this, &ElectroEngine::CheckStateREVERSE2KM, Qt::QueuedConnection);
                 connect(startBackward, &OutDiscretETag::s_valueChd,  this, &ElectroEngine::CheckStateREVERSE2KM, Qt::QueuedConnection);
                 connect(_owner, &Unit::s_connected, this, &ElectroEngine::CheckStateREVERSE2KM, Qt::QueuedConnection);
-                if(startBackward->isOn())KMbackward->needBeDetectedAlarm();
-                else KMbackward->needBeUndetectedNoAlarm();
+
+                if( kmAlarmON ){
+                    connect(startBackward, &OutDiscretETag::s_on,  KMbackward, &InDiscretETag::needBeDetectedAlarm, Qt::QueuedConnection);
+                    connect(startBackward, &OutDiscretETag::s_off, KMbackward, &InDiscretETag::needBeUndetectedNoAlarm, Qt::QueuedConnection);
+                    if(startBackward->isOn())KMbackward->needBeDetectedAlarm();
+                    else KMbackward->needBeUndetectedNoAlarm();
+                }
             }
             else if (SensorsNames[2] == "" && SensorsNames[3] == "") {   //+++++ если нет контакторов
                 connect(startForward, &OutDiscretETag::s_valueChd, this, &ElectroEngine::CheckStateREVERSE0KM, Qt::QueuedConnection);
@@ -146,17 +154,17 @@ ElectroEngine::ElectroEngine(Unit *Owner, std::vector<QString> SensorsNames, QSt
             }
         } //---------------------------------------------- реверсивный двигатель
         if(SensorsNames.capacity() > 4 ?  SensorsNames[4] != "" : false) { //++++++ есть QK
-            QK = new InDiscretETag(_owner, SensorsNames[4].section('|', 0, 0),
-                    MultiEnginePrefix + SensorsNames[4].section('|', 1, 1),
-                    true, false, SensorsNames[4].section('|', 2, 2).toInt(), false);
-            QK->needBeDetectedAlarmNoTime();
+            QF = new InDiscretETag(_owner, SensorsNames[4].section('|', 0, 0),
+                MultiEnginePrefix + SensorsNames[4].section('|', 1, 1),
+                true, false, SensorsNames[4].section('|', 2, 2).toInt(), false);
+            QF->needBeDetectedAlarmNoTime();
         }
         //tmp = QString::number(SensorsNames.capacity());
 
         if(SensorsNames.capacity() > 5 ?  SensorsNames[5] != "" : false) { //+++++++ есть стоп кнопка
             AS = new InDiscretETag(_owner,  SensorsNames[5].section('|', 0, 0),
-                    MultiEnginePrefix + SensorsNames[5].section('|', 1, 1),
-                    true, false, SensorsNames[5].section('|', 2, 2).toInt(), false);
+                MultiEnginePrefix + SensorsNames[5].section('|', 1, 1),
+                true, false, SensorsNames[5].section('|', 2, 2).toInt(), false);
             AS->needBeDetectedAlarmNoTime();
         }
     }
@@ -201,8 +209,8 @@ void ElectroEngine::CheckStateSTART1KM()
             _nowState = EngToForvard;
             /*TEST*/if(KMforward->isImit() && startForward->isImit())
                 /*TEST*/QTimer::singleShot(1000, [ this ]() {
-                this->KMforward->writeImitVal(true);
-            });///
+                    this->KMforward->writeImitVal(true);
+                });///
         }
     }
     else {
@@ -211,8 +219,8 @@ void ElectroEngine::CheckStateSTART1KM()
                 _nowState = EngToStopForward;
                 /*TEST*/if(KMforward->isImit() && startForward->isImit())
                     /*TEST*/QTimer::singleShot(1000, [ this ]() {
-                    this->KMforward->writeImitVal(false);
-                });///
+                        this->KMforward->writeImitVal(false);
+                    });///
             }
             else _nowState = EngManualForward;
         }
@@ -221,7 +229,7 @@ void ElectroEngine::CheckStateSTART1KM()
     if(tmpSt != _nowState) {
         _prevState = tmpSt;
     }
-    emit StateUpdate();
+    emit s_stateUpdate();
 }
 
 //------------------------------------------------------------------------------
@@ -267,7 +275,7 @@ void ElectroEngine::CheckStateSartStop1KM()
     if(tmpSt != _nowState) {
         _prevState = tmpSt;
     }
-    emit StateUpdate();
+    emit s_stateUpdate();
 }
 
 //------------------------------------------------------------------------------
@@ -295,7 +303,7 @@ void ElectroEngine::CheckStateSartStop()
     if(tmpSt != _nowState) {
         _prevState = tmpSt;
     }
-    emit StateUpdate();
+    emit s_stateUpdate();
 }
 
 //else  {
@@ -323,7 +331,7 @@ void ElectroEngine::CheckStateREVERSE0KM()
     if(tmpSt != _nowState)
         _prevState = tmpSt;
 
-    emit StateUpdate();
+    emit s_stateUpdate();
 }
 
 //------------------------------------------------------------------------------
@@ -359,7 +367,7 @@ void ElectroEngine::CheckStateREVERSE1KM()
     if(tmpSt != _nowState) {
         _prevState = tmpSt;
     }
-    emit StateUpdate();
+    emit s_stateUpdate();
 }
 //------------------------------------------------------------------------------
 void ElectroEngine::CheckStateREVERSE2KM()
@@ -371,8 +379,8 @@ void ElectroEngine::CheckStateREVERSE2KM()
         else {
             _nowState = EngToForvard;
             /*TEST*/if(KMforward->isImit() && startForward->isImit()) QTimer::singleShot(1000, [ this ]() {
-                this->KMforward->writeImitVal(true);
-            });///
+                    this->KMforward->writeImitVal(true);
+                });///
         }
     }
     else if((!startForward->isOn()) && startBackward->isOn()) {
@@ -380,8 +388,8 @@ void ElectroEngine::CheckStateREVERSE2KM()
         else {
             _nowState = EngToBackward;
             /*TEST*/if(KMbackward->isImit() && startBackward->isImit()) QTimer::singleShot(1000, [ this ]() {
-                this->KMbackward->writeImitVal(true);
-            });///
+                    this->KMbackward->writeImitVal(true);
+                });///
         }
     }
     else if((!startBackward->isOn()) && !startForward->isOn()) {
@@ -389,8 +397,8 @@ void ElectroEngine::CheckStateREVERSE2KM()
             if(_nowState == EngForvard || _nowState == EngToForvard) {
                 _nowState = EngToStopForward;
                 /*TEST*/if(KMforward->isImit() && startForward->isImit()) QTimer::singleShot(1000, [ this ]() {
-                    this->KMforward->writeImitVal(false);
-                });///
+                        this->KMforward->writeImitVal(false);
+                    });///
             }
             else _nowState = EngManualForward;
         }
@@ -398,8 +406,8 @@ void ElectroEngine::CheckStateREVERSE2KM()
             if(_nowState == EngBackward || _nowState == EngToBackward) {
                 _nowState = EngToStopBackward;
                 /*TEST*/if(KMbackward->isImit() && startBackward->isImit()) QTimer::singleShot(1000, [ this ]() {
-                    this->KMbackward->writeImitVal(false);
-                });///
+                        this->KMbackward->writeImitVal(false);
+                    });///
             }
             else _nowState = EngManualBackward;
         }
@@ -418,7 +426,7 @@ void ElectroEngine::CheckStateREVERSE2KM()
 
     if(tmpSt != _nowState)
         _prevState = tmpSt;
-    emit StateUpdate();
+    emit s_stateUpdate();
 }
 //------------------------------------------------------------------------------
 

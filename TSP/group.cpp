@@ -35,21 +35,22 @@ Quality Group::readQuality()
 void Group::update(bool updateTime)
 {
     static Quality newQuality;
+    if(listOfTags.count()){
+        updateFreq = listOfTags[0]->updateFreq;//TODO Дич. Переписать.
+        newQuality = listOfTags[0]->readQuality();
 
-    updateFreq = listOfTags[0]->updateFreq;
-    newQuality = listOfTags[0]->readQuality();
+        for(int i = 1; i < listOfTags.count(); i++) {
 
-    for(int i = 1; i < listOfTags.count(); i++) {
+            if (newQuality != Check && listOfTags[i]->readQuality() != newQuality){
+                newQuality = Check;
+            }
 
-        if (newQuality != Check && listOfTags[i]->readQuality() != newQuality){
-            newQuality = Check;
+            if(listOfTags[i]->updateFreq < updateFreq)
+                updateFreq = listOfTags[i]->updateFreq;
         }
 
-        if(listOfTags[i]->updateFreq < updateFreq)
-            updateFreq = listOfTags[i]->updateFreq;
+        setQuality(newQuality);
     }
-
-    setQuality(newQuality);
     if(updateTime)
         lastUpdate = QDateTime::currentDateTime();
     emit s_onUpdated();
@@ -78,8 +79,8 @@ void Group::setQuality(Quality quality)
     if(this->quality != quality){
         this->quality = quality;
         emit s_logging(MessVerbose, QDateTime::currentDateTime(),
-                        false, this->objectName(), "Group quality s_valueChd: "
-                        + Prom::qualityToString(quality));
+            false, this->objectName(), "Group quality s_valueChd: "
+                + Prom::qualityToString(quality));
         emit s_onQualityChanged();
     }
 }

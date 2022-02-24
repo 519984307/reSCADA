@@ -25,6 +25,7 @@ public:
     ~Tag();
     //variables
     int id;
+    QVariant  getValue() const {return value;};
     QString address;
     int virtualRand;
     int virtualBit;

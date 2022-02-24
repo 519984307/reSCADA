@@ -12,7 +12,7 @@ Rectangle {
     property  alias nameText: nameText
 
     property bool checkable: false
-    property bool checked: false
+    property bool checked: true
     property alias pressed: mA.pressed
     property color unPressCheckColor: Fap.buttonsBackground
     property color pressCheckColor: Qt.hsla(unPressCheckColor.hslHue,
@@ -27,12 +27,24 @@ Rectangle {
     onCheckableChanged: renewColor()
     onPressCheckColorChanged: renewColor()
     onUnPressCheckColorChanged: renewColor()
-    signal s_chackedUserChanged(variant Chacked)
+    onPressedChanged: renewColor()
+    signal s_checkedUserChanged(variant Checked)
+    signal s_on()
+    signal s_off()
+    function on(){
+        checked = true
+        color = pressCheckColor
+    }
+    function off(){
+        checked = false
+        color = unPressCheckColor
+    }
     function renewColor(){
         if( checkable ){
             if( checked ) color = pressCheckColor
             else color = unPressCheckColor
         }
+        else if( pressed )color = pressCheckColor
         else color = unPressCheckColor
     }
 
@@ -60,14 +72,20 @@ Rectangle {
         onExited: border.width--
         onClicked: {
             if((mouse.button & Qt.LeftButton) && checkable) {
-                checked = !checked
-                s_chackedUserChanged(checked)
+                //checked = !checked
+                s_checkedUserChanged(!checked)
+                if( checked )
+                    s_on()
+                else
+                    s_off()
             }
         }
         onPressedChanged: {
             if( !checkable ){
-                if( pressed )color = pressCheckColor
-                else color = unPressCheckColor
+                if(pressed)
+                    s_on();
+                else
+                    s_off();
             }
         }
     }

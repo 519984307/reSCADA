@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.15
 import "fap.js" as Fap
 
-UnitPropItem {
+StartStopUnit {
     id: fan
     width: 30
     height: 30
@@ -12,60 +12,12 @@ UnitPropItem {
     property alias textX: fanName.x
     property alias textY: fanName.y
 
-    property bool st: false
-    property bool std: false
-    property bool manual: false
-    property bool cleaning: false
-
-    signal start
-    signal stop
-    signal addToCurrentRoteStarted
-    signal addToCurrentRoteStoped
-
-    function started() {
-        startComand()
-        std = true
-        manual = false
-        cleaning = false
-        backgroundColor = "Green"
-    }
-    function stoped() {
-        stopComand()
-        std = false
-        manual = false
-        cleaning = false
-        backgroundColor = Fap.ready
-    }
-    function startComand() {
-        st = true
-        manual = false
-        cleaning = false
-        backgroundColor = "Lime"
-    }
-    function stopComand() {
-        st = false
-        manual = false
-        cleaning = false
-        backgroundColor = "Lime"
-    }
-    function manualWork() {
-        manual = true
-        backgroundColor = "Gold"
-    }
-
-    function cleaningWork() {
-        cleaning = true
-    }
-
-    onStChanged: canvas.requestPaint()
-    onStdChanged: canvas.requestPaint()
-    onAlarmChanged: canvas.requestPaint()
-    onAlarmNotifyChanged: canvas.requestPaint()
-    onNotifyChanged: canvas.requestPaint()
-    onBlockedChanged: canvas.requestPaint()
-    onLinkedChanged: canvas.requestPaint()
-    onManualChanged: canvas.requestPaint()
-
+//    onStChanged: canvas.requestPaint()
+//    onStdChanged: canvas.requestPaint()
+//    onManualChanged: canvas.requestPaint()
+    onBorderCurrentWidthChanged: canvas.requestPaint()
+    onBorderCurrentColorChanged: canvas.requestPaint()
+    onBackgroundCurrentColorChanged:canvas.requestPaint()
 
     Canvas {
         id: canvas
@@ -115,20 +67,21 @@ UnitPropItem {
         acceptedButtons: Qt.RightButton | Qt.LeftButton
         onDoubleClicked: {
             if (st)
-                stop()
+                s_stop()
             else
-                start()
+                s_start()
         }
         onClicked: {
             alarmNotify = false;
             if (mouse.button & Qt.RightButton) {
-                openSettings()}
-            else if(mouse.modifiers & Qt.ShiftModifier){
-                addToCurrentRoteStoped()
+                openSettings()
             }
-            else if(mouse.modifiers & Qt.ControlModifier){
-                addToCurrentRoteStarted()
-            }
+            //            else if(mouse.modifiers & Qt.ShiftModifier){
+            //                addToCurrentRoteStoped()
+            //            }
+            //            else if(mouse.modifiers & Qt.ControlModifier){
+            //                addToCurrentRoteStarted()
+            //            }
         }
     }
 }
@@ -138,4 +91,3 @@ Designer {
     D{i:0;height:55;width:56}
 }
 ##^##*/
-

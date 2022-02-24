@@ -164,8 +164,8 @@ RectificationColumn0 {
         width: parent.pipePassThin
         visible: parent.fullView
         anchors.top: cl2.bottom
-        anchors.bottom: ang90_1.top
-        anchors.bottomMargin: 12
+        anchors.bottom: parent.top
+        anchors.bottomMargin: -18
         anchors.horizontalCenter: cl2.horizontalCenter
         nActiveColor: parent.pipePassColor
         borderWidth: parent.pipePassBorderWidth
@@ -629,6 +629,6 @@ RectificationColumn0 {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:2}D{i:24}
+    D{i:0;formeditorZoom:2}
 }
 ##^##*/

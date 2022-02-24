@@ -188,7 +188,7 @@ Window {
             pressCheckColor: "gray"
             unPressCheckColor: "#8afda6"
             nameText.text: "Вкл"
-            onS_chackedUserChanged: s_manOn(Chacked)
+            onS_checkedUserChanged: s_manOn(Checked)
             onCheckedChanged: {
                 if (checked)
                     nameText.text = "ОТКЛ"

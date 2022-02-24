@@ -21,7 +21,6 @@ Window {
     property color mainColor: "#a3fa96"
     property color scaleColor: "#1a6b14"
 
-
     //signal minRangeChanged(int value)
     //signal maxRangeChanged(int value)
     //signal valueChanged   (int value)
@@ -76,6 +75,7 @@ Window {
         anchors.left: parent.horizontalCenter
         anchors.right: parent.right
         anchors.top: textWrkDp.bottom
+        mantissa: 2
         correctingButtons: true
         //onValueRealChanged: maxRangeChanged(valueReal)
         limited: true
@@ -94,6 +94,7 @@ Window {
         anchors.left: parent.left
         anchors.right: parent.horizontalCenter
         anchors.top: textWrkDp.bottom
+        mantissa: 2
         correctingButtons: true
         //onValueRealChanged: minRangeChanged(valueReal)
         limited: true
@@ -168,6 +169,7 @@ Window {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: textLvl.bottom
+        mantissa: 3
         correctingButtons: true
         //onValueRealChanged: valueChanged(valueReal)
         limited: true

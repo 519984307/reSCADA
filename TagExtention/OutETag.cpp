@@ -82,38 +82,39 @@ bool OutETag::setValue(QVariant Value, bool notImit)
         _logging(Prom::MessAlarm, "значение - "+ QString::number(Value.toDouble()) + " уже установлено", false);
         return true;
     }
-    //    static QVariant convVal;
-    //    switch (_conv) {
-    //    case Prom::VCNo :
-    //        convVal = Value;
-    //        break;
-    //    case Prom::VCFloatInIntToDouble :
-    //        convVal =  QVariant(Value.toDouble() * 10).toInt();
-    //        break;
-    //    case Prom::VCFloat3InIntToDouble3 :
-    //        convVal =  QVariant(Value.toDouble() * 1000).toInt();
-    //        break;
-    //    }
-    //    if( ! _tag->writeValue(convVal)){
-    //        _logging(Prom::MessAlarm, "TSP отказал в установке значения - " + QString::number(Value.toDouble()), _imit);
-    //        emit s_valueChd(_value);
-    //        return false;
-    //    }
-    //    setTimerStart();
-    //    _setedValue = Value;
-    //    if(_setType == Prom::PreSet){
-    //        //_value = Value;
-    //        if(_preValue != _value){
-    //            _preValue = _value;
-    //            if(_owner->ini && saveValue){
-    //                _owner->ini->setValue(_owner->tagPrefix+ "/" + _DBName + ".value", _value);
-    //            }
-    //            emit s_valueChd(Value);
-    //        }
-    //    }
-    //    if(! _pulse){
-    //        _logging(Prom::MessChangeSensor,"установлено значение - " + QString::number(Value.toDouble()), _imit);
-    //    }
+        static QVariant convVal;
+        switch (_conv) {
+        case Prom::VCNo :
+            convVal = Value;
+            break;
+        case Prom::VCdiv10:
+            convVal =  QVariant(Value.toDouble() * 10).toInt();
+            break;
+        case Prom::VCdiv1000 :
+            convVal =  QVariant(Value.toDouble() * 1000).toInt();
+            break;
+        }
+         _logging(Prom::MessAlarm, "СУКА!!! - из " + QString::number(_preValue.toDouble())+" в "+ QString::number(Value.toDouble()), _imit);
+//        if( ! _tag->writeValue(convVal)){
+//            _logging(Prom::MessAlarm, "TSP отказал в установке значения - " + QString::number(Value.toDouble()), _imit);
+//            emit s_valueChd(_value);
+//            return false;
+//        }
+        setTimerStart();
+        _setedValue = Value;
+        if(_setType == Prom::PreSet){
+            //_value = Value;
+            if(_preValue != _value){
+                _preValue = _value;
+                if(_owner->ini && saveValue){
+                    _owner->ini->setValue(_owner->tagPrefix+ "/" + _DBName + ".value", _value);
+                }
+                emit s_valueChd(Value);
+            }
+        }
+        if(! _pulse){
+            _logging(Prom::MessChangeSensor,"установлено значение - " + QString::number(Value.toDouble()), _imit);
+        }
 
     return true;
 }
@@ -204,7 +205,7 @@ void OutETag::_qualityChangedSlot()
                 _checkVal();
             }
         }
-        else setValue(_setedValue, true);
+        //else setValue(_setedValue, true);
     }
 }
 

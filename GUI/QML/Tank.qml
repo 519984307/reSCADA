@@ -3,19 +3,20 @@ import QtGraphicalEffects 1.15
 
 Item {
     id: contItem
-    width: 80
-    height: 200
+    width: 50
+    height:200
+
     property alias levelText: levelDig
-    property alias levelTextBottMarg: levelDig.anchors.bottomMargin
-    property alias levelTextHorOffset: levelDig.anchors.horizontalCenterOffset
+    property int levelTextBottMarg: radius + seam2.height
+    property int levelTextHorOffset: 0
     property alias mfuAlarmTopLevel: mfuAlarmTopLevel
-    property int radius: 30
+    property int radius: 10
     property real level: 80
     property real levelRatio: 0.8
     property alias nameText: nameText
     property alias nameTextPixSize: nameText.font.pixelSize
-    property alias nameTextHorOffset: nameText.anchors.horizontalCenterOffset
-    property int nameBottMargin: height * 0.4
+    property int nameBottMarg: height * 0.3
+    property int nameTextHorOffset: 0
     property bool showSeam: true
     property bool showLevel: true
     property int borderWidth: 2
@@ -160,29 +161,39 @@ Item {
     }
     Text {
         id: nameText
-        width: parent.width * 0.9
-        anchors.bottom: parent.bottom
+        width:  parent.width* 0.85
+        height: parent.width
+
+        font.pixelSize: 300
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        text: qsTr("ЁМКОСТЬ")
+        text: "ЁМКОСТЬ"
         font.bold: true
         wrapMode: Text.WordWrap
-        anchors.horizontalCenterOffset: 0
+        minimumPixelSize: 4
+        fontSizeMode: Text.Fit
+        anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottomMargin: parent.nameBottMargin
-        minimumPixelSize: 1
+        anchors.bottomMargin: parent.nameBottMarg
+        anchors.horizontalCenterOffset: parent.nameTextHorOffset
+
     }
     Text {
         id: levelDig
         text: "<b>" + contItem.level +"</b>" + postfix
-        anchors.bottom: parent.bottom
+
+        font.pixelSize: 300
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        anchors.horizontalCenterOffset: 0
-        //anchors.bottomMargin: parent.height * levelRatio - height
-        anchors.horizontalCenter: parent.horizontalCenter
-        maximumLineCount: 0
+
+        minimumPixelSize: 5
         fontSizeMode: Text.Fit
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottomMargin:     parent.levelTextBottMarg
+        anchors.horizontalCenterOffset: parent.levelTextHorOffset
+        width:  parent.width* 0.85
+        height: Math.max(parent.height* 0.1, parent.width* 0.3)
         visible: showLevel
     }
     Rectangle {
@@ -294,7 +305,7 @@ Item {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:1.75}
+    D{i:0;formeditorZoom:3}
 }
 ##^##*/
 

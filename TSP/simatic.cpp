@@ -153,13 +153,16 @@ inline void SimaticDriver::createReadTasks()
           if( address->DBNumb == task->DBNumb // DB совпадает
               && address->memArea == task->memArea// и обл. памяти совпадает
               && (task->memArea == S7AreaDB ? true : address->type == task->type)// и тип совпадает
-              && group->listOfTags.at(i)->getQuality() == Good//и тег уже успешно опрашивался
+              //&& group->listOfTags.at(i)->getQuality() == Good//и тег уже успешно опрашивался
               && task->regAddr.memSlot + group->optimRangeMax//и адрес не очень далеко от 1-го тэга в задаче.
                    >= address->regAddr.memSlot) {
             task->listOfTags.append(group->listOfTags.at(i));//Добавление тэга в задачу.
           }
           else{//иначе завершаем группу
             i--;//Шаг назад, чтобы начать с текущего тэга новую задачу.
+            if(task->listOfTags.count()>1 && task->type == S7WLBit ){
+                task->type = S7WLByte;
+            }
             task = nullptr;
           }
         }
@@ -200,10 +203,10 @@ inline int amtFromType( SimAddress *lastTagAdr, SimaticDriver::Task *task )
     return  (lastTagAdr->regAddr.memSlot - task->regAddr.memSlot)
            + dataSizeByte(lastTagAdr->type);
   }
-  else if( task->type == S7WLBit ){
-    return 1 + (lastTagAdr->regAddr.memSlot - task->regAddr.memSlot ) * 8
-           + lastTagAdr->regAddr.bit - task->regAddr.bit;
-  }
+  //Запрашивать отдельные биты группами нельзя поэтому убрал этот кусок
+//  else if( task->listOfTags.count() == 1 && task->type == S7WLBit && task->memArea == S7AreaMK){
+//    return 1 + (lastTagAdr->regAddr.memSlot - task->regAddr.memSlot ) * 8 + lastTagAdr->regAddr.bit - task->regAddr.bit;
+//  }
   else{
     return 1 + lastTagAdr->regAddr.memSlot - task->regAddr.memSlot;// +1 т.к. включая начальный элемент
   }
@@ -235,10 +238,15 @@ void SimaticDriver::read( SimaticDriver::Task *task )
         SimAddress * tagAdr = static_cast<SimAddress*>(tag->speshData);
 
         switch (tagAdr->type) {
-          case S7WLBit:
-            tag->setValue( GetBitAt( data, offsetBuff,
-                                   tagAdr->regAddr.bit ) );
-            break;
+        case S7WLBit:
+            if(task->type == S7WLBit){
+                tag->setValue( GetBitAt( data, offsetBuff, 0 ) );
+            }
+            else{
+                tag->setValue( GetBitAt( data, offsetBuff,
+                    tagAdr->regAddr.bit ) );
+              }
+              break;
           case S7WLByte:
             tag->setValue( GetByteAt( data,offsetBuff) );
             break;

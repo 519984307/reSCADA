@@ -94,6 +94,7 @@ bool ETag::connected()
 //------------------------------------------------------------------------------
 void ETag::reInitialise()
 {
+
     if(_owner && _owner->sensorsConnected() != connected() )
         emit s_qualityChd(connected());
     emit s_valueChd(value());
@@ -103,7 +104,7 @@ void ETag::reInitialise()
     emit s_setDelayChd(_setTimer->interval() / 1000);
     emit s_pulseDelayChd(_pulseTimer->interval() / 1000);
     if(_alarm)
-        emit s_alarm("повторный сигнала аварии, в связи с принудительным обновлением состояния");
+        emit s_alarm("повторный сигнала аварии, при принудительном обновлении состояния");
     else
         emit s_alarmReseted();
     emit s_liveValueChd(_value);
@@ -127,7 +128,9 @@ void ETag::_qualityChangedSlot()
     if(_tag->readQuality() == Prom::Good){
         emit s_qualityChd(true);
         _logging (Prom::MessAlarm, "соединение восстановлено", false);
+        //reInitialise(); незагруженные теги проямляли неопределённость при имитации но пофиг на них: они ж не загруженные
         if(!_imit){
+            _acceptValue(_tag->getValue());
             _logValChange();
             _timeLog.start();
         }

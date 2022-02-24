@@ -124,9 +124,9 @@ UnitPropItem {
                     pidPTop.show()
                 }
             }
-            onS_chackedUserChanged: {
-                s_manTopOn(Chacked)
-                pidPTop.s_manOn(Chacked)
+            onS_checkedUserChanged: {
+                s_manTopOn(Checked)
+                pidPTop.s_manOn(Checked)
             }
         }
     }
@@ -207,7 +207,7 @@ UnitPropItem {
                     pidPBott.show()
                 }
             }
-            onS_chackedUserChanged: pidPBott.s_manOn(Chacked)
+            onS_checkedUserChanged: pidPBott.s_manOn(Checked)
         }
     }
     AnalogSignalVar2 {

@@ -20,7 +20,7 @@ class ElectroEngine : public QObject
     Q_OBJECT
 
 public:
-    explicit ElectroEngine(Unit *Owner, std::vector<QString> SensorsNames, QString MultiEnginePrefix = "");
+    explicit ElectroEngine(Unit *Owner, std::vector<QString> SensorsNames, QString MultiEnginePrefix = "", char Option = Prom::ALL_8OPT_ON);
 
     bool StartForward();
     bool StartBackward();
@@ -35,7 +35,7 @@ public:
     InDiscretETag * KM = nullptr;
     InDiscretETag * KMforward = nullptr;
     InDiscretETag * KMbackward = nullptr;
-    InDiscretETag * QK = nullptr;
+    InDiscretETag * QF = nullptr;
     //bool isOperable() const { return operable; }
     QString AlarmDescription() const { return _alarmDescription; }
     bool isAlarm() const { return _alarm; }
@@ -49,8 +49,8 @@ protected:
     bool _alarm = false;
 
 signals:
-    void StateUpdate();
-    void Alarm(QString);
+    void s_stateUpdate();
+    void s_alarm(QString);
 
 //public slots:
     //void CheckState();

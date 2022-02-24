@@ -11,7 +11,8 @@ OneEngRouteUnit::OneEngRouteUnit(Prom::UnitType Type,
                                   bool Mover,
                                   std::vector<QString> EngSensorNames,
                                   bool BlockedStop,
-                                  Prom::UnitModes SaveMode)
+                                  Prom::UnitModes SaveMode,
+                                  char Option)
     : EngRouteUnit(Type,
                     Id,
                     Name,
@@ -21,9 +22,9 @@ OneEngRouteUnit::OneEngRouteUnit(Prom::UnitType Type,
                     BlockedStop,
                     SaveMode)
 {
-    _engine = new ElectroEngine(this , EngSensorNames);
-    connect(_engine, &ElectroEngine::Alarm, this, &Unit::detectAlarm, Qt::QueuedConnection);
-    connect(_engine, &ElectroEngine::StateUpdate, this, &Unit::updateState , Qt::QueuedConnection);
+    _engine = new ElectroEngine(this , EngSensorNames, "", Option);
+    connect(_engine, &ElectroEngine::s_alarm, this, &Unit::detectAlarm, Qt::QueuedConnection);
+    connect(_engine, &ElectroEngine::s_stateUpdate, this, &Unit::updateState , Qt::QueuedConnection);
 }
 
 //------------------------------------------------------------------------------
