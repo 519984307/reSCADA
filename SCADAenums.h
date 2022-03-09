@@ -27,6 +27,7 @@ const  char KM_ALARM_ON =     0b00000001; // шестнадцатеричный 
 
 enum UnitModes {
     UnMdNoDef = 0,
+    UnMdCantHaveMode,
     UnMdStop,
     UnMdCollingStop,
     UnMdStart,
@@ -165,7 +166,8 @@ enum UnitType {
     TypeCombustor,
     TypeDruer,
     TypeRectnColumn,
-    TypePump
+    TypePump,
+    TypeCommonTags
 };
 Q_ENUM_NS(UnitType)
 
@@ -220,7 +222,9 @@ Q_ENUM_NS(SetModeResp)
 enum ETagValConv{
     VCNo,
     VCdiv10, //Число с плавающей точкой закодировано в целом числе - последний разряд десятые доли (256 = 25,6), преобразуем в обычное с плавающей точкой
-    VCdiv1000
+    VCdiv100,
+    VCdiv1000,
+    VCmul100
 };
 Q_ENUM_NS(ETagValConv)
 

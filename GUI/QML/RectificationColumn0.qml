@@ -30,7 +30,8 @@ UnitPropItem {
     property int pipeBorderWidth: 1
     property color indicColor: "gray"
 
-    property bool fullView: true
+    property bool adminView: false
+
     signal s_manTopOn(variant ManOn)
     backgroundColor: "#d3d3d3"
 
@@ -147,6 +148,7 @@ UnitPropItem {
         kdRow.visible: false
         onManOnOffChanged: sbPTop.checked = manOnOff
         Component.onCompleted: sbPTop.checked = manOnOff
+        adminView: parent.adminView
     }
 
     PID_Win{
@@ -164,6 +166,7 @@ UnitPropItem {
         mfuKiOut.visible: false
         mfuKdOut.visible: false
         kdRow.visible: false
+        adminView: parent.adminView
         onManOnOffChanged: { sbPrButt.checked = manOnOff }
         Component.onCompleted: sbPrButt.checked = manOnOff
     }
@@ -213,8 +216,7 @@ UnitPropItem {
     AnalogSignalVar2 {
         id: tWater
         objectName: "tWater"
-        x: -115
-        y: -72
+        y: -123
         width:  indicWidth
         height: indicHeigth
         anchors.right: parent.left

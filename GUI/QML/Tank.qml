@@ -13,6 +13,7 @@ Item {
     property int radius: 10
     property real level: 80
     property real levelRatio: 0.8
+    property int levelMantissa: 1
     property alias nameText: nameText
     property alias nameTextPixSize: nameText.font.pixelSize
     property int nameBottMarg: height * 0.3
@@ -34,7 +35,7 @@ Item {
 
     signal s_enableMouseArea( bool Enable)
     function setLevel( Level ) {
-        level = Level.toFixed(1)
+        level = Level.toFixed(levelMantissa)
     }
     function setAlarmLevelTop(value) { mfuAlarmTopLevel.setValue(value) }
     function setAlarmLevelBottom(value) {mfuAlarmBottomLevel.setValue(value) }

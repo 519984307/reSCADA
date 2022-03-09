@@ -37,10 +37,10 @@ signals:
     //void SendDispName( QString dispName );
 
 public slots:
-    void AddToCurrentRoteFull()  { _AddToCurrentRoute( Prom::UnMdFull );  }//для визуализации
-    void AddToCurrentRoteMidle() { _AddToCurrentRoute( Prom::UnMdMidle ); }//для визуализации
-    void AddToCurrentRoteLow()   { _AddToCurrentRoute( Prom::UnMdLow );   }//для визуализации
-    void AddToCurrentRoteEmpty() { _AddToCurrentRoute( Prom::UnMdEmpty ); }//для визуализации
+    void AddToCurrentRoteFull()  { _addToCurrentRoute( Prom::UnMdFull );  }//для визуализации
+    void AddToCurrentRoteMidle() { _addToCurrentRoute( Prom::UnMdMidle ); }//для визуализации
+    void AddToCurrentRoteLow()   { _addToCurrentRoute( Prom::UnMdLow );   }//для визуализации
+    void AddToCurrentRoteEmpty() { _addToCurrentRoute( Prom::UnMdEmpty ); }//для визуализации
 
     //void _CleanTimeEnd()override{}
 protected slots:

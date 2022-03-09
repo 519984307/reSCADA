@@ -70,7 +70,8 @@ void PromObject::addUnit(Unit * Un)
         _units.append(Un);
         //connect(this, SIGNAL(GlobalRescanSig()),       Un,   SLOT(RescanUnit()),  Qt::QueuedConnection);
         connect(this, SIGNAL(s_globalRestAlarm()),       Un,   SLOT(resetAlarm()),  Qt::QueuedConnection);
-        connect(Un, &Unit::s_alarm, this, &PromObject::alarmDo,  Qt::QueuedConnection);
+        connect(Un, &Unit::s_quitAlarm,  this, &PromObject::s_alarm,  Qt::QueuedConnection);
+        connect(Un, &Unit::s_quitAlarm,  this, &PromObject::alarmDo,  Qt::QueuedConnection);
         connect(Un, &Unit::s_loggingSig, this, &PromObject::Logging,  Qt::QueuedConnection);
 
         if(Un->unitType != Prom::TypePLC
@@ -336,9 +337,14 @@ void PromObject::UpdateRouteName(int id, QString name)
 }
 
 //------------------------------------------------------------------------------
-void PromObject::ShowTags()
+void PromObject::showTags()
 {
     _tspWin->show();
+}
+//------------------------------------------------------------------------------
+void PromObject::closeTags()
+{
+    _tspWin->close();
 }
 //------------------------------------------------------------------------------
 void PromObject::init()
@@ -346,7 +352,8 @@ void PromObject::init()
     connect(_gui, SIGNAL(test()),             this, SLOT(  alarmDo()),           Qt::QueuedConnection);
     connect(_gui, SIGNAL(stop()),             this, SLOT(  UserGlobalStop()),    Qt::QueuedConnection);
     connect(_gui, SIGNAL(globalResetAlarm()), this, SIGNAL(s_globalRestAlarm()), Qt::QueuedConnection);
-    connect(_gui, SIGNAL(showTags()),         this, SLOT(  ShowTags()),          Qt::QueuedConnection);
+    connect(_gui, SIGNAL(s_showTags()),         this, SLOT(  showTags()),          Qt::QueuedConnection);
+    connect(_gui, SIGNAL(s_closeTags()),         this, SLOT( closeTags()),          Qt::QueuedConnection);
     connect(this, SIGNAL(s_loaded()),         _gui, SLOT(  checkLoaded()),       Qt::QueuedConnection);
 
     connect(this, &PromObject::s_setCurrentRoute, this,  &PromObject::SetCurrentRoute);

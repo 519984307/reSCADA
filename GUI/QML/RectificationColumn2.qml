@@ -85,10 +85,11 @@ RectificationColumn0 {
         y: -32
         height: parent.pipePassThin
         anchors.verticalCenter: cl1.verticalCenter
-        anchors.left: cl1.right
+        anchors.left: cl1.horizontalCenter
         anchors.right: upAng.left
+        anchors.verticalCenterOffset: 26
         anchors.rightMargin: 0
-        anchors.leftMargin: -3
+        anchors.leftMargin: 0
         borderWidth: parent.pipePassBorderWidth
         nActiveColor: parent.pipePassColor
         z: 0
@@ -100,7 +101,7 @@ RectificationColumn0 {
         height: 10
         anchors.left: parent.right
         anchors.top: pipe1.top
-        anchors.leftMargin: 0
+        anchors.leftMargin: 3
         anchors.topMargin: 0
         nActiveColor: parent.pipePassColor
         pipeThin: parent.pipePassThin
@@ -199,19 +200,19 @@ RectificationColumn0 {
         borderWidth: parent.pipePassBorderWidth
     }
 
-    Pipe {
-        id: pipe3
-        height: parent.pipePassThin
-        anchors.left: parent.right
-        anchors.right: pipeAngBot6.left
-        anchors.top: parent.top
-        anchors.topMargin: parent.tank.radius
-        anchors.rightMargin: 0
-        anchors.leftMargin: 0
-        nActiveColor: parent.pipePassColor
-        z: 0
-        borderWidth: parent.pipePassBorderWidth
-    }
+//    Pipe {
+//        id: pipe3
+//        height: parent.pipePassThin
+//        anchors.left: parent.right
+//        anchors.right: pipeAngBot6.left
+//        anchors.top: parent.top
+//        anchors.topMargin: parent.tank.radius
+//        anchors.rightMargin: 0
+//        anchors.leftMargin: 0
+//        nActiveColor: parent.pipePassColor
+//        z: 0
+//        borderWidth: parent.pipePassBorderWidth
+//    }
 
     Rectangle {
         id: cl3
@@ -231,8 +232,10 @@ RectificationColumn0 {
         y: -32
         height: parent.pipePassThin
         anchors.verticalCenter: cl3.verticalCenter
-        anchors.left: cl3.right
+        anchors.left: cl3.horizontalCenter
         anchors.right: upAng10.left
+        anchors.verticalCenterOffset: 26
+        anchors.leftMargin: 0
         nActiveColor: parent.pipePassColor
         z: 0
         borderWidth: parent.pipePassBorderWidth
@@ -334,6 +337,7 @@ RectificationColumn0 {
     }
     Rectangle {
         id: cl2
+        y: -26
         width: colder.width
         height: width
         color: backgroundColor
@@ -341,7 +345,8 @@ RectificationColumn0 {
         border.width: parent.borderWidth / 2
         anchors.left: colder.right
         anchors.bottom: colder.bottom
-        anchors.leftMargin: parent.pipePassThin
+        anchors.bottomMargin: 0
+        anchors.leftMargin: 20
         z: 1
     }
     Pipe {
@@ -376,14 +381,15 @@ RectificationColumn0 {
         borderWidth: parent.pipeBorderWidth
         z: 0
     }
-    PipeAngle90 {
+    PipeAngle180{
         id: pipeOutWtrAng1
-        x: 157
-        y: -39
-        width: 7
-        height: 7
+        x: 109
+        y: -2
+        width: 26
+        height: 13
         anchors.right: pipeOutWtr3.right
         anchors.bottom: pipeOutWtr6.bottom
+        anchors.rightMargin: 0
         nActiveColor: parent.pipeOutWaterColor
         pipeThin: parent.pipeOutWaterThin
         borderWidth: parent.pipeBorderWidth
@@ -413,17 +419,6 @@ RectificationColumn0 {
         borderWidth: parent.pipeBorderWidth
         horOrVert: false
         z: 0
-    }
-    Pipe {
-        id: pipeOutWtr6
-        y: -35
-        height: parent.pipeOutWaterThin
-        anchors.verticalCenter: colder.verticalCenter
-        anchors.left: colder.right
-        anchors.right: pipeOutWtrAng1.left
-        anchors.verticalCenterOffset: -5
-        nActiveColor: parent.pipeOutWaterColor
-        borderWidth: parent.pipeBorderWidth
     }
     PipeAngle90 {
         id: pipeAngBot6
@@ -577,9 +572,9 @@ RectificationColumn0 {
     Pipe {
         id: pipeOutWtr81
         width: parent.pipeOutWaterThin
+        height: 60
         visible: parent.fullView
         anchors.left: upAng11.left
-        anchors.top: cl1.verticalCenter
         anchors.bottom: upAng11.top
         z: 0
         horOrVert: false
@@ -587,7 +582,6 @@ RectificationColumn0 {
         anchors.bottomMargin: 0
         borderWidth: parent.pipeBorderWidth
         anchors.leftMargin: 0
-        anchors.topMargin: 0
     }
 
     PipeAngle180 {
@@ -622,15 +616,14 @@ RectificationColumn0 {
     Pipe {
         id: pipeOutWtr91
         width: parent.pipeOutWaterThin
+        height: 10
         visible: parent.fullView
         anchors.left: upAng21.left
         anchors.top: upAng21.bottom
-        anchors.bottom: upAng11.top
         z: 0
         horOrVert: false
         nActiveColor: parent.pipeOutWaterColor
         rotation: 0
-        anchors.bottomMargin: 0
         borderWidth: parent.pipeBorderWidth
         anchors.leftMargin: 0
         anchors.topMargin: 0
@@ -656,24 +649,68 @@ RectificationColumn0 {
     RegulValveUnit {
         id: regulValveWater
         name: root.name + ".КВ"
-        x: 68
+        x: 111
         width: 20
         height: 20
         anchors.top: parent.top
+        anchors.topMargin: vWaterTopMarg
         regValve.substanceColor: pipeOutWaterColor
         z: 10
         regValve.position: 30
         objectName: root.objectName + ".vWater"
-        anchors.topMargin: vWaterTopMarg
         regValve.nameOnTop: true
-        anchors.horizontalCenter: cl2.horizontalCenter
         regValve.nameOnLeft: false
         regValve.nameTextPixSize: parent.valveNameSize
+    }
+
+    Pipe {
+        id: pipe3
+        height: parent.pipePassThin
+        visible: parent.fullView
+        anchors.left: parent.right
+        anchors.right: pipeAngBot6.left
+        anchors.top: parent.top
+        z: 0
+        nActiveColor: parent.pipePassColor
+        anchors.rightMargin: 0
+        borderWidth: parent.pipePassBorderWidth
+        anchors.topMargin: 23
+        anchors.leftMargin: 8
+    }
+
+    PipeAngle90 {
+        id: pipeAngBot7
+        width: 6
+        height: 6
+        visible: parent.fullView
+        anchors.left: parent.left
+        anchors.top: parent.top
+        nActiveColor: parent.pipePassColor
+        pipeThin: parent.pipePassThin
+        borderWidth: parent.pipePassBorderWidth
+        rotation: 270
+        anchors.topMargin: 15
+        anchors.leftMargin: 70
+    }
+
+    PipeAngle90 {
+        id: pipeAngBot8
+        width: 6
+        height: 6
+        visible: parent.fullView
+        anchors.left: parent.left
+        anchors.top: parent.top
+        nActiveColor: parent.pipePassColor
+        pipeThin: parent.pipePassThin
+        borderWidth: parent.pipePassBorderWidth
+        rotation: 90
+        anchors.topMargin: 21
+        anchors.leftMargin: 72
     }
 }
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:1.66}
+    D{i:0;formeditorZoom:8}
 }
 ##^##*/

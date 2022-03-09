@@ -37,8 +37,8 @@ signals:
 
 public slots:
 
-    void AddToCurrentRoteNeedUnload() { _AddToCurrentRoute( Prom::UnMdNeedUnload ); }
-    void AddToCurrentRoteNeedLoad()   { _AddToCurrentRoute( Prom::UnMdNeedLoad ); }
+    void AddToCurrentRoteNeedUnload() { _addToCurrentRoute( Prom::UnMdNeedUnload ); }
+    void AddToCurrentRoteNeedLoad()   { _addToCurrentRoute( Prom::UnMdNeedLoad ); }
     void _updateStateAndMode() override;
 
 protected slots:

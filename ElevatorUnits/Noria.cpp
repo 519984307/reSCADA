@@ -48,7 +48,7 @@ void Noria::_alarmDo()
         }
     }
     _routeCommand =  Prom::RtCmNo;
-    emit InformToRoute( this, Prom::RtCmNo, Prom::RtUnAlarm );
+    emit s_informToRoute( this, Prom::RtCmNo, Prom::RtUnAlarm );
 }
 
 //------------------------------------------------------------------------------

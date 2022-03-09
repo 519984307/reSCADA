@@ -23,6 +23,7 @@ class Log : public QObject
 public:
     explicit Log(QObject * parant = nullptr);
     ~Log();
+    bool csvLol = false;
 signals:
     void done();
 

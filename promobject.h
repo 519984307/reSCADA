@@ -57,6 +57,7 @@ signals:
     void s_globalRescanSig();
     void s_moverStop();
     void s_loaded();
+    void s_alarm();
 
     void s_routeCreated    (QVariant);         //для визуализации
     void s_routeDeleted    (QVariant);         //для визуализации
@@ -88,7 +89,8 @@ public slots:
     void SetRouteCurrent(int id);              //для визуализации
     void UpdateRouteName(int id, QString name);//для визуализации
     //void delSelf();
-    void ShowTags();
+    void showTags();
+    void closeTags();
     void init();
     void init(QObject *GUI);
     void UserGlobalStop(){ emit s_globalStop(true); }

@@ -25,6 +25,8 @@ Item {
         id: view
         selectionMode: SelectionMode.NoSelection
         anchors.fill: parent
+        alternatingRowColors: false
+        backgroundVisible: false
         model: dataModel
         clip: true
 

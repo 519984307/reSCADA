@@ -145,7 +145,7 @@ void Route::_CommandToUnit(RouteUnit * RUnit, Prom::RouteCommand Command)
 {
     emit Logging  (Prom::MessInfo, QDateTime::currentDateTime(), true, objectName(), "команда от маршрута - " + objectName() +
                     " юниту - " + RUnit->objectName() + QString::number(Command));
-    emit RUnit->CommandFromRouteSig(Command);
+    emit RUnit->s_commandFromRouteSig(Command);
 }
 
 //------------------------------------------------------------------------------
@@ -489,7 +489,7 @@ bool Route::CheckConnectAllUnits()
 {
     bool check = true;
     for(int i = 0; i < _unitList.count(); i ++) {
-        check = check &&(_unitList[i]->MyRoute() == this);
+        check = check &&(_unitList[i]->myRoute() == this);
     }
     return check;
 }
@@ -577,9 +577,9 @@ bool Route::_ConnectAllUnits()
 //------------------------------------------------------------------------------
 bool Route::DisconnectUnit(RouteUnit * RUnit)
 {
-    if(RUnit->MyRoute() == this){
-        disconnect(RUnit, &RouteUnit::InformToRoute, this, &Route::InformFromUnit);
-        RUnit->SetMyRoute(nullptr,  Prom::UnMdNoDef);
+    if(RUnit->myRoute() == this){
+        disconnect(RUnit, &RouteUnit::s_informToRoute, this, &Route::InformFromUnit);
+        RUnit->setMyRoute(nullptr,  Prom::UnMdNoDef);
         _CheckConnection();
         return true;
     }
@@ -593,12 +593,12 @@ bool Route::DisconnectUnit(RouteUnit * RUnit)
 //------------------------------------------------------------------------------
 bool Route::_ConnectUnit(RouteUnit * RUnit)
 {
-    if(RUnit->MyRoute() == this) return true;
-    if(RUnit->MyRoute() == nullptr) {
-        if(RUnit->SetMyRoute(this,  UnitRouteMode(RUnit))){
+    if(RUnit->myRoute() == this) return true;
+    if(RUnit->myRoute() == nullptr) {
+        if(RUnit->setMyRoute(this,  UnitRouteMode(RUnit))){
             //            bool b = disconnect(RUnit, &RouteUnit::InformToRoute, this, &Route::InformFromUnit);
             //            qDebug() << this->objectName() << RUnit->objectName() << b;
-            connect(RUnit, &RouteUnit::InformToRoute, this, &Route::InformFromUnit, Qt::QueuedConnection);
+            connect(RUnit, &RouteUnit::s_informToRoute, this, &Route::InformFromUnit, Qt::QueuedConnection);
             return true;
         }
     }
@@ -610,7 +610,7 @@ void Route::_CheckConnection()
 {
     _allUnitsConnected = true;
     for(int i = 0 ; i < _unitList.count(); i ++) {
-        _allUnitsConnected &= _unitList[i]->MyRoute() == this;
+        _allUnitsConnected &= _unitList[i]->myRoute() == this;
     }
 }
 

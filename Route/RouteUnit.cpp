@@ -20,7 +20,7 @@ RouteUnit::RouteUnit(Prom::UnitType Type,
     //      _routeAlarmMode(AlarmRouteMode)
 {
     pthread_mutex_init(&mutex, NULL);
-    connect(this, &RouteUnit::CommandFromRouteSig, this, &RouteUnit::CommandFromRoute, Qt::QueuedConnection);
+    connect(this, &RouteUnit::s_commandFromRouteSig, this, &RouteUnit::commandFromRoute, Qt::QueuedConnection);
 }
 //------------------------------------------------------------------------------
 RouteUnit::~RouteUnit()
@@ -29,7 +29,7 @@ RouteUnit::~RouteUnit()
 }
 
 //----------------------------------------------------------------------------------------.
-bool RouteUnit::InRouteCommand(Route * route, Prom::RouteCommand Command) const
+bool RouteUnit::inRouteCommand(Route * route, Prom::RouteCommand Command) const
 {   
     if(_myRoute == route){
         return _routeCommand == Command;
@@ -38,13 +38,13 @@ bool RouteUnit::InRouteCommand(Route * route, Prom::RouteCommand Command) const
 }
 
 //------------------------------------------------------------------------------
-void RouteUnit::_AddToCurrentRoute(Prom::UnitModes mode)
+void RouteUnit::_addToCurrentRoute(Prom::UnitModes mode)
 {
-    AddInRoute(g_currentRoute, mode);
+    addInRoute(g_currentRoute, mode);
 }
 
 //------------------------------------------------------------------------------
-bool RouteUnit::SetMyRoute(Route * route, Prom::UnitModes mode)
+bool RouteUnit::setMyRoute(Route * route, Prom::UnitModes mode)
 {
     pthread_mutex_lock(&mutex);
     if(_myRoute != nullptr && route != nullptr) return false;
@@ -60,26 +60,26 @@ bool RouteUnit::SetMyRoute(Route * route, Prom::UnitModes mode)
     _myRoute = route;
     _routeMode = mode;
     _routeCommand = Prom::RtCmNo;
-    emit SetInRoute(_myRoute == nullptr ? 0 : _myRoute->ID);
+    emit s_setInRoute(_myRoute == nullptr ? 0 : _myRoute->ID);
     pthread_mutex_unlock(&mutex);
     return true;
 }
 
 //------------------------------------------------------------------------------
-void RouteUnit::AddInRoute(Route *route, Prom::UnitModes mode)
+void RouteUnit::addInRoute(Route *route, Prom::UnitModes mode)
 {
     if(route == nullptr){
         logging(Prom::MessChangeCommand,  QDateTime::currentDateTime(), true, objectName(), "подключение к маршруту не удалось: маршрут не существует");
         return;
     }
     _routeCommand = Prom::RtCmNo;
-    connect   (this, SIGNAL(AddInRouteSig(RouteUnit *, Prom::UnitModes)), route, SLOT(AddUnit(RouteUnit * , Prom::UnitModes)), Qt::QueuedConnection);
-    emit AddInRouteSig(this, mode);
-    disconnect(this, SIGNAL(AddInRouteSig(RouteUnit *, Prom::UnitModes)), route, SLOT(AddUnit(RouteUnit * , Prom::UnitModes)));
+    connect   (this, SIGNAL(s_addInRouteSig(RouteUnit *, Prom::UnitModes)), route, SLOT(AddUnit(RouteUnit * , Prom::UnitModes)), Qt::QueuedConnection);
+    emit s_addInRouteSig(this, mode);
+    disconnect(this, SIGNAL(s_addInRouteSig(RouteUnit *, Prom::UnitModes)), route, SLOT(AddUnit(RouteUnit * , Prom::UnitModes)));
 }
 
 //------------------------------------------------------------------------------
-Prom::UnitModes RouteUnit::RouteMode(Route * rout)
+Prom::UnitModes RouteUnit::routeMode(Route * rout)
 {
     return rout->UnitRouteMode(this);
 }
@@ -91,7 +91,7 @@ Prom::UnitModes RouteUnit::RouteMode(Route * rout)
 //}
 
 //------------------------------------------------------------------------------
-void RouteUnit::CommandFromRoute(Prom::RouteCommand Command)
+void RouteUnit::commandFromRoute(Prom::RouteCommand Command)
 {
     static Prom::UnitModes newMode = Prom::UnMdNoDef;
     emit logging  (Prom::MessInfo, QDateTime::currentDateTime(), true, objectName(), "обработка юнитом " + objectName() +
@@ -99,7 +99,7 @@ void RouteUnit::CommandFromRoute(Prom::RouteCommand Command)
     if(_myRoute != nullptr) {
         if(_routeCommand == Command){
             if(currentMode() == _ModeOfCommand(&_routeCommand)){
-                emit InformToRoute(this, _routeCommand, Prom::RtUnNo);
+                emit s_informToRoute(this, _routeCommand, Prom::RtUnNo);
             }
         }
         else{
@@ -108,17 +108,17 @@ void RouteUnit::CommandFromRoute(Prom::RouteCommand Command)
             switch (setMode(newMode, false)){
             case RejNoCond   :
             case RejTransPr  :
-                emit InformToRoute(this, Prom::RtCmNo, Prom::RtUnReject);
+                emit s_informToRoute(this, Prom::RtCmNo, Prom::RtUnReject);
                 break;
             case RejAlarm    :
-                emit InformToRoute(this, Prom::RtCmNo, Prom::RtUnAlarm);
+                emit s_informToRoute(this, Prom::RtCmNo, Prom::RtUnAlarm);
                 break;
             case RejAnnown   :
-                emit InformToRoute(this, Prom::RtCmNo, Prom::RtUnDtKnowComm);
+                emit s_informToRoute(this, Prom::RtCmNo, Prom::RtUnDtKnowComm);
                 break;
             case DoneAlready :
                 _routeCommand = Command;
-                emit InformToRoute(this, _routeCommand, Prom::RtUnNo);
+                emit s_informToRoute(this, _routeCommand, Prom::RtUnNo);
                 break;
             case DoneWhait   :
                 _routeCommand = Command;
@@ -128,7 +128,7 @@ void RouteUnit::CommandFromRoute(Prom::RouteCommand Command)
         }
     }
     else {
-        emit InformToRoute(this, Prom::RtCmNo, Prom::RtUnNotInRoute);
+        emit s_informToRoute(this, Prom::RtCmNo, Prom::RtUnNotInRoute);
         logging(Prom::MessInfo,  QDateTime::currentDateTime(), false, objectName(), "попытка маршрутного изменения режима оборудования не состоящего в маршруте");
     }
 }
@@ -137,16 +137,16 @@ void RouteUnit::_doOnModeChange()
 {
     if(_myRoute != nullptr){
         if(Prom::icvalModes(_ModeOfCommand(& _routeCommand), currentMode())){
-            emit InformToRoute(this, _routeCommand, Prom::RtUnNo);
+            emit s_informToRoute(this, _routeCommand, Prom::RtUnNo);
         }
         else if(! _alarm){
             if(currentMode() == _ModeOfCommand(&_routeCommand)){
                 _routeCommand =  Prom::RtCmNo;
-                emit InformToRoute(this, Prom::RtCmNo, Prom::RtUnReject);
+                emit s_informToRoute(this, Prom::RtCmNo, Prom::RtUnReject);
             }
             else if(! _midleMode()){
                 _routeCommand =  Prom::RtCmNo;
-                emit InformToRoute(this, Prom::RtCmNo, Prom::RtUnReject);
+                emit s_informToRoute(this, Prom::RtCmNo, Prom::RtUnReject);
             }
         }
     }
@@ -174,7 +174,7 @@ void RouteUnit::_alarmDo()
 {
     setMode(saveMode, false);
     _routeCommand =  Prom::RtCmNo;
-    emit InformToRoute(this, Prom::RtCmNo, Prom::RtUnAlarm);
+    emit s_informToRoute(this, Prom::RtCmNo, Prom::RtUnAlarm);
 }
 
 //------------------------------------------------------------------------------

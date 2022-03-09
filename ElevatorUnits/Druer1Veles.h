@@ -63,8 +63,8 @@ signals:
     void Started();
 
 public slots:
-    void AddToCurrentRoteStarted() { _AddToCurrentRoute( Prom::UnMdStart );}
-    void AddToCurrentRoteStoped()  { _AddToCurrentRoute( Prom::UnMdStop ); }
+    void AddToCurrentRoteStarted() { _addToCurrentRoute( Prom::UnMdStart );}
+    void AddToCurrentRoteStoped()  { _addToCurrentRoute( Prom::UnMdStop ); }
     void _updateStateAndMode() override;
     void Start() { if( ! _blocked ) setMode( Prom::UnMdStart, true ); }
     void Stop() { setMode( Prom::UnMdStop, true ); }

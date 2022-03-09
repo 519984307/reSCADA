@@ -5,7 +5,7 @@ UnitPropItem {
     id: contItem
     width: 20
     height: width
-    property alias museArea: museArea
+    property alias mouseArea: mouseArea
     property color colorRun: Fap.run
     property color colorStopReady: Fap.ready
     property color colorManual: Fap.manual
@@ -45,7 +45,7 @@ UnitPropItem {
         backgroundColor = colorManual
     }
     MouseArea {
-        id: museArea
+        id: mouseArea
         anchors.fill: parent
         acceptedButtons: Qt.RightButton | Qt.LeftButton
         onClicked: {

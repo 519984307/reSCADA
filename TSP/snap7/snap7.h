@@ -342,7 +342,6 @@ typedef struct{
     int   Amount;
     void  *pdata;
 } TS7DataItem, *PS7DataItem;
-
 //typedef int TS7ResultItems[MaxVars];
 //typedef TS7ResultItems *PS7ResultItems;
 

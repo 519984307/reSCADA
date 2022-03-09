@@ -27,25 +27,25 @@ private:
     bool _blockedStop = false;
 
 signals:
-    void StartComand();      //для визуализации
-    void Started();         //для визуализации
-    void StopComand();     //для визуализации
-    void Stoped();        //для визуализации
-    void Cleaning();
-    void ManualStarted();//для визуализации
-    void NoDef();       //для визуализации
+    void s_startComand();      //для визуализации
+    void s_started();         //для визуализации
+    void s_stopComand();     //для визуализации
+    void s_stoped();        //для визуализации
+    void s_cleaning();
+    void s_manualStarted();//для визуализации
+    void s_noDef();       //для визуализации
 
 protected slots:
     void _customConnectToGUI(QObject * guiItem,  QObject * propWin) override;
 
 public slots:
 
-    virtual void AddToCurrentRoteStoped()  { _AddToCurrentRoute(Prom::UnMdStop ); }//для визуализации
-    virtual void AddToCurrentRoteStarted() { _AddToCurrentRoute(Prom::UnMdStart); }//для визуализации
-    virtual void Start()      { if(! _blocked)setMode(Prom::UnMdStart, true); }//для визуализации
-    virtual void Stop()       { if(! (_blockedStop && _blocked))setMode(Prom::UnMdStop, true); }//для визуализации
+    virtual void addToCurrentRoteStoped()  { _addToCurrentRoute(Prom::UnMdStop ); }//для визуализации
+    virtual void addToCurrentRoteStarted() { _addToCurrentRoute(Prom::UnMdStart); }//для визуализации
+    virtual void start()      { if(! _blocked)setMode(Prom::UnMdStart, true); }//для визуализации
+    virtual void stop()       { if(! (_blockedStop && _blocked))setMode(Prom::UnMdStop, true); }//для визуализации
     //virtual void BlockedStop(){ if(! _blocked)SetMode(Prom::UnMdStop, true); }//для визуализации
-    virtual void CleanStop()  { if(! _blocked)setMode(Prom::UnMdCleanStop, true); } ;//для визуализации
+    virtual void cleanStop()  { if(! _blocked)setMode(Prom::UnMdCleanStop, true); } ;//для визуализации
 
     void _updateStateAndMode() override;
     void _cleanTimeEnd() override;

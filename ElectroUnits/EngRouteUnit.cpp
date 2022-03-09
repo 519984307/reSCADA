@@ -55,7 +55,7 @@ Prom::SetModeResp EngRouteUnit::_customSetMode(Prom::UnitModes *Mode, bool)
         if(mover && currentMode() == Prom::UnMdStart) {
             _cleaned = false;
             _cleanTimer->start();
-            emit Cleaning();
+            emit s_cleaning();
 //            _setSetedMode(*Mode);
             return Prom::DoneWhait;
         }
@@ -74,33 +74,33 @@ void EngRouteUnit::_updateStateAndMode()
     case Prom::EngNoDef:{
         _setCurrentState(Prom::UnStNoDef);
         _setCurrentMode(Prom::UnMdNoDef);
-        emit Stoped();
+        emit s_stoped();
         break;
     }
     case Prom::EngToStopForward: {
         _setCurrentState(Prom::UnStStopCommand);
-        emit StopComand();
+        emit s_stopComand();
         break;
     }
     case Prom::EngStoped: {
         _setCurrentState(Prom::UnStStoped);
         if(_cleaned) _setCurrentMode(Prom::UnMdCleanStop);
         else _setCurrentMode(Prom::UnMdStop);
-        emit Stoped();
+        emit s_stoped();
         break;
     }
     case Prom::EngToForvard: {
         _setCurrentState(Prom::UnStStartCommand);
-        emit StartComand();
+        emit s_startComand();
         break;
     }
     case Prom::EngForvard: {
         _cleaned = false;
-        emit Started();
+        emit s_started();
         if(mover && _cleanTimer->isActive()){
             _setCurrentState(Prom::UnStClean);
             _setCurrentMode(Prom::UnMdStart);
-            emit Cleaning();
+            emit s_cleaning();
         }
         else{
             if(_cleaned) {
@@ -117,7 +117,7 @@ void EngRouteUnit::_updateStateAndMode()
     case Prom::EngManualForward: {
         _setCurrentState(Prom::UnStManualStarted);
         _setCurrentMode(Prom::UnMdNoDef);
-        emit ManualStarted();
+        emit s_manualStarted();
         break;
     }
     case Prom::EngAlarm: {
@@ -142,15 +142,15 @@ void EngRouteUnit::_cleanTimeEnd()
 //------------------------------------------------------------------------------
 void EngRouteUnit::_customConnectToGUI(QObject * guiItem,  QObject *)
 {
-    connect(this,    SIGNAL(StartComand()),             guiItem, SLOT(startComand()),             Qt::QueuedConnection);
-    connect(this,    SIGNAL(StopComand()),              guiItem, SLOT(stopComand()),              Qt::QueuedConnection);
-    connect(guiItem, SIGNAL(addToCurrentRoteStarted()), this,    SLOT(AddToCurrentRoteStarted()), Qt::QueuedConnection);
-    connect(guiItem, SIGNAL(addToCurrentRoteStoped()),  this,    SLOT(AddToCurrentRoteStoped()),  Qt::QueuedConnection);
-    connect(guiItem, SIGNAL(start()),                   this,    SLOT(Start()),                   Qt::QueuedConnection);
-    connect(guiItem, SIGNAL(stop()),                    this,    SLOT(Stop()),               Qt::QueuedConnection);
-    connect(this,    SIGNAL(Stoped()),                  guiItem, SLOT(stoped()) ,                 Qt::QueuedConnection);
-    connect(this,    SIGNAL(ManualStarted()),           guiItem, SLOT(manualWork()) ,             Qt::QueuedConnection);
-    connect(this,    SIGNAL(Started()),                 guiItem, SLOT(started()),                 Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_startComand()),           guiItem, SLOT(startComand()),             Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_stopComand()),            guiItem, SLOT(stopComand()),              Qt::QueuedConnection);
+    connect(guiItem, SIGNAL(addToCurrentRoteStarted()), this,    SLOT(addToCurrentRoteStarted()), Qt::QueuedConnection);
+    connect(guiItem, SIGNAL(addToCurrentRoteStoped()),  this,    SLOT(addToCurrentRoteStoped()),  Qt::QueuedConnection);
+    connect(guiItem, SIGNAL(s_start()),                 this,    SLOT(start()),                   Qt::QueuedConnection);
+    connect(guiItem, SIGNAL(s_stop()),                  this,    SLOT(stop()),                    Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_stoped()),                guiItem, SLOT(stoped()) ,                 Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_manualStarted()),         guiItem, SLOT(manualWork()) ,             Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_started()),               guiItem, SLOT(started()),                 Qt::QueuedConnection);
 }
 
 //------------------------------------------------------------------------------

@@ -33,6 +33,8 @@ Window {
     property color colorSetPt: "black"
     property color colorImpact: "DarkGoldenRod"
 
+    property bool adminView: false
+
 //    property alias process: mfuProcess.valueReal
 //    property alias setPt: mfuSetPt.valueReal
 //    property alias impact: mfuImpact.valueReal
@@ -213,7 +215,6 @@ Window {
         MFUnit {
             id: mfuProcess
             height: parent.height * 0.15
-            visible: true
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.rightMargin: 0
@@ -238,14 +239,12 @@ Window {
         //            fontSizeMode: Text.Fit
         //            anchors.leftMargin: 0
         //            anchors.rightMargin: 0
-        //            visible: true
         //        }
 
         MFUnit {
             id: mfuSetPt
             //width: parent.width *0.7
             height: parent.height * 0.15
-            visible: true
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.rightMargin: 0
@@ -284,7 +283,6 @@ Window {
             id: mfuImpact
             width: parent.width *0.7
             height: parent.height * 0.1
-            visible: true
             anchors.right: parent.right
             anchors.rightMargin: 0
             readOnly: !impIsOut || ! manOnOff
@@ -313,7 +311,7 @@ Window {
                 MFUnit {
                     id: mfuKp
                     width: parent.width *0.48
-                    visible: true
+                    visible: adminView
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     readOnly: false
@@ -327,6 +325,7 @@ Window {
                 }
                 Text {
                     width: parent.width *0.1
+                    visible: mfuKp.visible || mfuKpOut.visible
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     font.pixelSize: 300
@@ -339,7 +338,6 @@ Window {
                 MFUnit {
                     id: mfuKpOut
                     width: parent.width *0.4
-                    visible: true
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.topMargin: 0
@@ -361,7 +359,7 @@ Window {
                 MFUnit {
                     id: mfuKi
                     width: parent.width *0.48
-                    visible: true
+                    visible: adminView
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     readOnly: false
@@ -376,6 +374,7 @@ Window {
 
                 Text {
                     width: parent.width *0.1
+                    visible: mfuKi.visible || mfuKiOut.visible
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     font.pixelSize: 300
@@ -388,7 +387,6 @@ Window {
                 MFUnit {
                     id: mfuKiOut
                     width: parent.width *0.4
-                    visible: true
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.topMargin: 0
@@ -410,7 +408,7 @@ Window {
                 MFUnit {
                     id: mfuKd
                     width: parent.width *0.48
-                    visible: true
+                    visible: adminView
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     readOnly: false
@@ -425,6 +423,7 @@ Window {
 
                 Text {
                     width: parent.width *0.1
+                    visible: mfuKd.visible || mfuKdOut.visible
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     font.pixelSize: 300
@@ -437,7 +436,6 @@ Window {
                 MFUnit {
                     id: mfuKdOut
                     width: parent.width *0.4
-                    visible: true
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.topMargin: 0

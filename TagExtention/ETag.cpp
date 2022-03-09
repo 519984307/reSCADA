@@ -45,7 +45,7 @@ ETag::ETag(Unit * Owner,
     connect(_pulseTimer, &QTimer::timeout, this, &ETag::pulseTimerEnd);
 
     connect(this, &ETag::s_logging, _owner, &Unit::logging, Qt::QueuedConnection);
-    if(_owner->tagPrefix != "" && _DBName != ""){
+    if(/*_owner->tagPrefix != "" &&*/ _DBName != ""){
         if(g_TSP != nullptr)
             _tag = g_TSP->getTagByName(_owner->tagPrefix + _DBName);
         if(_tag != nullptr){
@@ -161,8 +161,14 @@ void ETag::_acceptValue(QVariant Val)
     case Prom::VCdiv10 :
         Val = Val.toDouble() / 10;
         break;
+    case Prom::VCdiv100 :
+        Val = Val.toDouble() / 100;
+        break;
     case Prom::VCdiv1000 :
         Val = Val.toDouble() / 1000;
+        break;
+    case Prom::VCmul100 :
+        Val = Val.toDouble() * 100;
         break;
     }
 

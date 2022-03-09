@@ -1,12 +1,11 @@
 import QtQuick 2.15
 import "fap.js" as Fap
 
-UnitPropItem {
+StartStopUnit {
     id: contItem
     width: 20
     height: width
     property alias perstWin: regPersWin
-    property alias rect: regVal
     property alias freq: regPersWin.value
     property alias reqMaxRange: regPersWin.valueMax
     property alias freqMinRange: regPersWin.valueMin
@@ -23,37 +22,6 @@ UnitPropItem {
     signal s_moreLtl( variant MoreLtl )
     signal s_lessLtl( variant LessLtl )
     signal s_freqChanged( variant ValvePos )
-
-    property bool st: false
-    property bool std: false
-    property bool manual: false
-
-    function started() {
-        startComand()
-        std = true
-        manual = false
-        backgroundColor = "Green"
-    }
-    function stoped() {
-        stopComand()
-        std = false
-        manual = false
-        backgroundColor = Fap.ready
-    }
-    function startComand() {
-        st = true
-        manual = false
-        backgroundColor = "Lime"
-    }
-    function stopComand() {
-        st = false
-        manual = false
-        backgroundColor = "Lime"
-    }
-    function manualWork() {
-        manual = true
-        backgroundColor = "Gold"
-    }
 
     Rectangle {
         id: regVal
@@ -88,22 +56,16 @@ UnitPropItem {
         scaleColor: "#1a6b14"
     }
 
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.RightButton | Qt.LeftButton
-        onClicked: {
-            if (mouse.button & Qt.RightButton) {
-                openSettings()
-            } else if (mouse.button & Qt.LeftButton) {
-                regPersWin.show()
-            }
+    mouseArea.onClicked: {
+        if (mouse.button & Qt.LeftButton) {
+            regPersWin.show()
         }
     }
 }
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:1.75}
+    D{i:0;formeditorZoom:1.1}
 }
 ##^##*/
 

@@ -38,22 +38,26 @@ void Group::update(bool updateTime)
     if(listOfTags.count()){
         updateFreq = listOfTags[0]->updateFreq;//TODO Дич. Переписать.
         newQuality = listOfTags[0]->readQuality();
-
+        static bool freqUpd;
+        freqUpd = false;
         for(int i = 1; i < listOfTags.count(); i++) {
 
             if (newQuality != Check && listOfTags[i]->readQuality() != newQuality){
                 newQuality = Check;
             }
 
-            if(listOfTags[i]->updateFreq < updateFreq)
+            if(listOfTags[i]->updateFreq > updateFreq){
                 updateFreq = listOfTags[i]->updateFreq;
+                freqUpd = false;
+            }
         }
 
         setQuality(newQuality);
+        if(freqUpd)emit s_onUpdated();
     }
     if(updateTime)
         lastUpdate = QDateTime::currentDateTime();
-    emit s_onUpdated();
+
 }
 //------------------------------------------------------------------------------
 bool Group::insertTag(Tag *tag)

@@ -56,8 +56,8 @@ protected slots:
     void _customConnectToGUI( QObject * guiItem, QObject * propWin ) override;
 
 public slots:
-    void AddToCurrentRoteIn1pos(){  _AddToCurrentRoute( Prom::UnMd1pos  ); }
-    void AddToCurrentRoteIn2pos(){  _AddToCurrentRoute( Prom::UnMd2pos  ); }
+    void AddToCurrentRoteIn1pos(){  _addToCurrentRoute( Prom::UnMd1pos  ); }
+    void AddToCurrentRoteIn2pos(){  _addToCurrentRoute( Prom::UnMd2pos  ); }
     void ToPos1(){ if( ! _blocked )setMode( Prom::UnMd1pos, true ); }
     void ToPos2(){ if( unitType == Prom::TypeGate || ! _blocked )setMode( Prom::UnMd2pos, true ); }///Вынести в отдельный класс ЗАДВИЖКИ
     void Stop(){ if( unitType == Prom::TypeGate || ! _blocked ) setMode( Prom::UnMdStop, true ); }///Вынести в отдельный класс ЗАДВИЖКИ

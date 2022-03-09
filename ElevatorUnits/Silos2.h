@@ -32,9 +32,9 @@ signals:
     //void SendDispName( QString dispName );
 
 public slots:
-    void AddToCurrentRoteFull()  { _AddToCurrentRoute( Prom::UnMdFull );  }//для визуализации
-    void AddToCurrentRoteLow()   { _AddToCurrentRoute( Prom::UnMdLow );   }//для визуализации
-    void AddToCurrentRoteEmpty() { _AddToCurrentRoute( Prom::UnMdEmpty ); }//для визуализации
+    void AddToCurrentRoteFull()  { _addToCurrentRoute( Prom::UnMdFull );  }//для визуализации
+    void AddToCurrentRoteLow()   { _addToCurrentRoute( Prom::UnMdLow );   }//для визуализации
+    void AddToCurrentRoteEmpty() { _addToCurrentRoute( Prom::UnMdEmpty ); }//для визуализации
 
 protected slots:
     Prom::SetModeResp _customSetMode( Prom::UnitModes *mode, bool UserOrSys ) override;

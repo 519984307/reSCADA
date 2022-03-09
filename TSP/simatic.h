@@ -35,6 +35,7 @@ public:
   static bool strToAddr(QString str, SimAddress * address);
   //static inline bool compare(SimAddress *a1, SimAddress *a2);
   bool insertGroup(Group  * group) override;
+  int PDULen {-1};
   struct Task : public SimAddress, CommonTask{
     int endAdr{-1};
     //int buffByteCount{0};
@@ -53,6 +54,7 @@ private:
   void handleNextTask() override;
   inline void createReadTasks();
   void read(Task * task);
+  int readInList(int fstTaskInd, QList<Task*> *taskList = nullptr ); //Читает данные с ПЛК начиная с заданной задачи и далее по списку ListOfTasks сколько влезет в PDU Lengh. Возвращает индекс последней прочитанной задачи
   void write(Task * task);
   //bool check(int res, QString function = "unknown function");
   void scheduleHandler(); //TODO вынести в класс драйвера
