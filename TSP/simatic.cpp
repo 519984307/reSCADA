@@ -98,14 +98,22 @@ void SimaticDriver::disconnect()
 void SimaticDriver::handleNextTask()
 {
     if( started ){
+        cycleDone = true;
         if( client->Connected() ){
             if (listOfTasks.count() > 0){
-                Task * task = listOfTasks.takeFirst();
-                if (task->writeTask)
+
+                if (listOfTasks.first()->writeTask){
+                    Task * task = listOfTasks.takeFirst();
                     write(task);
-                else
+                    delete task;
+                }
+                else{
+                    Task * task = listOfTasks.takeFirst();
                     read(task);
-                delete task;
+                    delete task;
+                    //readInList();
+                    //scheduleHandler();
+                }
             }
             else{
                 createReadTasks();
@@ -113,7 +121,7 @@ void SimaticDriver::handleNextTask()
         }
         else{
             foreach (Group * group, listOfGroups) {//Перебор групп.
-                //errorFiller(group->listOfTags, "driver read error: driver isn\'t connected");
+                errorFiller(group->listOfTags, "driver read error: driver isn\'t connected");
                 qualityFiller(group->listOfTags, Bad);
                 group->update();
             }
@@ -130,7 +138,8 @@ inline void SimaticDriver::createReadTasks()
     Task * task = nullptr;//Текущая задача.
     foreach (Group * group, listOfGroups) {//Перебор групп.
         //Если задержка группы на опрос прошла.
-        if (group->lastUpdate.msecsTo(QDateTime::currentDateTime()) > group->delay){
+        if (group->lastUpdate.msecsTo(QDateTime::currentDateTime()) > group->delay
+            && group->listOfTags.count() > 0 ){
             //Перебор тэгов в группе, для разделения на задачи.
             for (int i = 0; i < group->listOfTags.count(); i++){
                 //Пулучение адреса тэга з приепленной к нему структуры.
@@ -209,15 +218,15 @@ inline int toBitAdr( SimAddress *SA )
 inline int amtFromType( SimAddress *lastTagAdr, SimaticDriver::Task *task )
 {
     if( lastTagAdr->memArea == S7AreaDB ){//Т.к. из BD читаем только байтами нужно добавить биты от типов данных длиннее байта
-        return  (lastTagAdr->regAddr.memSlot - task->regAddr.memSlot)
-            + dataSizeByte(lastTagAdr->type);
+        return  /*(*/(lastTagAdr->regAddr.memSlot - task->regAddr.memSlot)
+            + dataSizeByte(lastTagAdr->type)/* + 1) / 2*/;// +1 чтобы не округлило в меньшую сторону, /2 т.к. в word 2 byte
     }
     //Запрашивать отдельные биты группами нельзя поэтому убрал этот кусок
     //  else if( task->listOfTags.count() == 1 && task->type == S7WLBit && task->memArea == S7AreaMK){
     //    return 1 + (lastTagAdr->regAddr.memSlot - task->regAddr.memSlot ) * 8 + lastTagAdr->regAddr.bit - task->regAddr.bit;
     //  }
     else{
-        return 1 + lastTagAdr->regAddr.memSlot - task->regAddr.memSlot;// +1 т.к. включая начальный элемент
+        return (1 + lastTagAdr->regAddr.memSlot - task->regAddr.memSlot) /*/ 2*/;// +1 т.к. включая начальный элемент и +1 чтобы не округлило в меньшую сторону. Итого +2.
     }
 }
 //NOTE просто захотелось побаловаться с #define))) Ни разу не пробовал.
@@ -292,7 +301,8 @@ void SimaticDriver::read( SimaticDriver::Task *task )
     }
 }
 //------------------------------------------------------------------------------
-int SimaticDriver::readInList(int FstTaskInd,  QList<Task*> *TaskList)
+#define offsetBuff2 (tagAdr->regAddr.memSlot - tmpTask->regAddr.memSlot) * sizeKf
+void SimaticDriver::readInList(int FstTaskInd,  QList<Task*> *TaskList)
 {
     if( TaskList == nullptr){
         TaskList = &listOfTasks;
@@ -302,121 +312,134 @@ int SimaticDriver::readInList(int FstTaskInd,  QList<Task*> *TaskList)
             errorFiller(TaskList->at(i)->listOfTags, "driver read error: driver is null");
             qualityFiller(TaskList->at(i)->listOfTags, Bad);
         }
-        return TaskList->count() - 1;
+        return;
     }
     if(client->Connected()){
-        static int PDUsumm = 0;
-        static std::vector <PS7DataItem> Items;
-        static SimAddress * lastTagAdr;//Получение адреса тэга
-        static int_fast8_t sizeKf;//Вычисление поправ-го коэф-та в зависимости от типа
-        static int amt;//Вычисление кол-ва единиц на считывание
-        //static byte *data;//Выделение буфера чтения
-        static int lastTaskInd;
+        byte buf[20][500];
+        int PDUsumm = 0;
+        TS7DataItem Items[20];
+        SimAddress * lastTagAdr;//Получение адреса тэга
+        int_fast8_t sizeKf;//Вычисление поправ-го коэф-та в зависимости от типа
+        int amt;//Вычисление кол-ва единиц на считывание
+        // byte *data;//Выделение буфера чтения
+        int lastTaskInd;
         lastTaskInd = FstTaskInd;
-        static Task *tmpTask;
+        Task *tmpTask;
+        //Перебор задач и формирование из них Item для запроса. Если задача на запись,
+        //останавливаем перебор.
 
-        for (; lastTaskInd < TaskList->count(); lastTaskInd++ ) {//Перебор задач
+        int iN = 0;
+        while ( lastTaskInd < TaskList->count()
+            && iN < 20
+            && !TaskList->at(lastTaskInd)->writeTask ) {//Перебор задач
             tmpTask = TaskList->at(lastTaskInd);
             sizeKf = dataSizeByte( tmpTask->type );//Вычисление поправ-го коэф-та в зависимости от типа
 
             //Если задача запрашивает больше чем влазит в PDU Lenght, то запрашиваем
             //функцией read() она умеет дробить запросы и возвращаем номер этой
             //задачи как последней прочитанной
-            if( lastTaskInd == FstTaskInd && sizeKf > PDULen ){
-                if( lastTaskInd == FstTaskInd){
-                    read( tmpTask );
-                    return lastTaskInd;
-                }
-            }
-            PDUsumm += sizeKf;
-            //Проверка на превышение PDU Lenght суммой буферов задач в запросе
-            if(PDUsumm > PDULen){
-                lastTaskInd--;
-                break;
-            }
             lastTagAdr = static_cast<SimAddress*>(tmpTask->listOfTags.last()->speshData);//Получение адреса тэга
             amt = amtFromType(lastTagAdr,tmpTask );//Вычисление кол-ва единиц на считывание
+            PDUsumm += amt * sizeKf;
 
-            Items.push_back( new TS7DataItem() );
-            Items.back()->Area = tmpTask->memArea;
-            Items.back()->WordLen = tmpTask->type;
-            Items.back()->Result = 0;
-            Items.back()->DBNumber = tmpTask->DBNumb;
-            Items.back()->Start = tmpTask->type == S7WLBit ? toBitAdr( tmpTask ) : tmpTask->regAddr.memSlot;
-            Items.back()->Amount = amt;
-            Items.back()->pdata = new byte[amt * sizeKf];
+            if( PDUsumm > PDULen ){
+                if( iN == 0 && amt * sizeKf > PDULen ){
+                    read( tmpTask );
+                    delete tmpTask;
+                    return;
+                }
+                break;
+            }
+            //Проверка на превышение PDU Lenght суммой буферов задач в запросе
+
+
+            Items[iN].Area = tmpTask->memArea;
+            Items[iN].WordLen = tmpTask->type;
+            Items[iN].Result = 0;
+            Items[iN].DBNumber = tmpTask->DBNumb;
+            Items[iN].Start = tmpTask->type == S7WLBit ? toBitAdr( tmpTask ) : tmpTask->regAddr.memSlot;
+            Items[iN].Amount = amt;
+            Items[iN].pdata = buf[iN];//byte[amt * sizeKf * 2];
+            lastTaskInd++;
+            iN++;
         }
-        static int res;
-        res = client->ReadMultiVars( Items.at(0), Items.size() );
 
-#define offsetBuff2 (tagAdr->regAddr.memSlot - tmpTask->regAddr.memSlot) * sizeKf
-        if(res == 0){
 
-            for (uint ItN = 0; ItN < Items.size(); ItN++) {
-                tmpTask = TaskList->at(FstTaskInd + ItN);//Задача соответ-я Item
-                sizeKf = dataSizeByte( tmpTask->type );//TODO возможно лучше поле в структуре сделать, а не вычислять. Вычисление поправ-го коэф-та в зависимости от типа
+        if(iN > 0){
+            int res = client->ReadMultiVars( &Items[0], iN );
 
-                if( Items.at(ItN)->Result == 0){
+            if(res == 0){
 
-                    foreach (Tag *tag, tmpTask->listOfTags) {//Запись результата в тэги
-                        static SimAddress * tagAdr;
-                        tagAdr = static_cast<SimAddress*>(tag->speshData);
+                for ( int i = 0 ;i < iN; i++) {
+                    tmpTask = TaskList->takeAt(FstTaskInd);//Задача соответ-я Item. Изымается из списка!!!
+                    sizeKf = dataSizeByte( tmpTask->type );//TODO возможно лучше поле в структуре сделать, а не вычислять. Вычисление поправ-го коэф-та в зависимости от типа
 
-                        switch (tagAdr->type) {
-                        case S7WLBit:
-                            if(tmpTask->type == S7WLBit){
-                                tag->setValue( GetBitAt( Items.at(ItN)->pdata, offsetBuff2, 0 ) );
+                    if( Items[i].Result == 0){
+
+                        foreach (Tag *tag, tmpTask->listOfTags) {//Запись результата в тэги
+                            SimAddress * tagAdr;
+                            tagAdr = static_cast<SimAddress*>(tag->speshData);
+
+                            switch (tagAdr->type) {
+                            case S7WLBit:
+                                if(tmpTask->type == S7WLBit){
+                                    tag->setValue( GetBitAt( Items[i].pdata, offsetBuff2, 0 ) );
+                                }
+                                else{
+                                    tag->setValue( GetBitAt( Items[i].pdata, offsetBuff2,
+                                        tagAdr->regAddr.bit ) );
+                                }
+                                break;
+                            case S7WLByte:
+                                tag->setValue( GetByteAt( Items[i].pdata,offsetBuff2) );
+                                break;
+                            case S7WLWord:
+                                tag->setValue( GetIntAt( Items[i].pdata, offsetBuff2 ) );
+                                break;
+                            case S7WLCounter:
+                            case S7WLTimer:
+                                tag->setValue( GetWordAt( Items[i].pdata, offsetBuff2 ) );
+                                break;
+                            case S7WLDWord:
+                                if( tag->type == TFloat ) tag->setValue( GetRealAt( Items[i].pdata, (tagAdr->regAddr.memSlot - tmpTask->regAddr.memSlot) * sizeKf ));
+                                else tag->setValue( GetDIntAt( Items[i].pdata, offsetBuff2 ) );
+                                break;
+                                //Такого варианта не будет, т.к. он кодируется в тегах просто как Double Word
+                                //          case S7WLReal:
+                                //            tag->setValue( (double)GetRealAt( data, tagAdr->regAddr.memSlot * kf ) );
+                                //            break;
+                            default:
+                                break;
                             }
-                            else{
-                                tag->setValue( GetBitAt( Items.at(ItN)->pdata, offsetBuff2,
-                                    tagAdr->regAddr.bit ) );
-                            }
-                            break;
-                        case S7WLByte:
-                            tag->setValue( GetByteAt( Items.at(ItN)->pdata,offsetBuff2) );
-                            break;
-                        case S7WLWord:
-                            tag->setValue( GetIntAt( Items.at(ItN)->pdata, offsetBuff2 ) );
-                            break;
-                        case S7WLCounter:
-                        case S7WLTimer:
-                            tag->setValue( GetWordAt( Items.at(ItN)->pdata, offsetBuff2 ) );
-                            break;
-                        case S7WLDWord:
-                            if( tag->type == TFloat ) tag->setValue( GetRealAt( Items.at(ItN)->pdata, offsetBuff2 ));
-                            else tag->setValue( GetDIntAt( Items.at(ItN)->pdata, offsetBuff2 ) );
-                            break;
-                            //Такого варианта не будет, т.к. он кодируется в тегах просто как Double Word
-                            //          case S7WLReal:
-                            //            tag->setValue( (double)GetRealAt( data, tagAdr->regAddr.memSlot * kf ) );
-                            //            break;
-                        default:
-                            break;
+                            tag->setError("");
+                            tag->setQuality(Good);
                         }
-                        tag->setError("");
-                        tag->setQuality(Good);
                     }
+                    else{
+                        errorFiller(tmpTask->listOfTags, "Item address read error: " + QString(CliErrorText(res).c_str()));
+                        qualityFiller(tmpTask->listOfTags, Bad);
+                    }
+
+                    //delete [] static_cast<byte*>(Items[i].pdata);//Зачищаю память под данные, т.к. она выделялась чрез new
+                    delete tmpTask;
                 }
-                else{
-                    errorFiller(tmpTask->listOfTags, "Item address read error: " + QString(CliErrorText(res).c_str()));
+            }
+            else{
+                if (res == 589856){
+                    noError = false;
+                }
+                iN--;
+                while ( iN >= 0) {
+                    tmpTask = TaskList->takeAt(FstTaskInd);//Задача соответ-я Item
+                    errorFiller(tmpTask->listOfTags, "Read error: " + QString(CliErrorText(res).c_str()));
                     qualityFiller(tmpTask->listOfTags, Bad);
+                    delete [] static_cast<byte*>(Items[iN].pdata);
+                    delete tmpTask;
+                    iN--;
                 }
-                delete &Items.at(ItN)->pdata;
-                delete &Items.at(ItN);
-            }
-            Items.clear();
-        }
-        else{
-            if (res == 589856)
-                noError = false;
-            for( int tsN = FstTaskInd; tsN <= lastTaskInd; tsN++ ){
-                errorFiller(TaskList->at(tsN)->listOfTags, "Read error: " + QString(CliErrorText(res).c_str()));
-                qualityFiller(TaskList->at(tsN)->listOfTags, Bad);
             }
         }
-        return lastTaskInd;
     }
-    return TaskList->count() - 1;
 }
 //------------------------------------------------------------------------------
 void SimaticDriver::write(SimaticDriver::Task *task )
@@ -500,8 +523,10 @@ void SimaticDriver::write(SimaticDriver::Task *task )
 //------------------------------------------------------------------------------
 void SimaticDriver::scheduleHandler()
 {
-    if (started)
-        taskTimer->singleShot(1, this, &SimaticDriver::handleNextTask);
+    if (started && cycleDone){
+        cycleDone = false;
+        taskTimer->singleShot(100, this, &SimaticDriver::handleNextTask);
+    }
 }
 
 //------------------------------------------------------------------------------

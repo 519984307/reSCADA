@@ -1,4 +1,5 @@
 #include "tag.h"
+//#include <qdebug.h>
 //------------------------------------------------------------------------------
 Tag::Tag(int Id,
          QString Name,
@@ -80,6 +81,7 @@ void Tag::setValue(QVariant value)
 {
     if (this->value != value){
         this->value = value;
+        //qDebug()<<this->objectName() + "Tag value s_valueChd: " + value.toString();
         //emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag value s_valueChd: " + readValue().toString());
         emit s_onValueChanged(value);
     }

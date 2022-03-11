@@ -126,7 +126,7 @@ void TSPWindow::setValTagInCurrRow( QVariant value )
   int row = ui->tableTags->currentIndex().row();
   if (row < 0) return;
   QVariant V = ui->tableTags->model()->index(row,0).data();
-  qDebug()<<V.toString();
+  //qDebug()<<V.toString();
   Tag * tag = tsp->getTagById(V.toInt());
   if(tag){
     emit tsp->s_logging( MessInfo, QDateTime::currentDateTime(), true, tag->objectName(), "GUI action: set TRUE" );

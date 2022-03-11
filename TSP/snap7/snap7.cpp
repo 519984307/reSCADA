@@ -890,8 +890,8 @@ void SetWordAt(void *Buffer, int Pos, word Value)
 //---------------------------------------------------------------------------
 void SetIntAt(void *Buffer, int Pos, smallint Value)
 {
-  qDebug()<<Value;
-  qDebug()<<SwapWord(pword(&Value));
+  //qDebug()<<Value;
+  //qDebug()<<SwapWord(pword(&Value));
   *(psmallint(pbyte(Buffer)+Pos))=SwapWord(pword(&Value));
 }
 //---------------------------------------------------------------------------
@@ -907,8 +907,8 @@ void SetDIntAt(void *Buffer, int Pos, longint Value)
 //---------------------------------------------------------------------------
 void SetRealAt(void *Buffer, int Pos, float Value)
 {
-  qDebug()<<Value;
-  qDebug()<<SwapWord(pword(&Value));
+  //qDebug()<<Value;
+  //qDebug()<<SwapWord(pword(&Value));
   *(plongword(pbyte(Buffer)+Pos))=SwapDWord(plongword(&Value));
 }
 //---------------------------------------------------------------------------
