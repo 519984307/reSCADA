@@ -5,13 +5,15 @@ UnitPropItem {
     width: 70
     height: 350
     property alias tank: tank
+    allovAlarmBodyBlinck: false
+    allovAlarmBorderBlinck: true
 
 
     //++++++++ Test +++++++
     //        mouseArea.onPressAndHold: {
     //            linked = true
     //            connected = true
-    //            allovAlarmBlinck = true
+    //            allovAlarmBodyBlinck = true
     //            setQuitAlarm()
     //            var cl = tank.mainGradientColor
     //            cl = backgroundCurrentColor
@@ -23,6 +25,10 @@ UnitPropItem {
         onClicked: {
             if (mouse.button & Qt.RightButton) {
                 openSettings()
+            }
+            if (mouse.button & Qt.LeftButton) {
+                setNotified()
+                setAlarmNotified()
             }
         }
         //        onPressAndHold: {

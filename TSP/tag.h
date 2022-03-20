@@ -62,7 +62,7 @@ signals:
     void s_onValueChanged(QVariant); //for external use
     void s_onQualityChanged(); //for external use
     void s_onErrorChanged(QString error); //for external use
-    void s_onWriteRequested(Tag * tag);
+    void s_onWriteRequested(Tag * tag, QVariant NewValue = 0);
     void s_logging(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
 public slots:
     QVariant readValue(); //for external use

@@ -54,6 +54,7 @@ StartStopUnit {
         onS_valueChenged: s_freqChanged( Value )
         mainColor: "#09aad4"
         scaleColor: "#1a6b14"
+        mfuCurValue.mantissa: 1
     }
 
     mouseArea.onClicked: {

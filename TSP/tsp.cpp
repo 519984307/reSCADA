@@ -320,6 +320,8 @@ bool TSP::addTag(int id, QString name, QString address, QString options, int gro
             type = TBool;
         else if (option == "int")
             type = TInt;
+//        else if (option == "uint")
+//            type = TUInt;
         else if (option == "float")
             type = TFloat;
         else {
@@ -378,13 +380,13 @@ bool TSP::addTag(Tag *tag)
         tag->setError("tag name isn\'t unique");
         tag->setQuality(Bad); tag->access = NA;
     }
-    twin = getTagByAddress(tag->groupId, tag->address);
-    if (twin){
-        emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " creation error: tag address isn\'t unique");
-        //        twin->setError("tag address isn\'t unique"); twin->setQuality(Bad); twin->access = NA;
-        tag->setError("tag address isn\'t unique");
-        tag->setQuality(Bad); tag->access = NA;
-    }
+//    twin = getTagByAddress(tag->groupId, tag->address);
+//    if (twin){
+//        emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + tag->objectName() + " creation error: tag address isn\'t unique");
+//        //        twin->setError("tag address isn\'t unique"); twin->setQuality(Bad); twin->access = NA;
+//        tag->setError("tag address isn\'t unique");
+//        tag->setQuality(Bad); tag->access = NA;
+//    }
     if( !twin /*tag->access != NA && tag->access != WO &&*/ ){
         if(!group->insertTag(tag)){
             return false;

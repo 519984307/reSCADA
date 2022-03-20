@@ -45,7 +45,7 @@ private:
     void setQuality(Quality quality);
 signals:
     void s_onQualityChanged(); //for external use
-    void s_onWriteRequested(Tag * tag);
+    void s_onWriteRequested(Tag * tag, QVariant NewValue = 0);
     void s_onUpdated();
     void s_logging(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
     void s_onTagInserted(Group *);

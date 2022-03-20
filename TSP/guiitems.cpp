@@ -355,7 +355,7 @@ QVariant TSPTableModelGroups::data(const QModelIndex &index, int role) const
         case groupName:     return config->name;
         case groupOptions:  return config->options;
         case groupDelay:    return config->delay;
-        case groupComment:  return config->comment;
+        case groupComment:  return config->errorString;
         default: return QVariant();
         }
     }
@@ -505,12 +505,12 @@ QVariant TSPTableModelTags::data(const QModelIndex &Index, int Role) const
         case tagAddress:  return config->address;
         case tagValue:    {
             if (config->tag){
-//                QVariant value = config->tag->readValue();
-//                switch (config->tag->type) {
-//                case TInt: return value.toInt();
-//                case TFloat: return config->tag->readValue();
-//                case TBool: return value.toBool() ? "True" : "False";
-                //}
+                QVariant value = config->tag->readValue();
+                switch (config->tag->type) {
+                case TInt: return value.toInt();
+                case TFloat: return config->tag->readValue();
+                case TBool: return value.toBool() ? "True" : "False";
+                }
                 return config->tag->readValue();
             }else
                 return "Error";

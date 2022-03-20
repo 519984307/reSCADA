@@ -44,6 +44,7 @@ UnitPropItem {
         onS_moreVal: s_openLtl( More )
         onS_lessVal: s_closeLtl( Less )
         onS_valueChenged: s_valvePosChanged(Value)
+        mfuCurValue.mantissa: 2
     }
 
     MouseArea {

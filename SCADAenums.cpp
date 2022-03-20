@@ -196,7 +196,7 @@ QString Prom::qualityToString(Quality quality)
     case Unknown:   return "Unknown";
     case Bad:       return "Bad";
     case Good:      return "Good";
-    default:        return "<quality>";
+    case NotValid:   return "Not valid";
     }
 }
 

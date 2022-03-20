@@ -62,7 +62,7 @@ void SimaticDriver::connect()
             emit s_logging(MessInfo, QDateTime::currentDateTime(), false,
                 this->objectName(), "Simatic driver connected");
             noError = true;
-            PDULen = client->PDULength();
+            PDULen = client->PDULength() - 64;
         }
         else {//Нет соединения. Сообщение об ошибке в лог.
             noError = false;
@@ -102,17 +102,17 @@ void SimaticDriver::handleNextTask()
         if( client->Connected() ){
             if (listOfTasks.count() > 0){
 
-                if (listOfTasks.first()->writeTask){
-                    Task * task = listOfTasks.takeFirst();
+                if (listOfTasks.last()->writeTask){
+                    Task * task = listOfTasks.takeLast();
                     write(task);
                     delete task;
                 }
                 else{
-                    Task * task = listOfTasks.takeFirst();
-                    read(task);
-                    delete task;
-                    //readInList();
-                    //scheduleHandler();
+                    //                    Task * task = listOfTasks.takeFirst();
+                    //                    read(task);
+                    //                    delete task;
+                    readInList();
+                    scheduleHandler();
                 }
             }
             else{
@@ -131,16 +131,33 @@ void SimaticDriver::handleNextTask()
     }
 }
 //------------------------------------------------------------------------------
+inline int amtFromType( SimAddress *lastTagAdr, SimaticDriver::Task *task )
+{
+    if( lastTagAdr->memArea == S7AreaDB ){//Т.к. из BD читаем только байтами нужно добавить биты от типов данных длиннее байта
+        return  /*(*/(lastTagAdr->regAddr.memSlot - task->regAddr.memSlot)
+            + dataSizeByte(lastTagAdr->type)/* + 1) / 2*/;// +1 чтобы не округлило в меньшую сторону, /2 т.к. в word 2 byte
+    }
+    //Запрашивать отдельные биты группами нельзя поэтому убрал этот кусок
+    //  else if( task->listOfTags.count() == 1 && task->type == S7WLBit && task->memArea == S7AreaMK){
+    //    return 1 + (lastTagAdr->regAddr.memSlot - task->regAddr.memSlot ) * 8 + lastTagAdr->regAddr.bit - task->regAddr.bit;
+    //  }
+    else{
+        return (1 + lastTagAdr->regAddr.memSlot - task->regAddr.memSlot) /*/ 2*/;// +1 т.к. включая начальный элемент и +1 чтобы не округлило в меньшую сторону. Итого +2.
+    }
+}
+//------------------------------------------------------------------------------
 //Разбивает теги группы на задачи(task) с тэгами у которых адреса идут один за другим.
 inline void SimaticDriver::createReadTasks()
 {
     SimAddress * address;
-    Task * task = nullptr;//Текущая задача.
+    Task * task;//Текущая задача.
     foreach (Group * group, listOfGroups) {//Перебор групп.
         //Если задержка группы на опрос прошла.
         if (group->lastUpdate.msecsTo(QDateTime::currentDateTime()) > group->delay
             && group->listOfTags.count() > 0 ){
             //Перебор тэгов в группе, для разделения на задачи.
+            task = nullptr;
+
             for (int i = 0; i < group->listOfTags.count(); i++){
                 //Пулучение адреса тэга з приепленной к нему структуры.
                 address = static_cast<SimAddress*>( group->listOfTags.at(i)->speshData );
@@ -163,9 +180,10 @@ inline void SimaticDriver::createReadTasks()
                     if( address->DBNumb == task->DBNumb // DB совпадает
                         && address->memArea == task->memArea// и обл. памяти совпадает
                         && (task->memArea == S7AreaDB ? true : address->type == task->type)// и тип совпадает
-                        //&& group->listOfTags.at(i)->getQuality() == Good//и тег уже успешно опрашивался
-                        && task->regAddr.memSlot + group->optimRangeMax//и адрес не очень далеко от 1-го тэга в задаче.
-                            >= address->regAddr.memSlot) {
+                        && group->listOfTags.at(i)->getQuality() == Good//и тег уже успешно опрашивался
+                        && task->regAddr.memSlot + group->optimRangeMax >= address->regAddr.memSlot//и адрес не очень далеко от 1-го тэга в задаче.
+                        && amtFromType(address,task ) <= 32 )
+                    {
                         task->listOfTags.append(group->listOfTags.at(i));//Добавление тэга в задачу.
                     }
                     else{//иначе завершаем группу
@@ -184,7 +202,7 @@ inline void SimaticDriver::createReadTasks()
     }
 }
 //------------------------------------------------------------------------------
-void SimaticDriver::createWriteTask(Tag *tag)
+void SimaticDriver::createWriteTask(Tag *tag, QVariant NewValue)
 {
     SimAddress * address;
     address = static_cast<SimAddress*>( tag->speshData );
@@ -192,43 +210,31 @@ void SimaticDriver::createWriteTask(Tag *tag)
     if( address->regAddr.memSlot == -1
         || tag->access == RO
         || tag->access == NA ) return;
-    Task * wTask = new Task;
-    wTask->writeTask = true;
-    wTask->memArea = address->memArea;
-    wTask->DBNumb = address->DBNumb;
-    wTask->type = wTask->memArea == S7AreaDB ? S7WLByte : address->type;//address->type;
-    wTask->regAddr = address->regAddr;
-    wTask->listOfTags.append( tag );
-    listOfTasks.append(wTask);
-    Task * rTask = new Task;
-    rTask->writeTask = false;
-    rTask->memArea = address->memArea;
-    rTask->DBNumb = address->DBNumb;
-    rTask->type = rTask->memArea == S7AreaDB ? S7WLByte : address->type;//address->type;
-    rTask->regAddr = address->regAddr;
-    rTask->listOfTags.append( tag );
-    listOfTasks.append(rTask);
+
+    writeTag(tag,NewValue);
+    //    Task * wTask = new Task;
+    //    wTask->writeTask = true;
+    //    wTask->memArea = address->memArea;
+    //    wTask->DBNumb = address->DBNumb;
+    //    wTask->type = wTask->memArea == S7AreaDB ? S7WLByte : address->type;//address->type;
+    //    wTask->regAddr = address->regAddr;
+    //    wTask->listOfTags.append( tag );
+    //    listOfTasks.append(wTask);
+    //    Task * rTask = new Task;
+    //    rTask->writeTask = false;
+    //    rTask->memArea = address->memArea;
+    //    rTask->DBNumb = address->DBNumb;
+    //    rTask->type = rTask->memArea == S7AreaDB ? S7WLByte : address->type;//address->type;
+    //    rTask->regAddr = address->regAddr;
+    //    rTask->listOfTags.append( tag );
+    //    listOfTasks.append(rTask);
 }
 //------------------------------------------------------------------------------
 inline int toBitAdr( SimAddress *SA )
 {
     return SA->regAddr.memSlot * 8 + SA->regAddr.bit;
 }
-//------------------------------------------------------------------------------
-inline int amtFromType( SimAddress *lastTagAdr, SimaticDriver::Task *task )
-{
-    if( lastTagAdr->memArea == S7AreaDB ){//Т.к. из BD читаем только байтами нужно добавить биты от типов данных длиннее байта
-        return  /*(*/(lastTagAdr->regAddr.memSlot - task->regAddr.memSlot)
-            + dataSizeByte(lastTagAdr->type)/* + 1) / 2*/;// +1 чтобы не округлило в меньшую сторону, /2 т.к. в word 2 byte
-    }
-    //Запрашивать отдельные биты группами нельзя поэтому убрал этот кусок
-    //  else if( task->listOfTags.count() == 1 && task->type == S7WLBit && task->memArea == S7AreaMK){
-    //    return 1 + (lastTagAdr->regAddr.memSlot - task->regAddr.memSlot ) * 8 + lastTagAdr->regAddr.bit - task->regAddr.bit;
-    //  }
-    else{
-        return (1 + lastTagAdr->regAddr.memSlot - task->regAddr.memSlot) /*/ 2*/;// +1 т.к. включая начальный элемент и +1 чтобы не округлило в меньшую сторону. Итого +2.
-    }
-}
+
 //NOTE просто захотелось побаловаться с #define))) Ни разу не пробовал.
 #define offsetBuff (tagAdr->regAddr.memSlot - task->regAddr.memSlot) * sizeKf
 //------------------------------------------------------------------------------
@@ -250,7 +256,6 @@ void SimaticDriver::read( SimaticDriver::Task *task )
             task->type == S7WLBit ? toBitAdr( task )
                                   : task->regAddr.memSlot,
             amt, task->type, data);
-        client->PDURequested();
         if(res == 0){
             //Запись результата в тэги
             foreach (Tag *tag, task->listOfTags) {
@@ -330,7 +335,7 @@ void SimaticDriver::readInList(int FstTaskInd,  QList<Task*> *TaskList)
 
         int iN = 0;
         while ( lastTaskInd < TaskList->count()
-            && iN < 20
+            && iN < 12 //Можно и 20, но я пока на примере WinCC видел только 12
             && !TaskList->at(lastTaskInd)->writeTask ) {//Перебор задач
             tmpTask = TaskList->at(lastTaskInd);
             sizeKf = dataSizeByte( tmpTask->type );//Вычисление поправ-го коэф-та в зависимости от типа
@@ -352,13 +357,12 @@ void SimaticDriver::readInList(int FstTaskInd,  QList<Task*> *TaskList)
             }
             //Проверка на превышение PDU Lenght суммой буферов задач в запросе
 
-
             Items[iN].Area = tmpTask->memArea;
             Items[iN].WordLen = tmpTask->type;
             Items[iN].Result = 0;
             Items[iN].DBNumber = tmpTask->DBNumb;
             Items[iN].Start = tmpTask->type == S7WLBit ? toBitAdr( tmpTask ) : tmpTask->regAddr.memSlot;
-            Items[iN].Amount = amt;
+            Items[iN].Amount = amt;// -1 т.к. если пприбавить к адресу начала считывания колличество нужных байт,то получит конечную ячейку на 1 дальше необходимой
             Items[iN].pdata = buf[iN];//byte[amt * sizeKf * 2];
             lastTaskInd++;
             iN++;
@@ -417,7 +421,7 @@ void SimaticDriver::readInList(int FstTaskInd,  QList<Task*> *TaskList)
                     }
                     else{
                         errorFiller(tmpTask->listOfTags, "Item address read error: " + QString(CliErrorText(res).c_str()));
-                        qualityFiller(tmpTask->listOfTags, Bad);
+                        qualityFiller(tmpTask->listOfTags, Check);
                     }
 
                     //delete [] static_cast<byte*>(Items[i].pdata);//Зачищаю память под данные, т.к. она выделялась чрез new
@@ -433,7 +437,7 @@ void SimaticDriver::readInList(int FstTaskInd,  QList<Task*> *TaskList)
                     tmpTask = TaskList->takeAt(FstTaskInd);//Задача соответ-я Item
                     errorFiller(tmpTask->listOfTags, "Read error: " + QString(CliErrorText(res).c_str()));
                     qualityFiller(tmpTask->listOfTags, Bad);
-                    delete [] static_cast<byte*>(Items[iN].pdata);
+                    //delete [] static_cast<byte*>(Items[iN].pdata);
                     delete tmpTask;
                     iN--;
                 }
@@ -441,6 +445,76 @@ void SimaticDriver::readInList(int FstTaskInd,  QList<Task*> *TaskList)
         }
     }
 }
+//------------------------------------------------------------------------------
+#define offsetBuffwrite (tagAdr->regAddr.memSlot - task->regAddr.memSlot) * sizeKf
+void SimaticDriver::writeTag(Tag *Tag, QVariant NewValue )
+{
+    if(!client) {
+        Tag->setError("driver read error: driver is null");
+        Tag->setQuality(Bad);
+        //emit LoggingSystem(MessError, QDateTime::currentDateTime(), this->objectName(), "Simatic driver read error: driver is null");
+        return;
+    }
+    if (started) connect();
+    if(client->Connected()){
+        SimAddress *tagAdr = static_cast<SimAddress*>(Tag->speshData);//Получение адреса тэга
+        int amt = dataSizeByte(tagAdr->type);//Вычисление кол-ва единиц на считывание
+        byte data[amt];
+        for (int i = 0; i < amt; i++) {
+            data[i] = 0;
+        }
+        amt = 1;
+        //Запись значений тэгов в буфер для отправки
+        int res = 0;
+
+        switch (tagAdr->type) {
+        case S7WLBit:
+            data[0] = NewValue.toBool();
+            break;
+        case S7WLWord:
+            SetIntAt( data, 0, NewValue.toInt() );
+            break;
+        case S7WLByte:
+        case S7WLCounter:
+        case S7WLTimer:
+            SetWordAt( data, 0, NewValue.toUInt() );
+            break;
+        case S7WLDWord:
+            //amt = 2;
+            if( Tag->type == TFloat )
+                SetRealAt( data, 0,  NewValue.toFloat() );
+            else
+                SetDIntAt( data, 0,  NewValue.toUInt() );
+            break;
+        default:
+            break;
+        }
+
+        if(res == 0){//Проверка, что в случае S7WLBit запрос байта со значениями рядомстоящих битов успешен.
+            res = client->WriteArea(tagAdr->memArea, tagAdr->DBNumb,
+                tagAdr->type == S7WLBit ? toBitAdr( tagAdr )
+                                        : tagAdr->regAddr.memSlot,
+                amt, tagAdr->type, data);
+        }
+        if(res == 0){
+            Tag->setError("");
+            Tag->setQuality(Good);
+            Tag->setValue(NewValue);
+            Tag->ready = true;
+        }
+        if( res != 0 ){
+            if (res == 589856)
+                noError = false;
+            Tag->setError("driver write error: " + QString(CliErrorText(res).c_str()));
+            Tag->setQuality(Bad);
+        }
+    }
+    else{
+        Tag->setError("driver write error: driver isn\'t connected");
+        Tag->setQuality(Bad);
+    }
+}
+
 //------------------------------------------------------------------------------
 void SimaticDriver::write(SimaticDriver::Task *task )
 {
@@ -467,15 +541,20 @@ void SimaticDriver::write(SimaticDriver::Task *task )
 
             switch (tagAdr->type) {
             case S7WLBit:
-                //!TODO попробовать, может ПЛК нормально отреагирует на установку бита в DB с task->type == S7WLBit?
-                //! тогда не нужно будет предварительно считывать байт, чтоб не затереть соседние биты.
-
-                if( task->memArea == S7AreaDB ){//Чтобы не обнулить рядомстоящие биты запрос их актуального состояния.
-                    res = client->ReadArea(task->memArea, task->DBNumb, tagAdr->regAddr.memSlot,
-                        amt, task->type,
-                        &data[offsetBuff]);
+                if(task->listOfTags.count() == 1 ){
+                    data[0] = task->listOfTags.at(i)->newValue.toBool();
                 }
-                SetBitAt( data, offsetBuff, tagAdr->regAddr.bit, task->listOfTags.at(i)->newValue.toBool() );
+                else{
+                    //!NOTE не тестировалось!!!
+                    byte tmp = 0;
+                    data[offsetBuff] = task->listOfTags.at(i)->newValue.toBool();
+                    if( task->memArea == S7AreaDB ){//Чтобы не обнулить рядомстоящие биты запрос их актуального состояния.
+                        res = client->ReadArea(task->memArea, task->DBNumb,
+                        tagAdr->regAddr.memSlot, 1, task->type, &tmp);
+                        data[offsetBuff] |= tmp; //считанные биты вставляем в байт с записываемым битом
+                    }
+                    SetBitAt( data, offsetBuff, tagAdr->regAddr.bit, task->listOfTags.at(i)->newValue.toBool() );
+                }
                 break;
             case S7WLWord:
                 SetIntAt( data, offsetBuff, task->listOfTags.at(i)->newValue.toInt() );
@@ -525,7 +604,7 @@ void SimaticDriver::scheduleHandler()
 {
     if (started && cycleDone){
         cycleDone = false;
-        taskTimer->singleShot(100, this, &SimaticDriver::handleNextTask);
+        taskTimer->singleShot(1, this, &SimaticDriver::handleNextTask);
     }
 }
 

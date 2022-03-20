@@ -59,7 +59,7 @@ signals:
     void s_disconnectDriver();
     void s_logging(MessType MessTypeID,  QDateTime DateTime, bool UserOrSys, QString Source, QString Message);
 public slots:
-    virtual void createWriteTask(Tag * tag) = 0;
+    virtual void createWriteTask(Tag * tag, QVariant NewValue = 0) = 0;
 protected slots:
     //virtual void TagInserted(Group * group);
 };

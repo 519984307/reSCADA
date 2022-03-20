@@ -49,7 +49,7 @@ AnalogSignalVar1 {
         limited: false
         onValueChanged: s_maxLimitChanged( Value )
         mantissa: parent.mantissa
-        step: limitStep
+//        step: limitStep
         disappear: true
         body.onVisibleChanged:{
             if(visible){

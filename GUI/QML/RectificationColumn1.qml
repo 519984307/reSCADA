@@ -52,6 +52,7 @@ RectificationColumn0 {
         y: -55
         width: parent.colderDiametr
         height: width
+        visible: true
         color: parent.backgroundColor
         radius: width / 2
         border.width: parent.pipePassBorderWidth
@@ -66,6 +67,7 @@ RectificationColumn0 {
         z: 10
         width: parent.width / 3
         height: width * 3
+        visible: true
         radius: 5
         anchors.left: upAng.right
         anchors.bottom: parent.top
@@ -80,7 +82,7 @@ RectificationColumn0 {
         id: pipe1
         y: -32
         height: parent.pipePassThin
-        visible: parent.fullView
+        visible: fullView
         anchors.verticalCenter: cl1.verticalCenter
         anchors.left: cl1.horizontalCenter
         anchors.right: parent.right
@@ -97,7 +99,7 @@ RectificationColumn0 {
         id: upAng
         width: 13
         height: 13
-        visible: parent.fullView
+        visible: fullView
         anchors.left: pipe1.right
         anchors.top: pipe1.top
         anchors.leftMargin: 0
@@ -111,6 +113,7 @@ RectificationColumn0 {
         id: ang90_1
         width: 10
         height: 10
+        visible: fullView
         borderWidth: parent.pipePassBorderWidth
         pipeThin: parent.pipePassThin
         anchors.right: pipeV2.right
@@ -121,7 +124,7 @@ RectificationColumn0 {
         id: pipeV2
         x: 150
         width: parent.pipePassThin
-        visible: parent.fullView
+        visible: fullView
         anchors.right: pipeAngBot5.right
         z: 50
         anchors.top: pipeAngBot5.bottom
@@ -135,7 +138,7 @@ RectificationColumn0 {
         id: pipeAngBot5
         width: 10
         height: 10
-        visible: parent.fullView
+        visible: fullView
         anchors.left: cl2.right
         anchors.top: cl2.verticalCenter
         nActiveColor: parent.pipePassColor
@@ -148,7 +151,7 @@ RectificationColumn0 {
         id: pipeV4
         x: 134
         width: parent.pipePassThin
-        visible: parent.fullView
+        visible: fullView
         anchors.top: cl2.bottom
         anchors.bottom: parent.top
         anchors.horizontalCenterOffset: 0
@@ -165,7 +168,7 @@ RectificationColumn0 {
         x: 134
         width: parent.pipePassThin
         height: cl2.width / 4
-        visible: parent.fullView
+        visible: fullView
         anchors.bottom: cl2.top
         z: 1
         nActiveColor: parent.pipePassColor
@@ -177,7 +180,7 @@ RectificationColumn0 {
     Pipe {
         id: pipe3
         height: parent.pipePassThin
-        visible: parent.fullView
+        visible: fullView
         anchors.left: parent.right
         anchors.right: ang90_1.left
         anchors.top: parent.top
@@ -292,7 +295,7 @@ RectificationColumn0 {
         y: -29
         width: colder.width
         height: width
-        visible: parent.fullView
+        visible: fullView
         color: parent.backgroundColor
         radius: width / 2
         border.width: parent.borderWidth / 2
@@ -306,7 +309,7 @@ RectificationColumn0 {
     Pipe {
         id: pipe5
         height: parent.pipePassThin
-        visible: parent.fullView
+        visible: fullView
         anchors.verticalCenter: cl2.verticalCenter
         anchors.left: colder.horizontalCenter
         anchors.right: cl2.left
@@ -338,7 +341,7 @@ RectificationColumn0 {
         id: pipeOutWtr4
         y: -77
         height: parent.pipeOutWaterThin
-        visible: parent.fullView
+        visible: true
         anchors.left: pipeOutWtrAng3.right
         anchors.right: pipeOutWtrAng2.left
         anchors.rightMargin: 0
@@ -392,7 +395,7 @@ RectificationColumn0 {
         id: pipeOutWtr5
         x: 77
         width: parent.pipeOutWaterThin
-        visible: parent.fullView
+        visible: parent.adminView
         anchors.top: pipeOutWtrAng2.bottom
         anchors.bottom: colder.top
         nActiveColor: parent.pipeOutWaterColor
@@ -406,7 +409,7 @@ RectificationColumn0 {
         id: pipeOutWtr7
         x: 77
         width: parent.pipeOutWaterThin
-        visible: parent.fullView
+        visible: parent.adminView
         anchors.top: pipeOutWtrAng2.bottom
         anchors.bottom: cl1.top
         nActiveColor: parent.pipeOutWaterColor
@@ -420,7 +423,7 @@ RectificationColumn0 {
         id: pipeOutWtrAng3
         width: 7
         height: 7
-        visible: parent.fullView
+        visible: true
         anchors.left: pipeOutWtr7.left
         anchors.top: pipeOutWtr4.top
         nActiveColor: parent.pipeOutWaterColor
@@ -434,7 +437,7 @@ RectificationColumn0 {
         x: 90
         width: parent.pipePassThin
         height: 23
-        visible: parent.fullView
+        visible: fullView
         anchors.right: upAng.right
         anchors.bottom: pipe3.top
         anchors.bottomMargin: -1
@@ -466,6 +469,7 @@ RectificationColumn0 {
         y: -28
         width: parent.pipePassThin * 2.5
         height: width
+        visible: fullView
         anchors.bottom: pipeV5.top
         nActiveColor: parent.pipePassColor
         borderWidth: parent.pipePassBorderWidth
@@ -537,7 +541,7 @@ RectificationColumn0 {
         id: pipeOutWtr81
         width: parent.pipeOutWaterThin
         height: 60
-        visible: parent.fullView
+        visible: true
         anchors.left: upAng11.left
         anchors.bottom: upAng11.top
         anchors.leftMargin: 0
@@ -581,7 +585,7 @@ RectificationColumn0 {
         id: pipeOutWtr91
         width: parent.pipeOutWaterThin
         height: 10
-        visible: parent.fullView
+        visible: true
         anchors.left: upAng21.left
         anchors.top: upAng21.bottom
         rotation: 0
@@ -597,7 +601,7 @@ RectificationColumn0 {
         id: pipeAngBot6
         width: 6
         height: 6
-        visible: parent.fullView
+        visible: fullView
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.leftMargin: 71
@@ -612,7 +616,7 @@ RectificationColumn0 {
         id: pipeAngBot7
         width: 6
         height: 6
-        visible: parent.fullView
+        visible: fullView
         anchors.left: parent.left
         anchors.top: parent.top
         nActiveColor: parent.pipePassColor
@@ -633,6 +637,6 @@ RectificationColumn0 {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:3}D{i:45}D{i:46}
+    D{i:0;formeditorZoom:3}
 }
 ##^##*/

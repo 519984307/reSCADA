@@ -47,7 +47,7 @@ private:
     static void sortTags(QList<Tag *> &listOfTags);
     static inline bool compare(MBaddress a1, MBaddress a2);
 public slots:
-    void createWriteTask(Tag * tag) override;
+    void createWriteTask(Tag * tag, QVariant NewValue = 0 ) override;
 };
 
 #endif // MODBUSDRIVER_H

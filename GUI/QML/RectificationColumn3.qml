@@ -18,6 +18,7 @@ RectificationColumn0 {
     Pipe {
         id: pipeV6
         width: parent.pipePassThin
+        visible: fullView
         anchors.left: pipeV1.right
         anchors.top: upAng1.bottom
         anchors.bottom: pipeH2.top
@@ -33,6 +34,7 @@ RectificationColumn0 {
         id: pipeV4
         x: 134
         width: parent.pipePassThin
+        visible: fullView
         anchors.top: cl2.bottom
         anchors.bottom: pipeH2.bottom
         anchors.bottomMargin: 35
@@ -47,6 +49,7 @@ RectificationColumn0 {
         id: pipeH2
         y: 13
         height: parent.pipePassThin
+        visible: fullView
         anchors.left: upAng5.right
         anchors.right: pipeAngBot5.left
         anchors.bottom: parent.top
@@ -127,6 +130,7 @@ RectificationColumn0 {
         id: pipe1
         y: -32
         height: parent.pipePassThin
+        visible: fullView
         anchors.verticalCenter: cl1.verticalCenter
         anchors.left: cl1.horizontalCenter
         anchors.right: upAng.left
@@ -145,6 +149,7 @@ RectificationColumn0 {
         x: 46
         width: 10
         height: 10
+        visible: fullView
         anchors.right: pipeV1.right
         anchors.top: pipe1.top
         anchors.rightMargin: 0
@@ -161,6 +166,7 @@ RectificationColumn0 {
         y: -22
         width: colder.width
         height: width
+        visible: fullView
         color: backgroundColor
         radius: width / 2
         border.width: parent.borderWidth / 2
@@ -175,6 +181,7 @@ RectificationColumn0 {
     Pipe {
         id: pipe2
         height: parent.pipePassThin
+        visible: fullView
         anchors.verticalCenter: cl2.verticalCenter
         anchors.left: colder.horizontalCenter
         anchors.right: cl2.left
@@ -191,6 +198,7 @@ RectificationColumn0 {
         id: pipeAngBot5
         width: 10
         height: 10
+        visible: fullView
         anchors.left: cl2.right
         anchors.top: pipe2.top
         anchors.topMargin: 0
@@ -208,6 +216,7 @@ RectificationColumn0 {
         x: 134
         width: parent.pipePassThin
         height: cl2.width / 4
+        visible: fullView
         anchors.bottom: cl2.top
         nActiveColor: parent.pipePassColor
         anchors.horizontalCenter: cl2.horizontalCenter
@@ -236,6 +245,7 @@ RectificationColumn0 {
         id: pipe5
         y: -32
         height: parent.pipePassThin
+        visible: fullView
         anchors.verticalCenter: cl3.verticalCenter
         anchors.left: cl3.horizontalCenter
         anchors.right: upAng1.left
@@ -253,6 +263,7 @@ RectificationColumn0 {
         x: 85
         width: 10
         height: 10
+        visible: fullView
         anchors.right: pipeV6.right
         anchors.top: pipe5.top
         anchors.rightMargin: 0
@@ -284,6 +295,7 @@ RectificationColumn0 {
         id: pipe6
         y: -32
         height: parent.pipePassThin
+        visible: fullView
         anchors.verticalCenter: cl4.verticalCenter
         anchors.left: cl4.horizontalCenter
         anchors.right: upAng2.left
@@ -300,6 +312,7 @@ RectificationColumn0 {
         x: 87
         width: 10
         height: 10
+        visible: fullView
         anchors.right: pipeV7.right
         anchors.top: pipe6.top
         nActiveColor: parent.pipePassColor
@@ -436,6 +449,7 @@ RectificationColumn0 {
         id: pipeV8
         x: 123
         width: parent.pipePassThin
+        visible: fullView
         anchors.right: pipeAngBot5.right
         anchors.top: pipeAngBot5.bottom
         anchors.bottom: pipeAngBot6.top
@@ -453,6 +467,7 @@ RectificationColumn0 {
         y: 17
         width: 10
         height: 10
+        visible: fullView
         anchors.left: cl2.right
         anchors.bottom: pipeH2.bottom
         anchors.bottomMargin: 0
@@ -467,6 +482,7 @@ RectificationColumn0 {
         id: pipeV1
         z: 100
         width: parent.pipePassThin
+        visible: fullView
         anchors.left: parent.right
         anchors.top: upAng.bottom
         anchors.bottom: upAng5.top
@@ -480,6 +496,7 @@ RectificationColumn0 {
     Pipe {
         id: pipeV7
         width: parent.pipePassThin
+        visible: fullView
         anchors.left: pipeV6.right
         anchors.top: upAng2.bottom
         anchors.bottom: pipeH2.top
@@ -497,6 +514,7 @@ RectificationColumn0 {
         y: -28
         width: parent.pipePassThin * 2.5
         height: width
+        visible: fullView
         anchors.bottom: pipeV5.top
         anchors.horizontalCenter: pipeV5.horizontalCenter
         borderWidth: parent.pipePassBorderWidth
@@ -525,6 +543,7 @@ RectificationColumn0 {
         z: 0
         width: 10
         height: 10
+        visible: fullView
         anchors.left: pipeV1.left
         anchors.bottom: pipeH2.bottom
         anchors.leftMargin: 0

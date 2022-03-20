@@ -31,15 +31,18 @@ UnitPropItem {
     property color indicColor: "gray"
 
     property bool adminView: false
+    property bool fullView: true
 
     signal s_manTopOn(variant ManOn)
     backgroundColor: "#d3d3d3"
+    allovAlarmBodyBlinck: false
+    allovAlarmBorderBlinck: true
 
     //++++++++ Test +++++++
     //    mouseArea.onPressAndHold: {
     //        linked = true
     //        connected = true
-    //        allovAlarmBlinck = true
+    //        allovAlarmBodyBlinck = true
     //        setQuitAlarm()
     //        var cl = tank.mainGradientColor
     //        cl = backgroundCurrentColor
@@ -52,6 +55,10 @@ UnitPropItem {
         onClicked: {
             if (mouse.button & Qt.RightButton) {
                 openSettings()
+            }
+            if (mouse.button & Qt.LeftButton) {
+                setNotified()
+                setAlarmNotified()
             }
         }
     }
@@ -145,6 +152,9 @@ UnitPropItem {
         mfuKpOut.visible: false
         mfuKiOut.visible:false
         mfuKdOut.visible:false
+        mfuSetPt.mantissa: 2
+        mfuFromProcess.mantissa: 2
+        mfuFromImpact.mantissa: 2
         kdRow.visible: false
         onManOnOffChanged: sbPTop.checked = manOnOff
         Component.onCompleted: sbPTop.checked = manOnOff
@@ -165,6 +175,9 @@ UnitPropItem {
         mfuKpOut.visible: false
         mfuKiOut.visible: false
         mfuKdOut.visible: false
+        mfuSetPt.mantissa: 2
+        mfuFromProcess.mantissa: 2
+        mfuFromImpact.mantissa: 2
         kdRow.visible: false
         adminView: parent.adminView
         onManOnOffChanged: { sbPrButt.checked = manOnOff }
@@ -254,8 +267,4 @@ UnitPropItem {
 
 
 
-/*##^##
-Designer {
-    D{i:0;formeditorZoom:1.75}
-}
-##^##*/
+

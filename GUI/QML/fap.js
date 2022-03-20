@@ -493,6 +493,14 @@ var colorArr = [{
                 }]
 
 //---------------------------------------------------
+function roundToPrec(value, precision)
+{
+    // спецчисло для округления
+    var precision_number = Math.pow(10, precision);
+    // округляем
+    return Math.round(value * precision_number) / precision_number;
+}
+
 function getAbsolutePosition(node) {
     var returnPos = {}
     returnPos.x = 0

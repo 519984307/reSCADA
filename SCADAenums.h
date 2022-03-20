@@ -310,6 +310,7 @@ enum Virtualization{
 enum DataType{
     TBool = 0,
     TInt,
+    TUInt,
     TFloat
 };
 

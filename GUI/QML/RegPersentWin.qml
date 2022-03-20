@@ -6,18 +6,19 @@ Window {
     id: root
     width: 180
     height: 150
+    property alias mfuCurValue: mfuCurValue
     title: "РК"
     flags: Qt.Window | Qt.Dialog
     minimumWidth: 180
     maximumHeight: 170
-    property alias sepCorBtn: curValue.separCorrButtons
+    property alias sepCorBtn: mfuCurValue.separCorrButtons
 
-    property alias value: curValue.valueReal
+    property alias value: mfuCurValue.valueReal
     property alias step: regStep.valueReal
 
     property alias valueMax: maxValue.valueReal
     property alias valueMin: minValue.valueReal
-    property alias readOnly: curValue.readOnly
+    property alias readOnly: mfuCurValue.readOnly
     property color mainColor: "#a3fa96"
     property color scaleColor: "#1a6b14"
 
@@ -28,7 +29,7 @@ Window {
 
     function setValueMinRange( MinRg ) { minValue.setValue( MinRg ) }
     function setValueMaxRange( MaxRg ) { maxValue.setValue( MaxRg ) }
-    function setValue(Value) { curValue.setValue( Value ) }
+    function setValue(Value) { mfuCurValue.setValue( Value ) }
     function setStep( Step ) { regStep.setValue(Step)}
     signal s_moreVal( variant More )
     signal s_lessVal( variant Less )
@@ -158,7 +159,7 @@ Window {
         verticalAlignment: Text.AlignVCenter
     }
     MFUnit {
-        id: curValue
+        id: mfuCurValue
         height: 40
         valueReal: 60
         backgroundColor: mainColor
@@ -169,7 +170,7 @@ Window {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: textLvl.bottom
-        mantissa: 3
+        mantissa: 0
         correctingButtons: true
         //onValueRealChanged: valueChanged(valueReal)
         limited: true
@@ -184,10 +185,10 @@ Window {
         id: stepTxt
         height: 20
         width: text.length * font.pixelSize * 0.7
-        visible: !curValue.readOnly
+        visible: !mfuCurValue.readOnly
         text: "ШАГ РЕГУЛИРОВКИ -"
         anchors.left: parent.left
-        anchors.top: curValue.bottom
+        anchors.top: mfuCurValue.bottom
         font.pixelSize: height * 0.6
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
@@ -196,12 +197,12 @@ Window {
         id: regStep
         valueReal: 1
         height: 20
-        visible: !curValue.readOnly
+        visible: !mfuCurValue.readOnly
         backgroundColor: mainColor
         borderColor: mainColor
         anchors.left: stepTxt.right
         anchors.right: parent.right
-        anchors.top: curValue.bottom
+        anchors.top: mfuCurValue.bottom
         textInput.font.bold: true
         correctingButtons: false
         upLimit: 10

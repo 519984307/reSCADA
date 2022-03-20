@@ -423,7 +423,7 @@ bool ModBusDriver::compare(ModBusDriver::MBaddress a1, ModBusDriver::MBaddress a
 }
 
 //------------------------------------------------------------------------------
-void ModBusDriver::createWriteTask(Tag *tag)
+void ModBusDriver::createWriteTask(Tag *tag, QVariant NewValue)
 {
     MBaddress address;
     if(!strToAddr(tag->address, &address)){

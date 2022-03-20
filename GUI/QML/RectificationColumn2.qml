@@ -84,6 +84,7 @@ RectificationColumn0 {
         id: pipe1
         y: -32
         height: parent.pipePassThin
+        visible: fullView
         anchors.verticalCenter: cl1.verticalCenter
         anchors.left: cl1.horizontalCenter
         anchors.right: upAng.left
@@ -99,6 +100,7 @@ RectificationColumn0 {
         id: upAng
         width: 10
         height: 10
+        visible: fullView
         anchors.left: parent.right
         anchors.top: pipe1.top
         anchors.leftMargin: 3
@@ -116,6 +118,7 @@ RectificationColumn0 {
         id: pipeV2
         x: 150
         width: parent.pipePassThin
+        visible: fullView
         anchors.right: pipeAngBot5.right
         z: 50
         anchors.top: pipeAngBot5.bottom
@@ -153,6 +156,7 @@ RectificationColumn0 {
         id: pipeAngBot5
         width: 10
         height: 10
+        visible: fullView
         anchors.left: cl2.right
         anchors.top: pipe2.top
         nActiveColor: parent.pipePassColor
@@ -167,6 +171,7 @@ RectificationColumn0 {
         id: pipeV4
         x: 134
         width: parent.pipePassThin
+        visible: fullView
         anchors.top: cl2.bottom
         anchors.bottom: pipe3.bottom
         anchors.bottomMargin: -5
@@ -181,6 +186,7 @@ RectificationColumn0 {
         y: -28
         width: parent.pipePassThin * 2.5
         height: width
+        visible: fullView
         anchors.bottom: pipeV5.top
         anchors.bottomMargin: -5
         anchors.horizontalCenter: pipeV5.horizontalCenter
@@ -192,6 +198,7 @@ RectificationColumn0 {
         x: 134
         width: parent.pipePassThin
         height: cl2.width / 4
+        visible: fullView
         anchors.bottom: cl2.top
         nActiveColor: parent.pipePassColor
         anchors.horizontalCenter: cl2.horizontalCenter
@@ -231,6 +238,7 @@ RectificationColumn0 {
         id: pipe5
         y: -32
         height: parent.pipePassThin
+        visible: fullView
         anchors.verticalCenter: cl3.verticalCenter
         anchors.left: cl3.horizontalCenter
         anchors.right: upAng10.left
@@ -244,6 +252,7 @@ RectificationColumn0 {
     Pipe {
         id: pipeV6
         width: parent.pipePassThin
+        visible: fullView
         anchors.left: pipeV7.right
         anchors.top: upAng10.bottom
         anchors.bottom: pipe3.top
@@ -260,6 +269,7 @@ RectificationColumn0 {
         x: 85
         width: 10
         height: 10
+        visible: fullView
         anchors.right: pipeV6.right
         anchors.top: pipe5.top
         nActiveColor: parent.pipePassColor
@@ -340,6 +350,7 @@ RectificationColumn0 {
         y: -26
         width: colder.width
         height: width
+        visible: fullView
         color: backgroundColor
         radius: width / 2
         border.width: parent.borderWidth / 2
@@ -352,6 +363,7 @@ RectificationColumn0 {
     Pipe {
         id: pipe2
         height: parent.pipePassThin
+        visible: fullView
         anchors.verticalCenter: cl2.verticalCenter
         anchors.left: colder.horizontalCenter
         anchors.right: cl2.left
@@ -426,6 +438,7 @@ RectificationColumn0 {
         y: 47
         width: 10
         height: 10
+        visible: fullView
         anchors.right: pipeAngBot5.right
         anchors.bottom: pipe3.bottom
         nActiveColor: parent.pipePassColor
@@ -451,6 +464,7 @@ RectificationColumn0 {
         id: pipeV7
         x: 46
         width: parent.pipePassThin
+        visible: fullView
         anchors.right: upAng.right
         anchors.top: upAng.bottom
         anchors.bottom: pipe3.top
@@ -573,7 +587,7 @@ RectificationColumn0 {
         id: pipeOutWtr81
         width: parent.pipeOutWaterThin
         height: 60
-        visible: parent.fullView
+        visible: true
         anchors.left: upAng11.left
         anchors.bottom: upAng11.top
         z: 0
@@ -617,7 +631,7 @@ RectificationColumn0 {
         id: pipeOutWtr91
         width: parent.pipeOutWaterThin
         height: 10
-        visible: parent.fullView
+        visible: true
         anchors.left: upAng21.left
         anchors.top: upAng21.bottom
         z: 0
@@ -666,7 +680,7 @@ RectificationColumn0 {
     Pipe {
         id: pipe3
         height: parent.pipePassThin
-        visible: parent.fullView
+        visible: fullView
         anchors.left: parent.right
         anchors.right: pipeAngBot6.left
         anchors.top: parent.top
@@ -682,7 +696,7 @@ RectificationColumn0 {
         id: pipeAngBot7
         width: 6
         height: 6
-        visible: parent.fullView
+        visible: fullView
         anchors.left: parent.left
         anchors.top: parent.top
         nActiveColor: parent.pipePassColor
@@ -697,7 +711,7 @@ RectificationColumn0 {
         id: pipeAngBot8
         width: 6
         height: 6
-        visible: parent.fullView
+        visible: fullView
         anchors.left: parent.left
         anchors.top: parent.top
         nActiveColor: parent.pipePassColor

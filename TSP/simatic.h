@@ -56,11 +56,12 @@ private:
   inline void createReadTasks();
   void read(Task * task);
   void readInList(int fstTaskInd = 0, QList<Task*> *taskList = nullptr ); //Читает данные с ПЛК начиная с заданной задачи и далее по списку ListOfTasks сколько влезет в PDU Lengh. Возвращает индекс последней прочитанной задачи
+  void writeTag(Tag *Tag, QVariant NewValue );
   void write(Task * task);
   //bool check(int res, QString function = "unknown function");
   void scheduleHandler(); //TODO вынести в класс драйвера
 
 public slots:
-  void createWriteTask(Tag * tag) override;
+  void createWriteTask(Tag * tag, QVariant NewValue = 0 ) override;
 };
 #endif // SIMATICDRIVER_H

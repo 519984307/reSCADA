@@ -11,7 +11,8 @@ Item {
     property bool alarm: false
     property bool alarmNotify: false
     property bool notify: false
-    property bool allovAlarmBlinck: true
+    property bool allovAlarmBodyBlinck: true
+    property bool allovAlarmBorderBlinck: false
 
     property bool blocked: false
     property bool linked: false
@@ -30,9 +31,9 @@ Item {
     property color borderAlarmColor: Fap.borderAlarm
     property color borderNotifyBlincColor: Fap.borderNotify
 
-        Component.onCompleted: {
-            renewColors()
-        }
+    Component.onCompleted: {
+        renewColors()
+    }
     signal s_resetAlarm()
     //    function linkColors() {
     //        //backgroundColor = backgroundCurrentColor
@@ -65,6 +66,14 @@ Item {
         alarm = false
         alarmNotify = false
         alarmDescr = ""
+    }
+    function setAlarmNotify() {
+        //РІРєР» РјРёРіР°РЅРёРµ
+        alarmNotify = true
+    }
+    function setAlarmNotified() {
+        //РїСЂРµРєСЂ РјРёРіР°РЅРёРµ
+        alarmNotify = false
     }
     function setNotify() {
         //РІРєР» РјРёРіР°РЅРёРµ
@@ -122,34 +131,41 @@ Item {
         running: false
         repeat: true
         onTriggered: {
-            if (allovAlarmBlinck && alarmNotify) {
-                backgroundCurrentColor = backgroundCurrentColor
-                        == backgroundColor ? backgroundAlarmBlinkColor : backgroundColor
+            if(alarmNotify){
+                if (allovAlarmBodyBlinck) {
+                    backgroundCurrentColor = backgroundCurrentColor
+                            == backgroundColor ? backgroundAlarmBlinkColor : backgroundColor
+                }
+                if (allovAlarmBorderBlinck) {
+                    borderCurrentColor = borderCurrentColor
+                            == borderAlarmColor ? borderColor : borderAlarmColor
+                }
             }
             if (notify) {
-                if (alarm) {
-                    borderCurrentColor = borderCurrentColor
-                            == borderAlarmColor ? borderNotifyBlincColor : borderAlarmColor
-                } else {
-                    borderCurrentColor = borderCurrentColor
-                            == borderColor ? borderNotifyBlincColor : borderColor
+                if (!(allovAlarmBorderBlinck && alarmNotify)) {
+                    borderCurrentColor =
+                            borderCurrentColor == borderColor ? borderNotifyBlincColor
+                                                              : (alarm? borderAlarmColor : borderColor)
                 }
             }
         }
     }
     onAlarmChanged: renewColors()
-
-    onAlarmNotifyChanged: {
+    function aNch(){
         renewColors()
-        if (alarmNotify && allovAlarmBlinck)
+        if (alarmNotify )//&& allovAlarmBodyBlinck)
             timer.start()
         else if (!notify)
             timer.stop()
     }
-
-    onAllovAlarmBlinckChanged: {
-        renewColors()
-        onAlarmNotifyChanged()
+    onAlarmNotifyChanged: {
+        aNch()
+    }
+    onAllovAlarmBodyBlinckChanged: {
+        aNch()
+    }
+    onAllovAlarmBorderBlinckChanged: {
+        aNch()
     }
     onNotifyChanged: {
         renewColors()

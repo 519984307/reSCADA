@@ -44,11 +44,11 @@ QVariant Tag::readValue()
        case TFloat:
             return value.toFloat();
         default:
-            emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag reading error: data type isn\'t valid");
+            //emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag reading error: data type isn\'t valid");
             return 0;
         }
     } else {
-        emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag reading error: access denied");
+        //emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag reading error: access denied");
         return 0;
     }
 }
@@ -69,7 +69,7 @@ bool Tag::writeValue(QVariant value)
         this->newValue = value;
         ready = false;
         //emit s_logging(MessVerbose, QDateTime::currentDateTime(), false, this->objectName(), "Tag writing: " + value.toString());
-        emit s_onWriteRequested(this);
+        emit s_onWriteRequested(this, value);
         return true;
     } else {
         emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag writing error: access denied");

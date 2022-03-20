@@ -22,16 +22,18 @@ Item {
     property bool limited: false
     property bool correctingButtons: true
     property alias readOnly: valueLable.readOnly
-    property double step: 0.5
+    property double step: 1
+    property double _step:  (Math.pow (10,-mantissa)).toFixed(mantissa) * step
     property double upLimit: 100
     property double downLimit: 0
 
-    property int mantissa: 1
+    property int mantissa: 0
     property alias valueFontSize: valueLable.font
     property bool disappear: false
     //property alias valueText: valueLable.text
     property double valueReal: 0
-    property double valueRealTmp: 0
+    property double incTmp: 0
+    property double errorRate: 0
 
     property bool separCorrButtons: false
     property bool setFromCore: false
@@ -53,7 +55,7 @@ Item {
     function checkLimits(value) {
         //уст с учетом лимитов
         value = Number(value)
-        value.toFixed(mantissa)
+        value = value.toFixed(mantissa)
         value = Number(value)
         if( setFromCore || !limited )
             return value
@@ -73,14 +75,6 @@ Item {
             //toFicsed округляет до нужной мантиссы, Number убирает ненужные нулитипа 12.32000
             valueLable.text = checkLimits(valueReal)
             if(setFromCore) setFromCore = false
-            //            if(setFromCore){
-            //                console.log( "onValueRealChanged_setFromCore", valueReal )
-            //                setFromCore = false
-            //            }
-            //            else if(valueLable.loaded){
-            //            console.log( "onValueRealChanged_NosetFromCore", valueReal )
-            //                valueChanged(valueReal)
-            //            }
         }
 
     }
@@ -150,42 +144,35 @@ Item {
             //font.family: "DSEG7 Classic"
             readOnly: false
             // Not Work
-            //            validator: DoubleValidator {
-            //                decimals: mantissa
-            //                locale: "RU"
-            //            }
+            validator: RegExpValidator {
+                regExp:/-?\d{1,100}[.,]?\d{0,10}/
+            }
             onEditingFinished: {
-                //console.log( "onEditingFinished", valueReal )
                 text = checkLimits(text)
+                var newVal = Number(text)
+                if (limited) {
+                    if(newVal > upLimit) {
+                        text = upLimit
+                    }
+                    else if(newVal < downLimit){
+                        text = downLimit
+                    }
+                }
                 if (text != valueReal) {//!=выбран осознанно, т.к. text строка, а value число
                     valueReal =  text
                     valueChanged(valueReal)
                 }
+                errorRate = 0
             }
             onTextChanged: {
-                //console.log( "onTextChanged", valueReal )
-                if( text.charAt(text.length - 1) === ',' ){
-                    remove(text.length - 1, text.length)
-                    text += "."
-                }
-                if( text.charAt(text.length - 1) === '.' ){
-                    if(text.indexOf('.',0) != (text.length - 1) )
-                        remove(text.length - 1, text.length)
-                }
+                text = text.replace(',', '.')
                 var newVal = text.indexOf('.')
                 if( newVal != -1 && newVal < text.length - mantissa - 1 ){
                     remove(text.length - 1, text.length)
                 }
-                newVal = Number(text)
+                //newVal = Number(text)
 
-                if( isNaN(newVal) ){//validator: DoubleValidator { пропускает "," приходится её так отсекать
-                    undo()
-                    return
-                }
-                if (limited && (newVal > upLimit) && limit) {
-                    remove(text.length - 1, text.length)
-                }
-                limit = true //Чтобы не лимитировать значения от setValue
+                //limit = true //Чтобы не лимитировать значения от setValue
             }
         }
         ToolTip {
@@ -216,7 +203,7 @@ Item {
                     if (timer.buffer == ""){
                         timer.buffer = valueLable.text
                     }
-                    valueLable.text = checkLimits( Number(valueLable.text) - step )
+                    valueLable.text = checkLimits( Number(valueLable.text) - _step)
                     timer.stop()
                     timer.start()
                 }
@@ -230,7 +217,6 @@ Item {
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            //anchors.rightMargin: mfu.borderWidth
             anchors.bottomMargin: mfu.borderWidth
             anchors.topMargin: mfu.borderWidth
             unPressCheckColor: mfu.backgroundColor
@@ -244,7 +230,7 @@ Item {
                     if (timer.buffer == ""){
                         timer.buffer = valueLable.text
                     }
-                    valueLable.text = checkLimits( Number(valueLable.text) + step )
+                    valueLable.text = checkLimits( Number(valueLable.text) + _step)
                     timer.stop()
                     timer.start()
                 }

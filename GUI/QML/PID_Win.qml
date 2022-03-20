@@ -9,6 +9,7 @@ Window {
     title: "ПИД регулятор"
     flags:/* Qt.Window |*/ Qt.Dialog
     color: "#ced5d6"
+    property alias mfuSetPt: mfuSetPt
 
     property alias mfuFromImpact: mfuFromImpact
     property alias mfuToImpact: mfuToImpact
@@ -86,6 +87,14 @@ Window {
 
     signal s_impMore( variant More )
     signal s_impLess( variant Less )
+    onVisibleChanged: {
+        if (visible == true) {
+            var absolutePos = mapToGlobal(0, 0)
+            x = absolutePos.x
+            y = absolutePos.y
+            requestActivate()
+        }
+    }
 
     Item{
         id: itemPr
@@ -224,8 +233,7 @@ Window {
             readOnly: true
             borderColor: "Black"
             correctingButtons: false
-            tooltip: "Контролируемый параме"
-            mantissa: 2
+            tooltip: "Контролируемый параметр"
         }
         //        Text {
         //            id: textFrom1
@@ -256,7 +264,6 @@ Window {
             limited: false
             backgroundColor: colorSetPt
             textInput.color: "White"
-            mantissa: 2
             maxBtn.nameText.color: "white"
             minBtn.nameText.color: "white"
             onValueChanged:  s_setPtChanged( Value )
@@ -289,7 +296,6 @@ Window {
             correctingButtons: manOnOff
             limited: false
             backgroundColor: colorImpact
-            mantissa: 2
             onS_more: s_impMore(More)
             onS_less: s_impLess(Less)
             onValueChanged: s_impactChanged( Value )
@@ -316,8 +322,6 @@ Window {
                     anchors.bottom: parent.bottom
                     readOnly: false
                     correctingButtons: false
-
-                    limited: false
                     backgroundColor: "#ffffff"
                     mantissa: 4
                     tooltip: "Коэфициент пропорциональности"
