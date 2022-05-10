@@ -320,8 +320,8 @@ bool TSP::addTag(int id, QString name, QString address, QString options, int gro
             type = TBool;
         else if (option == "int")
             type = TInt;
-//        else if (option == "uint")
-//            type = TUInt;
+        else if (option == "uint")
+            type = TUInt;
         else if (option == "float")
             type = TFloat;
         else {

@@ -21,6 +21,10 @@ Window {
     property alias readOnly: mfuCurValue.readOnly
     property color mainColor: "#a3fa96"
     property color scaleColor: "#1a6b14"
+    property bool confmOnEnter: false
+    property alias upLimit: maxValue.upLimit
+    property alias downLimit: minValue.downLimit
+    property string unitOfmeg: "%"
 
     //signal minRangeChanged(int value)
     //signal maxRangeChanged(int value)
@@ -39,7 +43,7 @@ Window {
 
     onVisibleChanged: {
         if (visible == true) {
-            var absolutePos = mapToGlobal(0, 0)
+            var absolutePos = root.mapToGlobal(0, 0)
             x = absolutePos.x
             y = absolutePos.y
             requestActivate()
@@ -49,7 +53,7 @@ Window {
     Text {
         id: textWrkDp
         height: 20
-        text: "РАБОЧИЙ ДИАПАЗОН %"
+        text: "РАБОЧИЙ ДИАПАЗОН " + unitOfmeg
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -80,8 +84,10 @@ Window {
         correctingButtons: true
         //onValueRealChanged: maxRangeChanged(valueReal)
         limited: true
-        downLimit: 0//minValue.valueReal + 1
+        downLimit: minValue.valueReal + 1
+        upLimit: 100
         onValueChanged: s_valueMaxChenged( Value )
+        confmOnEnter: root.confmOnEnter
     }
     MFUnit {
         id: minValue
@@ -99,8 +105,10 @@ Window {
         correctingButtons: true
         //onValueRealChanged: minRangeChanged(valueReal)
         limited: true
-        upLimit: 100//maxValue.valueReal - 1
+        upLimit: maxValue.valueReal - 1
+        downLimit: 0
         onValueChanged: s_valueMinChenged( Value )
+        confmOnEnter: root.confmOnEnter
     }
     Item {
         id: item1
@@ -110,7 +118,7 @@ Window {
         anchors.top: minValue.bottom
         Rectangle {
             id: min
-            width: valueMin / 100 * parent.width
+            width: valueMin / downLimit * parent.width
             color: "#6e9ec8"
             anchors.left: parent.left
             anchors.top: parent.top
@@ -126,7 +134,7 @@ Window {
         }
         Rectangle {
             id: max
-            width: (1 - valueMax / 100) * parent.width
+            width: (1 - valueMax / upLimit) * parent.width
             color: "#c36b6b"
             anchors.right: parent.right
             anchors.top: parent.top
@@ -134,7 +142,7 @@ Window {
         }
         Rectangle {
             id: recLvl
-            x: value / 100 * parent.width
+            x: value / (upLimit - downLimit) * parent.width
             width: 2
             height: parent.height * 1.1
             color: mainColor
@@ -150,7 +158,7 @@ Window {
     Text {
         id: textLvl
         height: 20
-        text: "ТЕКУЩЕЕ ЗНАЧЕНИЕ %"
+        text: "ТЕКУЩЕЕ ЗНАЧЕНИЕ " + unitOfmeg
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: item1.bottom
@@ -180,6 +188,7 @@ Window {
         onS_more: s_moreVal( More )
         onS_less: s_lessVal( Less )
         onValueChanged: s_valueChenged( Value )
+        confmOnEnter: root.confmOnEnter
     }
     Text {
         id: stepTxt
@@ -207,12 +216,15 @@ Window {
         correctingButtons: false
         upLimit: 10
         downLimit: 1
+        confmOnEnter: root.confmOnEnter
         //onValueRealChanged: stepChanged(valueReal)
     }
 }
 
+
+
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:2}
+    D{i:0;formeditorZoom:3}
 }
 ##^##*/

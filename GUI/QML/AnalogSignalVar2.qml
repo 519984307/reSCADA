@@ -15,6 +15,7 @@ AnalogSignalVar1 {
     property bool maxShow: true
     property bool minShow: true
     property int oldZ: 0
+    property bool confmOnEnter: false
 
     signal s_maxLimitChanged( variant Limit )
     function setMaxLimit( Limit ){ maxLvl.setValue( Limit ) }
@@ -51,6 +52,7 @@ AnalogSignalVar1 {
         mantissa: parent.mantissa
 //        step: limitStep
         disappear: true
+        confmOnEnter: parent.confmOnEnter
         body.onVisibleChanged:{
             if(visible){
                 oldZ = z

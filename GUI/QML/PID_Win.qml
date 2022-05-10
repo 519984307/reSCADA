@@ -9,6 +9,7 @@ Window {
     title: "ПИД регулятор"
     flags:/* Qt.Window |*/ Qt.Dialog
     color: "#ced5d6"
+    property alias mfuProcess: mfuProcess
     property alias mfuSetPt: mfuSetPt
 
     property alias mfuFromImpact: mfuFromImpact
@@ -49,6 +50,8 @@ Window {
 //    property alias kdOut: mfuKdOut.valueReal
 
     property bool impIsOut: true
+
+    property bool confmOnEnter: false
 
     signal s_manOn( variant ManOn )
     onS_manOn: {
@@ -111,7 +114,7 @@ Window {
             anchors.bottom: mfuFromProcess.top
             Rectangle {
                 height: {
-                    parent.height * (wind.process - mfuFromProcess.valueReal )
+                    parent.height * (mfuProcess.valueReal - mfuFromProcess.valueReal )
                             /(mfuToProcess.valueReal - mfuFromProcess.valueReal)}
                 color: colorProcess
                 anchors.left: parent.left
@@ -124,7 +127,27 @@ Window {
             anchors.bottomMargin: -border.width
             anchors.topMargin: -border.width
         }
-
+        Rectangle {
+            id: rectSetPt
+            color: rectPros.color
+            border.width: 1
+            anchors.left: rectPros.right
+            anchors.right: parent.right
+            anchors.top: mfuToProcess.bottom
+            anchors.bottom: mfuFromProcess.top
+            Rectangle {
+                height: {
+                    parent.height * (mfuSetPt.valueReal - mfuFromProcess.valueReal )
+                            /(mfuToProcess.valueReal - mfuFromProcess.valueReal)}
+                color: colorSetPt
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+            }
+            anchors.bottomMargin: -border.width
+            anchors.leftMargin: -rectPros.border.width
+            anchors.topMargin: -border.width
+        }
         MFUnit {
             id: mfuToProcess
             height: wind.height * 0.05
@@ -138,30 +161,8 @@ Window {
             limited: false
             tooltip: "Max"
             backgroundColor: "#e6e6e6"
+            confmOnEnter: wind.confmOnEnter
         }
-
-        Rectangle {
-            id: rectSetPt
-            color: rectPros.color
-            border.width: 1
-            anchors.left: rectPros.right
-            anchors.right: parent.right
-            anchors.top: mfuToProcess.bottom
-            anchors.bottom: mfuFromProcess.top
-            Rectangle {
-                height: {
-                    parent.height * (wind.setPt - mfuFromProcess.valueReal )
-                            /(mfuToProcess.valueReal - mfuFromProcess.valueReal)}
-                color: colorSetPt
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-            }
-            anchors.bottomMargin: -border.width
-            anchors.leftMargin: -rectPros.border.width
-            anchors.topMargin: -border.width
-        }
-
         MFUnit {
             id: mfuFromProcess
             width: mfuToProcess.width
@@ -176,6 +177,7 @@ Window {
             limited: false
             tooltip: "Min"
             backgroundColor: mfuToProcess.backgroundColor
+            confmOnEnter: wind.confmOnEnter
         }
     }
     Column{
@@ -226,6 +228,7 @@ Window {
             height: parent.height * 0.15
             anchors.left: parent.left
             anchors.right: parent.right
+            valueReal: 0
             anchors.rightMargin: 0
             anchors.leftMargin: 0
             backgroundColor: colorProcess
@@ -234,6 +237,7 @@ Window {
             borderColor: "Black"
             correctingButtons: false
             tooltip: "Контролируемый параметр"
+            confmOnEnter: wind.confmOnEnter
         }
         //        Text {
         //            id: textFrom1
@@ -267,6 +271,7 @@ Window {
             maxBtn.nameText.color: "white"
             minBtn.nameText.color: "white"
             onValueChanged:  s_setPtChanged( Value )
+            confmOnEnter: wind.confmOnEnter
             //textInput.text
         }
 
@@ -299,6 +304,7 @@ Window {
             onS_more: s_impMore(More)
             onS_less: s_impLess(Less)
             onValueChanged: s_impactChanged( Value )
+            confmOnEnter: wind.confmOnEnter
         }
         Column{
             id: column
@@ -326,6 +332,7 @@ Window {
                     mantissa: 4
                     tooltip: "Коэфициент пропорциональности"
                     onValueChanged:s_KpChanged(Value)
+                    confmOnEnter: wind.confmOnEnter
                 }
                 Text {
                     width: parent.width *0.1
@@ -348,10 +355,11 @@ Window {
                     anchors.bottomMargin: 0
                     readOnly: true
                     correctingButtons: false
-
                     limited: false
                     backgroundColor: "#ffffff"
                     tooltip: "Пропорциональная составляющая воздействия"
+                    confmOnEnter: wind.confmOnEnter
+                    mantissa: mfuImpact.mantissa + 1
                 }
             }
             Row{
@@ -368,12 +376,12 @@ Window {
                     anchors.bottom: parent.bottom
                     readOnly: false
                     correctingButtons: false
-
                     limited: false
                     backgroundColor: "#ffffff"
                     mantissa: 4
                     tooltip: "Интегральный коэфициент"
                     onValueChanged: s_KiChanged( Value )
+                    confmOnEnter: wind.confmOnEnter
                 }
 
                 Text {
@@ -397,10 +405,11 @@ Window {
                     anchors.bottomMargin: 0
                     readOnly: true
                     correctingButtons: false
-
                     limited: false
                     backgroundColor: "#ffffff"
                     tooltip: "Интегральная составляющая воздействия"
+                    confmOnEnter: wind.confmOnEnter
+                    mantissa: mfuImpact.mantissa + 1
                 }
             }
             Row{
@@ -417,12 +426,12 @@ Window {
                     anchors.bottom: parent.bottom
                     readOnly: false
                     correctingButtons: false
-
                     limited: false
                     backgroundColor: "#ffffff"
                     mantissa: 4
                     tooltip: "Дифференциальный коэфициент"
                     onValueChanged: s_KdChanged( Value )
+                    confmOnEnter: wind.confmOnEnter
                 }
 
                 Text {
@@ -446,10 +455,11 @@ Window {
                     anchors.bottomMargin: 0
                     readOnly: true
                     correctingButtons: false
-
                     limited: false
                     backgroundColor: "#ffffff"
                     tooltip: "Дифференциаьная составляющая воздействия"
+                    confmOnEnter: wind.confmOnEnter
+                    mantissa: mfuImpact.mantissa + 1
                 }
             }
         }
@@ -467,7 +477,7 @@ Window {
         Rectangle {
             color: colorImpact
             height: {
-                parent.height * (wind.impact - mfuFromImpact.valueReal )
+                parent.height * (mfuImpact.valueReal - mfuFromImpact.valueReal )
                         /(mfuToImpact.valueReal - mfuFromImpact.valueReal)
             }
             anchors.left: parent.left
@@ -484,6 +494,7 @@ Window {
         width: mfuToProcess.width
         anchors.right: parent.right
         anchors.top: parent.top
+        valueReal: 100
         anchors.rightMargin: 0
         limited: false
         anchors.topMargin: 0
@@ -492,6 +503,7 @@ Window {
         backgroundColor: mfuToProcess.backgroundColor
         readOnly: false
         borderColor: "Black"
+        confmOnEnter: wind.confmOnEnter
     }
     MFUnit {
         id: mfuFromImpact
@@ -507,6 +519,7 @@ Window {
         backgroundColor: mfuToProcess.backgroundColor
         readOnly: false
         borderColor: "Black"
+        confmOnEnter: wind.confmOnEnter
     }
 }
 

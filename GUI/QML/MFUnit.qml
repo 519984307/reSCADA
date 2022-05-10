@@ -17,6 +17,7 @@ Item {
     property color borderColor: "black"
     property int borderWidth: 1
     property alias textInput: valueLable
+    property bool showTooltip: !(tooltip == "")
     property string tooltip: ""
 
     property bool limited: false
@@ -33,10 +34,13 @@ Item {
     //property alias valueText: valueLable.text
     property double valueReal: 0
     property double incTmp: 0
-    property double errorRate: 0
+    //property double errorRate: 0
 
     property bool separCorrButtons: false
     property bool setFromCore: false
+
+    property bool confmOnEnter: false
+    property string confmBuff: ""
 
     signal s_more(bool More)
     signal s_less(bool Less)
@@ -44,38 +48,40 @@ Item {
     //property real extAlarmLevel: 0
     function setValue(value) {
         setFromCore = true
+        value = value.toFixed(mantissa)
         valueReal = Number(value)
-        //        if (valueLable.text != value) {//!=выбран осознанно, т.к. text строка, а value число
-        //            value = value.toFixed(mantissa)
-        //            value = Number(value)
-        //            valueLable.limit = false
-        //            valueLable.text = value
-        //        }
+        setFromCore = false
     }
     function checkLimits(value) {
-        //уст с учетом лимитов
         value = Number(value)
         value = value.toFixed(mantissa)
         value = Number(value)
         if( setFromCore || !limited )
             return value
-        if (value < mfu.downLimit) {
-            return mfu.downLimit
+        if (value < downLimit) {
+            return downLimit
         }
-        else if (value > mfu.upLimit) {
-            return mfu.upLimit
+        else if (value > upLimit) {
+            return upLimit
         }
         else return value
     }
     signal valueChanged(variant Value)
-    //onValueChanged: console.log( "valueChanged", valueReal )
+
     onValueRealChanged: {
         //console.log( "onValueRealChanged1", valueReal )
-        if( String(valueReal) !== valueLable.text ){
+        if( setFromCore ){
             //toFicsed округляет до нужной мантиссы, Number убирает ненужные нулитипа 12.32000
-            valueLable.text = checkLimits(valueReal)
-            if(setFromCore) setFromCore = false
+            valueLable.text = valueReal
         }
+        else {//if( String(valueReal) !== valueLable.text ){
+            valueLable.text = checkLimits(valueReal)
+            if( String(valueReal) !== valueLable.text ){
+                valueReal = valueLable.text
+            }
+            valueChanged(valueReal)
+        }
+        confmBuff = valueLable.text
 
     }
 
@@ -87,7 +93,8 @@ Item {
         property string buffer: ""
         onTriggered: {
             if (valueLable.text != buffer) {
-                valueLable.editingFinished()
+                if( !confmOnEnter )
+                    valueLable.editingFinished()
             }
             buffer = ""
         }
@@ -98,7 +105,7 @@ Item {
         //onClicked: mfu.notified()
         hoverEnabled: true
         onEntered: {
-            ttip.visible = true
+            if(showTooltip)ttip.visible = true
             //TEST valueReal += 10
         }
         onExited: {
@@ -112,130 +119,148 @@ Item {
                     body.visible = false
             }
         }
-    }
 
-    Rectangle {
-        id: body
-        visible: !mfu.disappear
-        anchors.fill: parent
-        color: backgroundColor
-        border.width: borderWidth
-        border.color: borderColor
+        Rectangle {
+            id: body
+            visible: !mfu.disappear
+            anchors.fill: parent
+            color: backgroundColor
+            border.width: borderWidth
+            border.color: borderColor
+            onVisibleChanged: if(!visible)valueLable.focus = false
 
+            TextInput {
+                id: valueLable
+                property bool limit: true
+                property bool loaded: false
+                property bool chdByUsr: false
+                anchors.left: minBtn.right
+                anchors.right: maxBtn.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                anchors.rightMargin: 0
+                anchors.leftMargin: 0
+                font.pixelSize: mfu.height * 0.7
+                readOnly: false
 
-        TextInput {
-            id: valueLable
-            property bool limit: true
-            property bool loaded: false
-            property bool chdByUsr: false
-            Component.onCompleted: {
-                text = checkLimits(valueReal.toFixed(mantissa))
-                loaded = true
-            }
-            anchors.left: minBtn.right
-            anchors.right: maxBtn.left
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            anchors.rightMargin: 0
-            anchors.leftMargin: 0
-            font.pixelSize: mfu.height * 0.7
-            //font.family: "DSEG7 Classic"
-            readOnly: false
-            // Not Work
-            validator: RegExpValidator {
-                regExp:/-?\d{1,100}[.,]?\d{0,10}/
-            }
-            onEditingFinished: {
-                text = checkLimits(text)
-                var newVal = Number(text)
-                if (limited) {
-                    if(newVal > upLimit) {
-                        text = upLimit
+                validator: RegExpValidator {
+                    regExp:/-?\d{1,100}[.,]?\d{0,10}/
+                }
+                Component.onCompleted: {
+                    text = checkLimits(valueReal)
+                    loaded = true
+                }
+                Keys.onPressed:{
+                    if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return){ //Enter
+                        valueReal = text
+                        confmBuff = text//""
+                        //focus = false;
                     }
-                    else if(newVal < downLimit){
-                        text = downLimit
+                    else if(event.key === Qt.Key_Escape){
+                        //confmBuff = ""
+                        focus = false;
                     }
                 }
-                if (text != valueReal) {//!=выбран осознанно, т.к. text строка, а value число
-                    valueReal =  text
-                    valueChanged(valueReal)
+                onEditingFinished: {
+                    text = checkLimits(text)
+                    if ( text != valueReal ) {//  "!=" выбран осознанно, т.к. text строка, а value число и нужно привести типы
+                        if(confmOnEnter){
+                            text = confmBuff
+                            confmBuff = ""
+                        }
+                        else{
+                            valueReal = text
+                        }
+                    }
                 }
-                errorRate = 0
-            }
-            onTextChanged: {
-                text = text.replace(',', '.')
-                var newVal = text.indexOf('.')
-                if( newVal != -1 && newVal < text.length - mantissa - 1 ){
-                    remove(text.length - 1, text.length)
-                }
-                //newVal = Number(text)
+                onFocusChanged: {
+                    if(focus ){
+                        if(confmBuff === "" && confmOnEnter){
+                            confmBuff = text
+                        }
+                    }
+                    else if( text == ""){
+                        onEditingFinished()
+                    }
 
-                //limit = true //Чтобы не лимитировать значения от setValue
-            }
-        }
-        ToolTip {
-            id: ttip
-            delay: 2000
-            timeout: 2000
-            visible: false
-            text: tooltip
-        }
-        SimpleButton {
-            id: minBtn
-            width: nameText.text.length * nameText.font.pixelSize * 0.7
-            visible: mfu.correctingButtons
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.leftMargin: 0
-            anchors.bottomMargin: mfu.borderWidth
-            anchors.topMargin: mfu.borderWidth
-            unPressCheckColor: mfu.backgroundColor
-            nameText.text: "-"
-            nameText.font.pixelSize: valueLable.font.pixelSize
-            border.width: 0
-            anchors.left: parent.left
-            radius: 0
-            checkable: false
-            mouseArea.onClicked: {
-                if(!separCorrButtons){
-                    if (timer.buffer == ""){
-                        timer.buffer = valueLable.text
+                }
+                onTextChanged: {
+                    if(setFromCore)return
+                    text = text.replace(',', '.')
+                    var newVal = text.indexOf('.')
+                    if( newVal != -1 && newVal < text.length - mantissa - 1 ){
+                        remove(text.length - 1, text.length)
                     }
-                    valueLable.text = checkLimits( Number(valueLable.text) - _step)
-                    timer.stop()
-                    timer.start()
                 }
             }
-            onPressedChanged: s_less(pressed)
-        }
-        SimpleButton {
-            id: maxBtn
-            width: nameText.text.length * nameText.font.pixelSize * 0.7
-            visible: mfu.correctingButtons
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: mfu.borderWidth
-            anchors.topMargin: mfu.borderWidth
-            unPressCheckColor: mfu.backgroundColor
-            nameText.text: "+"
-            nameText.font.pixelSize: valueLable.font.pixelSize
-            border.width: 0
-            radius: 0
-            checkable: false
-            mouseArea.onClicked: {
-                if(!separCorrButtons){
-                    if (timer.buffer == ""){
-                        timer.buffer = valueLable.text
-                    }
-                    valueLable.text = checkLimits( Number(valueLable.text) + _step)
-                    timer.stop()
-                    timer.start()
-                }
+            ToolTip {
+                id: ttip
+                delay: 2000
+                timeout: 2000
+                visible: false
+                text: tooltip
             }
-            onPressedChanged: s_more( pressed )
+            SimpleButton {
+                id: minBtn
+                width: nameText.text.length * nameText.font.pixelSize * 0.7
+                visible: mfu.correctingButtons
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.leftMargin: 0
+                anchors.bottomMargin: mfu.borderWidth
+                anchors.topMargin: mfu.borderWidth
+                unPressCheckColor: mfu.backgroundColor
+                nameText.text: "-"
+                nameText.font.pixelSize: valueLable.font.pixelSize
+                border.width: 0
+                anchors.left: parent.left
+                radius: 0
+                checkable: false
+                mouseArea.onClicked: {
+                    if(!valueLable.focus)
+                        valueLable.focus = true
+                    if(!separCorrButtons){
+                        if (timer.buffer == ""){
+                            timer.buffer = valueLable.text
+                        }
+                        valueLable.text = checkLimits( Number(valueLable.text) - _step)
+                        timer.stop()
+                        timer.start()
+                    }
+                }
+                onPressedChanged: s_less(pressed)
+            }
+            SimpleButton {
+                id: maxBtn
+                width: nameText.text.length * nameText.font.pixelSize * 0.7
+                visible: mfu.correctingButtons
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: mfu.borderWidth
+                anchors.topMargin: mfu.borderWidth
+                unPressCheckColor: mfu.backgroundColor
+                nameText.text: "+"
+                nameText.font.pixelSize: valueLable.font.pixelSize
+                border.width: 0
+                radius: 0
+                checkable: false
+                mouseArea.onClicked: {
+                    if(!valueLable.focus)
+                        valueLable.focus = true
+                    if(!separCorrButtons){
+                        if (timer.buffer == ""){
+                            timer.buffer = valueLable.text
+                        }
+                        valueLable.text = checkLimits( Number(valueLable.text) + _step)
+                        timer.stop()
+                        timer.start()
+                    }
+                }
+                onPressedChanged: s_more( pressed )
+            }
         }
     }
 }

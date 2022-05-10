@@ -89,8 +89,8 @@ UnitPropItem {
         backgroundColor: indicColor
         colorShortName: "green"
         postfix: "°c"
-
         tooltipText: "Температура верха"
+        confmOnEnter: true
     }
     AnalogSignalVar2 {
         id: pTop
@@ -112,6 +112,8 @@ UnitPropItem {
         postfix: "м"
         tooltipText: "Давление верха"
         mantissa: 2
+        confmOnEnter: true
+
         SimpleButton{
             id: sbPTop
             radius: height / 2
@@ -148,17 +150,21 @@ UnitPropItem {
         colorProcess: "yellow"
         impIsOut: false
         mfuToProcess.valueReal: 3
+        mfuToImpact.valueReal: 100
         mfuImpact.separCorrButtons: true
         mfuKpOut.visible: false
         mfuKiOut.visible:false
         mfuKdOut.visible:false
+        mfuProcess.mantissa: 2
         mfuSetPt.mantissa: 2
         mfuFromProcess.mantissa: 2
         mfuFromImpact.mantissa: 2
+        mfuImpact.mantissa: 2
         kdRow.visible: false
         onManOnOffChanged: sbPTop.checked = manOnOff
         Component.onCompleted: sbPTop.checked = manOnOff
         adminView: parent.adminView
+        confmOnEnter: true
     }
 
     PID_Win{
@@ -171,17 +177,21 @@ UnitPropItem {
         colorProcess: "yellow"
         impIsOut: false
         mfuToProcess.valueReal: 3
+        mfuToImpact.valueReal: 100
         mfuImpact.separCorrButtons: true
         mfuKpOut.visible: false
         mfuKiOut.visible: false
         mfuKdOut.visible: false
+        mfuProcess.mantissa: 2
         mfuSetPt.mantissa: 2
         mfuFromProcess.mantissa: 2
         mfuFromImpact.mantissa: 2
+        mfuImpact.mantissa: 2
         kdRow.visible: false
         adminView: parent.adminView
         onManOnOffChanged: { sbPrButt.checked = manOnOff }
         Component.onCompleted: sbPrButt.checked = manOnOff
+        confmOnEnter: true
     }
     AnalogSignalVar2 {
         id: pBottom
@@ -203,6 +213,8 @@ UnitPropItem {
         postfix: "м"
         tooltipText: "Давление в кубе"
         mantissa: 2
+        confmOnEnter: true
+
         SimpleButton{
             id: sbPrButt
             radius: height / 2
@@ -240,6 +252,7 @@ UnitPropItem {
         colorShortName: "#008000"
         tooltipText: "Температура отходящей воды"
         postfix: "°c"
+        confmOnEnter: true
 //        shLeft: false
 //        shRight: false
 //        shTop: true
@@ -262,6 +275,7 @@ UnitPropItem {
         colorShortName: "green"
         postfix: "°c"
         tooltipText: "Температура в кубе"
+        confmOnEnter: true
     }
 }
 

@@ -29,6 +29,7 @@ Item {
     property alias alarmBottomLevel: mfuAlarmBottomLevel.valueReal
     property string postfix:"%"
     property double volume:0
+    property bool confmOnEnter: false
 
     signal s_alarmTopLevelChanged( variant AlarmTopLevel )
     signal s_alarmBottomLevelChanged( variant AlarmTopLevel )
@@ -277,6 +278,7 @@ Item {
             s_enableMouseArea( !mainRect.visible )
         }
         onValueChanged: s_alarmTopLevelChanged( Value )
+        confmOnEnter: parent.confmOnEnter
     }
     MFUnit {
         id: mfuAlarmBottomLevel
@@ -301,6 +303,7 @@ Item {
             s_enableMouseArea( !mainRect.visible )
         }
         onValueChanged:  s_alarmBottomLevelChanged( Value )
+        confmOnEnter: parent.confmOnEnter
     }
 }
 

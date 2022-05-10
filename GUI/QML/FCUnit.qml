@@ -9,6 +9,8 @@ StartStopUnit {
     property alias freq: regPersWin.value
     property alias reqMaxRange: regPersWin.valueMax
     property alias freqMinRange: regPersWin.valueMin
+    property bool  hrzOrPrst: false
+    property alias title: title.text
 
     function setMinRange(value) {
         regPersWin.setValueMinRange( value )
@@ -30,6 +32,7 @@ StartStopUnit {
         border.width: borderCurrentWidth
         color: backgroundCurrentColor
         Text{
+            id: title
             text: "ЧП"
             anchors.fill: parent
             horizontalAlignment: Text.AlignHCenter
@@ -55,6 +58,8 @@ StartStopUnit {
         mainColor: "#09aad4"
         scaleColor: "#1a6b14"
         mfuCurValue.mantissa: 1
+        upLimit: hrzOrPrst ? 50 : 100
+        unitOfmeg: hrzOrPrst ? "Гц" : "%"
     }
 
     mouseArea.onClicked: {

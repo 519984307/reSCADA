@@ -158,6 +158,9 @@ void ETag::_acceptValue(QVariant Val)
     //Val = _tag->ReadValue();
     switch (_conv) {
     case Prom::VCNo: break;
+    case Prom::VCdiv2 :
+        Val = Val.toDouble() / 2;
+        break;
     case Prom::VCdiv10 :
         Val = Val.toDouble() / 10;
         break;

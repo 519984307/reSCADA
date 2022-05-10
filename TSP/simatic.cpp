@@ -271,25 +271,31 @@ void SimaticDriver::read( SimaticDriver::Task *task )
                             tagAdr->regAddr.bit ) );
                     }
                     break;
+                case S7WLChar:
                 case S7WLByte:
                     tag->setValue( GetByteAt( data,offsetBuff) );
                     break;
                 case S7WLWord:
+                    if( tag->type == TInt )tag->setValue( GetIntAt( data, offsetBuff ) );
+                    else if( tag->type == TUInt )tag->setValue( GetWordAt( data, offsetBuff ) );//!NOTE не тестировано
+                    break;
+                case S7WLInt:
                     tag->setValue( GetIntAt( data, offsetBuff ) );
+                    break;
+                case S7WLDInt:
+                    tag->setValue( GetDIntAt( data, offsetBuff ) );
                     break;
                 case S7WLCounter:
                 case S7WLTimer:
-                    tag->setValue( GetWordAt( data, offsetBuff ) );
+                    tag->setValue( GetDWordAt( data, offsetBuff ) );//!NOTE не тестировано
                     break;
                 case S7WLDWord:
                     if( tag->type == TFloat ) tag->setValue( GetRealAt( data, offsetBuff ));
-                    else tag->setValue( GetDIntAt( data, offsetBuff ) );
+                    else if( tag->type == TInt )tag->setValue( GetDIntAt( data, offsetBuff ) );
+                    else if( tag->type == TUInt )tag->setValue( GetDWordAt( data, offsetBuff ) );//!NOTE не тестировано
                     break;
-                    //Такого варианта не будет, т.к. он кодируется в тегах просто как Double Word
-                    //          case S7WLReal:
-                    //            tag->setValue( (double)GetRealAt( data, tagAdr->regAddr.memSlot * kf ) );
-                    //            break;
-                default:
+                case S7WLReal://!NOTE не тестировано
+                    tag->setValue( GetRealAt( data, offsetBuff ));
                     break;
                 }
             }
@@ -394,25 +400,31 @@ void SimaticDriver::readInList(int FstTaskInd,  QList<Task*> *TaskList)
                                         tagAdr->regAddr.bit ) );
                                 }
                                 break;
+                            case S7WLChar:
                             case S7WLByte:
                                 tag->setValue( GetByteAt( Items[i].pdata,offsetBuff2) );
                                 break;
                             case S7WLWord:
+                                if( tag->type == TInt )tag->setValue( GetIntAt( Items[i].pdata, offsetBuff2 ) );
+                                else if( tag->type == TUInt )tag->setValue( GetWordAt( Items[i].pdata, offsetBuff2 ) );//!NOTE не тестировано
+                                break;
+                            case S7WLInt:
                                 tag->setValue( GetIntAt( Items[i].pdata, offsetBuff2 ) );
+                                break;
+                            case S7WLDInt:
+                                tag->setValue( GetDIntAt( Items[i].pdata, offsetBuff2 ) );
                                 break;
                             case S7WLCounter:
                             case S7WLTimer:
                                 tag->setValue( GetWordAt( Items[i].pdata, offsetBuff2 ) );
                                 break;
                             case S7WLDWord:
-                                if( tag->type == TFloat ) tag->setValue( GetRealAt( Items[i].pdata, (tagAdr->regAddr.memSlot - tmpTask->regAddr.memSlot) * sizeKf ));
-                                else tag->setValue( GetDIntAt( Items[i].pdata, offsetBuff2 ) );
+                                if( tag->type == TFloat ) tag->setValue( GetRealAt( Items[i].pdata, offsetBuff2) );
+                                else if( tag->type == TInt )tag->setValue( GetDIntAt( Items[i].pdata, offsetBuff2 ) );
+                                else if( tag->type == TUInt )tag->setValue( GetDWordAt( Items[i].pdata, offsetBuff2 ) );//!NOTE не тестировано
                                 break;
-                                //Такого варианта не будет, т.к. он кодируется в тегах просто как Double Word
-                                //          case S7WLReal:
-                                //            tag->setValue( (double)GetRealAt( data, tagAdr->regAddr.memSlot * kf ) );
-                                //            break;
-                            default:
+                            case S7WLReal://!NOTE не тестировано
+                                tag->setValue( GetRealAt( Items[i].pdata, offsetBuff2 ));
                                 break;
                             }
                             tag->setError("");
@@ -471,22 +483,40 @@ void SimaticDriver::writeTag(Tag *Tag, QVariant NewValue )
         case S7WLBit:
             data[0] = NewValue.toBool();
             break;
-        case S7WLWord:
-            SetIntAt( data, 0, NewValue.toInt() );
-            break;
+        case S7WLChar:
         case S7WLByte:
+            SetByteAt( data, 0, NewValue.toUInt() );
+            break;
+        case S7WLWord:
+            //SetWordAt( data, 0, NewValue.toUInt() );//!NOTE не тестировано
+            if( Tag->type == TFloat )
+                SetRealAt( data, 0,  NewValue.toFloat() );
+            else if( Tag->type == TInt)
+                SetIntAt( data, 0,  NewValue.toInt() );
+            else if( Tag->type == TUInt)
+                SetWordAt( data, 0,  NewValue.toUInt() );
+            break;
+        case S7WLInt:
+            SetIntAt( data, 0,  NewValue.toInt() );
+            break;
+        case S7WLDInt:
+            SetDIntAt( data, 0,  NewValue.toInt() );
+            break;
         case S7WLCounter:
         case S7WLTimer:
             SetWordAt( data, 0, NewValue.toUInt() );
             break;
         case S7WLDWord:
-            //amt = 2;
+            amt = 2;
             if( Tag->type == TFloat )
                 SetRealAt( data, 0,  NewValue.toFloat() );
-            else
-                SetDIntAt( data, 0,  NewValue.toUInt() );
+            else if( Tag->type == TInt)
+                SetDIntAt( data, 0,  NewValue.toInt() );
+            else if( Tag->type == TUInt)
+                SetDWordAt( data, 0,  NewValue.toUInt() );
             break;
-        default:
+        case S7WLReal:
+            SetRealAt( data, 0,  NewValue.toFloat() );
             break;
         }
 
@@ -550,7 +580,7 @@ void SimaticDriver::write(SimaticDriver::Task *task )
                     data[offsetBuff] = task->listOfTags.at(i)->newValue.toBool();
                     if( task->memArea == S7AreaDB ){//Чтобы не обнулить рядомстоящие биты запрос их актуального состояния.
                         res = client->ReadArea(task->memArea, task->DBNumb,
-                        tagAdr->regAddr.memSlot, 1, task->type, &tmp);
+                            tagAdr->regAddr.memSlot, 1, task->type, &tmp);
                         data[offsetBuff] |= tmp; //считанные биты вставляем в байт с записываемым битом
                     }
                     SetBitAt( data, offsetBuff, tagAdr->regAddr.bit, task->listOfTags.at(i)->newValue.toBool() );
@@ -687,6 +717,10 @@ bool SimaticDriver::strToAddr(QString str, SimAddress *address)
             address->type = S7WLDWord;
             str.remove(0,1);//Удаление прочитанного символа, чтоб остался только номер адреса.
         }
+        else if( str[1] == "B" ){
+            address->type = S7WLByte;
+            str.remove(0,1);//Удаление прочитанного символа, чтоб остался только номер адреса.
+        }
         else{
             address->type = S7WLBit;
         }
@@ -703,6 +737,9 @@ bool SimaticDriver::strToAddr(QString str, SimAddress *address)
         }
         else if( str[0] == "X" ){
             address->type = S7WLBit;
+        }
+        else if( str[0] == "B" ){
+            address->type = S7WLByte;
         }
         else return false;
         str.remove(0,1);//Удаление прочитанного символа, чтоб остался только номер адреса.

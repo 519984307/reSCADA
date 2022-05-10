@@ -404,7 +404,7 @@ RectificationColumn0 {
         width: 26
         height: 13
         anchors.right: pipeOutWtr3.right
-        anchors.bottom: pipeOutWtr6.bottom
+        //anchors.bottom: pipeOutWtr6.bottom
         anchors.bottomMargin: 0
         anchors.rightMargin: 0
         z: 0
