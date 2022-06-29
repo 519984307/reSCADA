@@ -109,7 +109,7 @@ public slots:
     virtual void writeImitVal(QVariant setVal) = 0;
     virtual void saveParam();
     virtual void loadParam();
-    virtual void setTimerEnd() = 0;
+    virtual void _setTimerEnd() = 0;
     virtual void setTimerStart();
     bool resetAlarm();
     void writeSetDelay(QVariant Sec);

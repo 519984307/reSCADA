@@ -64,7 +64,7 @@ protected:
 public slots:
     void blockIt() { _block = true; }
     void unBlockIt() { _block = false; }
-    void setTimerEnd()  override;
+    void _setTimerEnd()  override;
     virtual bool setValue(QVariant Value, bool notImit = false);
     void setImpulseDuration(QVariant Delay);
 

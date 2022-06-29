@@ -1,22 +1,23 @@
-﻿#ifndef InETag_H
-#define InETag_H
+﻿#ifndef MxMnInETag_H
+#define MxMnInETag_H
 
 #include <QObject>
 #include "ETag.h"
 //#include "../../SCADAenums.h"
 //#include <QVariant>
 
-class InETag: public ETag
+class MxMnInETag: public ETag
 {
     Q_OBJECT
 public:
-    explicit InETag(Unit * Owner,
+    explicit MxMnInETag(Unit * Owner,
                     Prom::ESTagType Type,
                     QString Name,
                     QString DBName,
-                    bool HighOrLow,
-                    QVariant DetectLevel,
+                    QVariant MaxLevel,
+                    QVariant MinLevel,
                     QVariant ChageStep = 0,
+                    bool InOrOutDetect = false,
                     bool TunableSetTime = true,
                     bool TunablePulseTime = false,
                     bool TunabDetectLevel = false,
@@ -27,11 +28,14 @@ public:
 
     const bool tunabDetectLevel;
     bool isDetected (bool * Ok = nullptr) const { if(Ok)*Ok = _ok; return _detect; }
+    bool isMaxDetected (bool * Ok = nullptr) const { if(Ok)*Ok = _ok; return _maxDetect; }
+    bool isMinDetected (bool * Ok = nullptr) const { if(Ok)*Ok = _ok; return _minDetect; }
+
     bool isOk() const { return _ok; }
-    //bool isImit() const { return _imit; }
     void reInitialise() override;
 
-    QVariant detectLevel() const;
+    QVariant maxLevel() const;
+    QVariant minLevel() const;
     void _customConnectToGUI(QObject *guiItem, QObject *engRow) override;
     void setTimeMax( int );
     int timeMax();
@@ -39,32 +43,43 @@ public:
 protected:
     bool _onlyChange = true;
     bool _detect = false;
-    bool _highOrLow;
-    QVariant _detectLevel = 0;
+    bool _inOrOutDetect = true;//Определяет в каком диапазоне тег детектирован,
+    //true - детектирован между мин. и макс., выше макс. и ниже ммин. не
+    //детектирован. false - наоборот.
+    bool _maxDetect = false;
+    bool _minDetect = false;
+    QVariant _maxLevel = 0;
+    QVariant _minLevel = 0;
     double _correction = 0;
     bool _alarmOn = false;
-    bool _DnotU = false;
+    bool _DnotU = false; //Определяет нормальное (не аварийное) состояние тега
+    // true - в нормальном состоянии он дедектирован, false - не детектирован
     bool _detectPulse = false;
     bool _trig = true;
     bool _preDetect = true;
 //    bool _timeMaxValue = false;
 //    unsigned int _timeMaxInterval_ms = 1000;
     QVariant _timeMaxValue{0};
+    QVariant _timeMinValue{0};
     QVariant _timeLastValue{0};
     QTimerExt * _timeMax{ nullptr };
 
     void needBe(bool DtctOrNot, bool AlarmOn, bool SetTimer = true);
-    virtual bool _checkDetect();
+    virtual bool _checkDetect ();
 
 signals:
     void s_detected();
+    void s_maxDetected();
+    void s_minDetected();
     void s_undetected();
-    void s_delectLevelChanged(QVariant setVal);
+    void s_maxLevelChanged(QVariant setVal);
+    void s_minLevelChanged(QVariant setVal);
 
 public slots:
     void writeImit(bool setImit)  override;
     void writeImitVal(QVariant setVal)  override;
-    void setDetectLevel(QVariant setVal);
+    void setMaxLevel(QVariant MaxVal);
+    void setMinLevel(QVariant MinVal);
 
     void needBeDetectedAlarm(){ needBe(true, true); }
     void needBeDetectedNoAlarm(){ needBe(true, false); }
@@ -77,23 +92,19 @@ public slots:
     void needBeUndetectedNoAlarmNoTime(){ needBe(false, false, false); }
 
     void onlyChange();
-    virtual void pulsSensor(bool On);
-    void pulsSensorON(){ pulsSensor(true); };
-    void pulsSensorOFF(){ pulsSensor(false); };
+    virtual void pulsSensor(bool);
 
-    void HighOrLow(bool type) { _highOrLow = type; }
-    void _setTimerEnd()  override;
     void saveParam() override;
     void loadParam() override;
 
 protected slots:
+    void _setTimerEnd() override;
     void _qualityChangedSlot() override;
 
     void pulseTimerEnd() override;
     void _checkVal() override;
     void _checkPulse() override;
     void _timeMaxStep();
-
 };
 
-#endif // INLESTAG_H
+#endif // MXMNINLESTAG_H

@@ -38,7 +38,7 @@ ETag::ETag(Unit * Owner,
     setObjectName(Name);
     _setTimer = new QTimerExt(this);
     _setTimer->setSingleShot(true);
-    connect(_setTimer, &QTimer::timeout, this, &ETag::setTimerEnd, Qt::QueuedConnection);
+    connect(_setTimer, &QTimer::timeout, this, &ETag::_setTimerEnd, Qt::QueuedConnection);
 
     _pulseTimer = new QTimerExt(this);
     _pulseTimer->setSingleShot(true);

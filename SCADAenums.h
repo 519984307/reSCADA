@@ -175,7 +175,8 @@ enum ESTagType {
     TpDiscretOut,
     TpDiscretIn,
     TpOut,
-    TpIn
+    TpIn,
+    TpMxMnIn
 };
 Q_ENUM_NS(ESTagType)
 

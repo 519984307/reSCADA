@@ -220,7 +220,7 @@ void OutETag::_qualityChangedSlot()
 }
 
 //------------------------------------------------------------------------------
-void OutETag::setTimerEnd()
+void OutETag::_setTimerEnd()
 {
     if(_value != _setedValue ){
         _logging(Prom::MessAlarm,
