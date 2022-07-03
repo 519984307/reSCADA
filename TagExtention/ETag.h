@@ -54,9 +54,9 @@ public:
     virtual void connectToGUI(QObject *guiItem,  QObject *propWin);
 
 protected:
-    QVariant _value = 0;
-    QVariant _preValue = 0;
-    QVariant _changeStep = 0;
+    QVariant _value {0};
+    QVariant _preValue{0};
+    QVariant _changeStep {0};
     Unit * _owner;
     Tag * _tag = nullptr;
     QString _name;
@@ -77,7 +77,7 @@ protected:
     QTimerExt * _testLog;
     bool _pulse = false;
     Prom::ETagValConv _conv = Prom::VCNo;
-    unsigned int _pulseAsyncDelay = 0;
+    unsigned int _pulseAsyncDelay {0};
     bool _ferstLoad = true;
     virtual void _customConnectToGUI(QObject *,  QObject *){};
     int _pulseDuration{0};

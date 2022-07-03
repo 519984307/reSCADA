@@ -23,6 +23,11 @@ const borderNotify = "yellow"
 const borderAlarm = "red"
 const borderAlarmNotify = "red"
 
+const text = "black"
+const textNotify = "yellow"
+const textAlarm = "red"
+const textAlarmNotify = "red"
+
 const tra = "#f1c40f"
 const trna = "#cfb53b"
 const aspa = "#3498db"

@@ -13,12 +13,12 @@ class Group : public QObject
     Q_OBJECT
 public:
     //constructor
-    Group(int id,
-        int driverId,
-        QString name,
-        int delay,
-        int optimizerRangeInterval = 4,
-        int optimizerRangeMax = 70,
+    Group(int Id,
+        int DriverId,
+        QString Name,
+        int Delay,
+        int OptimizerRangeInterval = 4,
+        int OptimizerRangeMax = 70,
         QString Comment = "");
     //destructor
     ~Group();

@@ -67,14 +67,16 @@ bool OutETag::setValue(QVariant Value, bool notImit)
 
     if(!_ok){
         _logging(Prom::MessAlarm, "установить значение - " + QString::number( Value.toDouble()) + " не удалось: сигнал не загружен", false);
-        emit s_valueChd(_value);
+        if(_value != Value)
+            emit s_valueChd(_value);
         return false;
     }
     //_setTimer->stop(); убрал, но боюсь
     if(_tag->readQuality() != Prom::Good){
         _setedValue = Value;
         _logging(Prom::MessAlarm, "установить значение - " + QString::number( Value.toDouble()) + " не удалось: нет связи", false);
-        emit s_valueChd(_value);
+        if(_value != Value)
+            emit s_valueChd(_value);
         return false;
     }
 
@@ -109,7 +111,7 @@ bool OutETag::setValue(QVariant Value, bool notImit)
         emit s_valueChd(_value);
         return false;
     }
-    qDebug()<<"write "<<convVal;
+    //qDebug()<<"write "<<convVal;
     setTimerStart();
     _setedValue = Value;
     if(_setType == Prom::PreSet){
@@ -396,12 +398,12 @@ void OutETag::_customConnectToGUI(QObject *, QObject *engRow)
         tmpSgSt = qvariant_cast< QObject* >(ret);
         //получил указатель на главный раздел
         //-----подключил сигналы к значению и имитации
-        connect(tmpSgSt, SIGNAL(changedIm(bool)), this,      SLOT(writeImit(bool)), Qt::QueuedConnection);
-        connect(tmpSgSt, SIGNAL(changedImVal(QVariant)), this,      SLOT(writeImitVal(QVariant)), Qt::QueuedConnection);
-        connect(this,    SIGNAL(s_imitationChd(QVariant)), tmpSgSt, SLOT(changeIm(QVariant)), Qt::QueuedConnection);
-        connect(this,    SIGNAL(s_imitationValueChd(QVariant)), tmpSgSt, SLOT(changeImVal(QVariant)), Qt::QueuedConnection);
-        connect(this,    SIGNAL(s_liveValueChd(QVariant)), tmpSgSt, SLOT(changeVal(QVariant)), Qt::QueuedConnection);
-        connect(this,    SIGNAL(s_qualityChd(QVariant)), tmpSgSt, SLOT(changeConnected(QVariant)), Qt::QueuedConnection);
+        connect(tmpSgSt, SIGNAL(s_imChanged(bool)), this,      SLOT(writeImit(bool)), Qt::QueuedConnection);
+        connect(tmpSgSt, SIGNAL(s_imValChanged(QVariant)), this,      SLOT(writeImitVal(QVariant)), Qt::QueuedConnection);
+        connect(this,    SIGNAL(s_imitationChd(QVariant)), tmpSgSt, SLOT(setIm(QVariant)), Qt::QueuedConnection);
+        connect(this,    SIGNAL(s_imitationValueChd(QVariant)), tmpSgSt, SLOT(setImVal(QVariant)), Qt::QueuedConnection);
+        connect(this,    SIGNAL(s_liveValueChd(QVariant)), tmpSgSt, SLOT(setVal(QVariant)), Qt::QueuedConnection);
+        connect(this,    SIGNAL(s_qualityChd(QVariant)), tmpSgSt, SLOT(setConnected(QVariant)), Qt::QueuedConnection);
         //-----подключил сигналы к значению и имитации
         if(_menuChanged){
             QMetaObject::invokeMethod(engRow, "addPropertySetting", Qt::DirectConnection,
@@ -412,8 +414,8 @@ void OutETag::_customConnectToGUI(QObject *, QObject *engRow)
             //tmpSgSt = guiItem->findChild<QObject*>(est->getDBName() + "_delay");
             tmpSgSt = qvariant_cast< QObject* >(ret);//получаю указатель на уровень срабатывания
             //подключаю сигналы к уровням срабатывания
-            connect(tmpSgSt, SIGNAL(changedVal(QVariant)), this,  SLOT(setValue(QVariant)),    Qt::QueuedConnection);
-            connect(this,    SIGNAL(s_valueChd(QVariant)),    tmpSgSt, SLOT(changeVal(QVariant)), Qt::QueuedConnection);
+            connect(tmpSgSt, SIGNAL(s_valChanged(QVariant)), this,  SLOT(setValue(QVariant)),    Qt::QueuedConnection);
+            connect(this,    SIGNAL(s_valueChd(QVariant)),    tmpSgSt, SLOT(setVal(QVariant)), Qt::QueuedConnection);
             //подключаю сигналы к уровням срабатывания
         }
     }        //!добавляю время импульса
@@ -426,8 +428,8 @@ void OutETag::_customConnectToGUI(QObject *, QObject *engRow)
         //tmpSgSt = guiItem->findChild<QObject*>(est->getDBName() + "_delay");
         tmpSgSt = qvariant_cast< QObject* >(ret);//получаю указатель на задержку
         //подключаю сигналы к задержке
-        connect(tmpSgSt, SIGNAL(changedVal(    QVariant)),     this,     SLOT(setImpulseDuration(QVariant)), Qt::QueuedConnection);
-        connect(this,    SIGNAL(ChangeImpulseDelay(QVariant)), tmpSgSt, SLOT(changeVal(QVariant)    ), Qt::QueuedConnection);
+        connect(tmpSgSt, SIGNAL(s_valChanged(    QVariant)),     this,     SLOT(setImpulseDuration(QVariant)), Qt::QueuedConnection);
+        connect(this,    SIGNAL(ChangeImpulseDelay(QVariant)), tmpSgSt, SLOT(setVal(QVariant)    ), Qt::QueuedConnection);
         connect(this->_impTimer,  SIGNAL(StartSig(QVariant)),                 tmpSgSt, SLOT(startCountdown(QVariant)),       Qt::QueuedConnection);
         connect(this->_impTimer,  SIGNAL(StopSig() ), tmpSgSt, SLOT(stopCountdown()),       Qt::QueuedConnection);
         connect(this->_impTimer,  SIGNAL(timeout() ), tmpSgSt, SLOT(stopCountdown()),       Qt::QueuedConnection);

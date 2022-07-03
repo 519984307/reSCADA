@@ -319,7 +319,7 @@ void ETag::connectToGUI(QObject *guiItem, QObject *propWin)
     connect(this,SIGNAL(s_alarm(           QVariant )), tmpSgSt, SLOT(setAlarm()                 ), Qt::QueuedConnection);
     connect(tmpSgSt,SIGNAL(changedIgnore(   bool    )), this, SLOT(writeIgnorAlarm(bool    )), Qt::QueuedConnection);
     connect(this,SIGNAL(s_ignorAlarmChd(QVariant)), tmpSgSt, SLOT(changeIgnore(   QVariant)), Qt::QueuedConnection);
-    connect(this,SIGNAL(s_qualityChd(  QVariant)), tmpSgSt, SLOT(changeConnected(QVariant)), Qt::QueuedConnection);
+    connect(this,SIGNAL(s_qualityChd(  QVariant)), tmpSgSt, SLOT(setConnected(QVariant)), Qt::QueuedConnection);
     //-----подключил сигналы к авирии и игнору
     //}
 
@@ -332,8 +332,8 @@ void ETag::connectToGUI(QObject *guiItem, QObject *propWin)
             Q_ARG(QVariant, 1));
         //tmpSgSt = guiItem->findChild<QObject*>(est->getDBName() + "_pulseDelay");
         tmpSgSt = qvariant_cast< QObject* >(ret);//получаю указатель на задержку
-        connect(tmpSgSt, SIGNAL(changedVal(QVariant     )), this, SLOT(setPulseDuration(QVariant)), Qt::QueuedConnection);
-        connect(this, SIGNAL(s_pulseDelayChd(QVariant)), tmpSgSt, SLOT(changeVal(QVariant)), Qt::QueuedConnection);
+        connect(tmpSgSt, SIGNAL(s_valChanged(QVariant     )), this, SLOT(setPulseDuration(QVariant)), Qt::QueuedConnection);
+        connect(this, SIGNAL(s_pulseDelayChd(QVariant)), tmpSgSt, SLOT(setVal(QVariant)), Qt::QueuedConnection);
         connect(this->_pulseTimer, SIGNAL(StartSig(QVariant)),   tmpSgSt, SLOT(startCountdown(QVariant)), Qt::QueuedConnection);
         connect(this->_pulseTimer, SIGNAL(StopSig() ), tmpSgSt, SLOT(stopCountdown()), Qt::QueuedConnection);
         connect(this->_pulseTimer, SIGNAL(timeout() ), tmpSgSt, SLOT(stopCountdown()), Qt::QueuedConnection);
@@ -349,8 +349,8 @@ void ETag::connectToGUI(QObject *guiItem, QObject *propWin)
         //tmpSgSt = guiItem->findChild<QObject*>(est->getDBName() + "_delay");
         tmpSgSt = qvariant_cast< QObject* >(ret);//получаю указатель на задержку
         //подключаю сигналы к задержке
-        connect(tmpSgSt, SIGNAL(changedVal(QVariant)), this,SLOT(writeSetDelay(QVariant)), Qt::QueuedConnection);
-        connect(this,SIGNAL(s_setDelayChd(QVariant)), tmpSgSt, SLOT(changeVal(QVariant)    ), Qt::QueuedConnection);
+        connect(tmpSgSt, SIGNAL(s_valChanged(QVariant)), this,SLOT(writeSetDelay(QVariant)), Qt::QueuedConnection);
+        connect(this,SIGNAL(s_setDelayChd(QVariant)), tmpSgSt, SLOT(setVal(QVariant)    ), Qt::QueuedConnection);
         connect(this->_setTimer, SIGNAL(StartSig(QVariant)),   tmpSgSt, SLOT(startCountdown(QVariant)), Qt::QueuedConnection);
         connect(this->_setTimer, SIGNAL(StopSig() ), tmpSgSt, SLOT(stopCountdown()), Qt::QueuedConnection);
         connect(this->_setTimer, SIGNAL(timeout() ), tmpSgSt, SLOT(stopCountdown()), Qt::QueuedConnection);

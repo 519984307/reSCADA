@@ -5,7 +5,7 @@
 #include "ETag.h"
 //#include "../../SCADAenums.h"
 //#include <QVariant>
-
+class OutETag;
 class MxMnInETag: public ETag
 {
     Q_OBJECT
@@ -26,7 +26,6 @@ public:
                     Prom::ETagValConv Convertion = Prom::VCNo,
                     int TimeMax = 0);
 
-    const bool tunabDetectLevel;
     bool isDetected (bool * Ok = nullptr) const { if(Ok)*Ok = _ok; return _detect; }
     bool isMaxDetected (bool * Ok = nullptr) const { if(Ok)*Ok = _ok; return _maxDetect; }
     bool isMinDetected (bool * Ok = nullptr) const { if(Ok)*Ok = _ok; return _minDetect; }
@@ -39,6 +38,10 @@ public:
     void _customConnectToGUI(QObject *guiItem, QObject *engRow) override;
     void setTimeMax( int );
     int timeMax();
+    bool connectTagToMaxLevel( OutETag * Tag);
+    bool connectTagToMinLevel( OutETag * Tag);
+    bool findMaxMinTags();
+
 
 protected:
     bool _onlyChange = true;
@@ -48,8 +51,12 @@ protected:
     //детектирован. false - наоборот.
     bool _maxDetect = false;
     bool _minDetect = false;
+    bool _maxAlarm = false;
+    bool _minAlarm = false;
     QVariant _maxLevel = 0;
     QVariant _minLevel = 0;
+    bool _maxLevelSave {true};
+    bool _minLevelSave {true};
     double _correction = 0;
     bool _alarmOn = false;
     bool _DnotU = false; //Определяет нормальное (не аварийное) состояние тега
@@ -57,6 +64,7 @@ protected:
     bool _detectPulse = false;
     bool _trig = true;
     bool _preDetect = true;
+    bool _tunabDetectLevel;
 //    bool _timeMaxValue = false;
 //    unsigned int _timeMaxInterval_ms = 1000;
     QVariant _timeMaxValue{0};
@@ -66,6 +74,11 @@ protected:
 
     void needBe(bool DtctOrNot, bool AlarmOn, bool SetTimer = true);
     virtual bool _checkDetect ();
+    enum alarmType{
+        inStrype,
+        overMax,
+        overMin
+    };
 
 signals:
     void s_detected();

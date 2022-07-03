@@ -466,8 +466,8 @@ bool Unit::connectToGUI(const QObject * GUI)
 
     tmpSgSt = qvariant_cast< QObject* >(ret);//получаю указатель на зачистку
     //подключаю сигналы к зачистке
-    connect(tmpSgSt, SIGNAL(changedVal(QVariant)), this,      SLOT(writeCleanDelay(QVariant)), Qt::QueuedConnection);
-    connect(this,  SIGNAL(s_changeCleanDelay(QVariant)), tmpSgSt, SLOT(changeVal(QVariant)), Qt::QueuedConnection);
+    connect(tmpSgSt, SIGNAL(s_valChanged(QVariant)), this,      SLOT(writeCleanDelay(QVariant)), Qt::QueuedConnection);
+    connect(this,  SIGNAL(s_changeCleanDelay(QVariant)), tmpSgSt, SLOT(setVal(QVariant)), Qt::QueuedConnection);
     connect(this->_cleanTimer,  SIGNAL(StartSig(QVariant)),                 tmpSgSt, SLOT(startCountdown(QVariant)),       Qt::QueuedConnection);
     connect(this->_cleanTimer,  SIGNAL(StopSig() ), tmpSgSt, SLOT(stopCountdown()),       Qt::QueuedConnection);
     connect(this->_cleanTimer,  SIGNAL(timeout() ), tmpSgSt, SLOT(stopCountdown()),       Qt::QueuedConnection);

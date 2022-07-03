@@ -322,7 +322,7 @@ bool TSP::addTag(int id, QString name, QString address, QString options, int gro
             type = TInt;
         else if (option == "uint")
             type = TUInt;
-        else if (option == "float")
+        else if (option == "float" || option == "real")
             type = TFloat;
         else {
             emit s_logging(MessError, QDateTime::currentDateTime(), false, this->objectName(), "Tag " + name + " creation error: unknown option");

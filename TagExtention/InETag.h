@@ -9,6 +9,7 @@
 class InETag: public ETag
 {
     Q_OBJECT
+
 public:
     explicit InETag(Unit * Owner,
                     Prom::ESTagType Type,
@@ -32,6 +33,7 @@ public:
     void reInitialise() override;
 
     QVariant detectLevel() const;
+    bool highOrLow(){ return _highOrLow; };
     void _customConnectToGUI(QObject *guiItem, QObject *engRow) override;
     void setTimeMax( int );
     int timeMax();
@@ -61,6 +63,8 @@ signals:
     void s_undetected();
     void s_delectLevelChanged(QVariant setVal);
 
+    void highOrLowChanged();
+
 public slots:
     void writeImit(bool setImit)  override;
     void writeImitVal(QVariant setVal)  override;
@@ -81,7 +85,6 @@ public slots:
     void pulsSensorON(){ pulsSensor(true); };
     void pulsSensorOFF(){ pulsSensor(false); };
 
-    void HighOrLow(bool type) { _highOrLow = type; }
     void _setTimerEnd()  override;
     void saveParam() override;
     void loadParam() override;

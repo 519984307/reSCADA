@@ -66,6 +66,7 @@ public slots:
     void unBlockIt() { _block = false; }
     void _setTimerEnd()  override;
     virtual bool setValue(QVariant Value, bool notImit = false);
+    //virtual bool setValue(QVariant Value){return setValue(Value, false);};
     void setImpulseDuration(QVariant Delay);
 
 protected slots:

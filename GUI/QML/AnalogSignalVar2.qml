@@ -16,70 +16,94 @@ AnalogSignalVar1 {
     property bool minShow: true
     property int oldZ: 0
     property bool confmOnEnter: false
+    property bool maxMinOnRMBCl: false
+    property bool _usrAct: false
 
     signal s_maxLimitChanged( variant Limit )
     function setMaxLimit( Limit ){ maxLvl.setValue( Limit ) }
 
-    Component.onCompleted: maxLvl.oldZ = z
+    signal s_minLimitChanged( variant Limit )
+    function setMinLimit( Limit ){ minLvl.setValue( Limit ) }
 
-    //    mouseArea.onClicked: {
-    //        if ( mouse.button & Qt.RightButton) {
-    //            maxLvl.visible = !maxLvl.visible
-    //            //minLvl.visible = !minLvl.visible
-    //            if(maxLvl.visible){
-    //                oldZ = z
-    //                z = 100
-    //            }
-    //            else z = oldZ
-    //        }
-    //    }
+    mouseArea.onClicked: {
+        if ( mouse.button && Qt.RightButton && maxMinOnRMBCl) _usrAct = !_usrAct
+    }
+    function _onComExited(){
+        if( _usrAct && !maxMinOnRMBCl)
+            _usrAct = maxLvl.mouseArea.containsMouse || minLvl.mouseArea.containsMouse
+    }
+    mouseArea.onEntered: {
+        if( !maxMinOnRMBCl ) {
+            _usrAct = true
+        }
+    }
+    mouseArea.onExited: _onComExited()
+
+    on_UsrActChanged: {
+        if( _usrAct ){
+            oldZ = z
+            z = 100
+        }
+        else z = oldZ
+    }
 
     MFUnit {
         id: maxLvl
-        property int oldZ: 0
+        enabled:  maxShow
+        //property int oldZ: 0
+        //property bool _usrAct: false
         width: parent.width * 1.2
         height: parent.height
         anchors.bottom: parent.top
+        anchors.bottomMargin: -1
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottomMargin: - parent.borderWidth
         backgroundColor: "#c36b6b"
-        tooltip: "Max"
+        tooltip: "Макс."
         readOnly: false
-        visible: true
+        visible: parent._usrAct
         correctingButtons: true
         limited: false
         onValueChanged: s_maxLimitChanged( Value )
         mantissa: parent.mantissa
-//        step: limitStep
-        disappear: true
+        disappear: !maxMinOnRMBCl
         confmOnEnter: parent.confmOnEnter
-        body.onVisibleChanged:{
-            if(visible){
-                oldZ = z
-                parent.z = 100
-            }
-            else parent.z = oldZ
+        mouseArea.onExited: {
+            //_usrAct = false
+            _onComExited()
         }
+        mouseArea.onEntered: _usrAct = true
     }
-    //    MFUnit {
-    //        id: minLvl
-    //        height: parent.height
-    //        anchors.left: parent.left
-    //        anchors.right: parent.right
-    //        anchors.top: parent.bottom
-    //        anchors.topMargin: - parent.borderWidth
-    //        backgroundColor: "#6e9ec8"
-    //        tooltip: "Min"
-    //        readOnly: false
-    //        visible: false
-    //        correctingButtons: true
-    //        limited: false
-    //    }
+    MFUnit {
+        id: minLvl
+        enabled: minShow
+        //property int oldZ: 0
+        //property bool _usrAct: false
+        width: parent.width * 1.2
+        height: parent.height
+        anchors.horizontalCenter: parent.horizontalCenter
+        backgroundColor: "#6b9ac3"
+        tooltip: "Мин."
+        readOnly: false
+        visible: parent._usrAct
+        anchors.top: parent.bottom
+        anchors.topMargin: -2
+        correctingButtons: true
+        limited: false
+        onValueChanged: s_minLimitChanged( Value )
+        mantissa: parent.mantissa
+        disappear: !maxMinOnRMBCl
+        confmOnEnter: parent.confmOnEnter
+        mouseArea.onExited: {
+            //_usrAct = false
+            _onComExited()
+        }
+        mouseArea.onEntered: _usrAct = true
+    }
 }
 
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:1.25}
+    D{i:0;formeditorZoom:4}
 }
 ##^##*/

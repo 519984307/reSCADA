@@ -82,7 +82,6 @@ Window {
         anchors.top: textWrkDp.bottom
         mantissa: 2
         correctingButtons: true
-        //onValueRealChanged: maxRangeChanged(valueReal)
         limited: true
         downLimit: minValue.valueReal + 1
         upLimit: 100
@@ -103,10 +102,8 @@ Window {
         anchors.top: textWrkDp.bottom
         mantissa: 2
         correctingButtons: true
-        //onValueRealChanged: minRangeChanged(valueReal)
         limited: true
         upLimit: maxValue.valueReal - 1
-        downLimit: 0
         onValueChanged: s_valueMinChenged( Value )
         confmOnEnter: root.confmOnEnter
     }
@@ -180,7 +177,6 @@ Window {
         anchors.top: textLvl.bottom
         mantissa: 0
         correctingButtons: true
-        //onValueRealChanged: valueChanged(valueReal)
         limited: true
         upLimit: maxValue.valueReal
         downLimit: minValue.valueReal
@@ -217,7 +213,6 @@ Window {
         upLimit: 10
         downLimit: 1
         confmOnEnter: root.confmOnEnter
-        //onValueRealChanged: stepChanged(valueReal)
     }
 }
 

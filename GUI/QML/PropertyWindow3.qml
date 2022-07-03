@@ -94,7 +94,7 @@ Window {
             function changeIgnore(status) {
                 checkState = status ? Qt.Checked : Qt.Unchecked
             }
-            function changeConnected(status) {
+            function setConnected(status) {
                 text = alarmName + (status ? "" : " (Нет связи)")
             }
             function setAlarm() {
@@ -159,18 +159,18 @@ Window {
                     property string sigName: "Unknown signal"
                     width: parent == undefined ? 0 : parent.width
                     height: rowSize
-                    signal changedIm(bool status)
-                    signal changedImVal(variant status)
-                    function changeIm(status) {
+                    signal s_imChanged(bool status)
+                    signal s_imValChanged(variant status)
+                    function setIm(status) {
                         imit.checked = status ? Qt.Checked : Qt.Unchecked
                     }
-                    function changeImVal(status) {
+                    function setImVal(status) {
                         imitVal.checked = status ? Qt.Checked : Qt.Unchecked
                     }
-                    function changeVal(status) {
+                    function setVal(status) {
                         val = status ? Qt.Checked : Qt.Unchecked
                     }
-                    function changeConnected(status) {
+                    function setConnected(status) {
                         connected = status
                     }
                     CheckBox {
@@ -180,7 +180,7 @@ Window {
                         height: parent.height
                         indicator.width: parent.indicatorSize
                         indicator.height: parent.indicatorSize
-                        onCheckStateChanged: changedIm(checkState == Qt.Checked)
+                        onCheckStateChanged: s_imChanged(checkState == Qt.Checked)
                     }
                     CheckBox {
                         id: imitVal
@@ -189,7 +189,7 @@ Window {
                         height: parent.height
                         indicator.width: parent.indicatorSize
                         indicator.height: parent.indicatorSize
-                        onCheckStateChanged: changedImVal(
+                        onCheckStateChanged: s_imValChanged(
                                                  checkState == Qt.Checked)
                     }
                     CheckBox {
@@ -220,19 +220,25 @@ Window {
                     property string sigName: "Unknown signal"
                     width: parent == undefined ? 0 : parent.width
                     height: rowSize
-                    signal changedIm(bool status)
-                    signal changedImVal(variant status)
-                    function changeIm(status) {
+                    signal s_imChanged(bool status)
+                    signal s_imValChanged(variant status)
+                    function setIm(status) {
                         imit.checked = status ? Qt.Checked : Qt.Unchecked
                     }
-                    function changeImVal(status) {
+                    function setImVal(status) {
                         imitVal.text = status
                     }
-                    function changeVal(status) {
+                    function setVal(status) {
                         val = status
                     }
-                    function changeConnected(status) {
+                    function setConnected(status) {
                         connected = status
+                    }
+                    function commit() {
+                        if (imitVal.text === "") {
+                            imitVal.text = "0"
+                        }
+                        setImVal(parseFloat(imitVal.text, 10))
                     }
                     spacing: 1
                     CheckBox {
@@ -242,7 +248,7 @@ Window {
                         height: parent.height
                         indicator.width: parent.indicatorSize
                         indicator.height: parent.indicatorSize
-                        onCheckStateChanged: changedIm(checkState == Qt.Checked)
+                        onCheckStateChanged: s_imChanged(checkState == Qt.Checked)
                     }
 
                     TextField {
@@ -252,15 +258,16 @@ Window {
                         anchors.top: parent.top
                         anchors.topMargin: (rowSize - 16) / 2
                         text: "0"
+
+                        padding: 1
                         onTextChanged: {
                             text = text.replace(',', '.')
                         }
-                        onEditingFinished: parent.changedImVal(parseFloat(imitVal.text,
-                                                                          10))
+
+                        onEditingFinished: parent.s_imValChanged(parseFloat(text,10))
                         validator: RegExpValidator {
                             regExp: /(\d{1,10})([.,]\d{0,10})?$/
                         }
-                        padding: 1
                         Keys.onPressed: {
                             if (event.key === 16777220
                                     || event.key === 16777221) {
@@ -276,7 +283,7 @@ Window {
                         anchors.top: parent.top
                         anchors.topMargin: (rowSize - 16) / 2
                         text: val
-                        onEditingFinished: changedImVal(text)
+                        onEditingFinished: s_imValChanged(text)
                         readOnly: true
                         padding: 1
                         background: Rectangle {
@@ -307,8 +314,8 @@ Window {
                     property bool reversed: false
                     width: parent == undefined ? 0 : parent.width
                     height: rowSize
-                    signal changedVal(variant val)
-                    function changeVal(val) {
+                    signal s_valChanged(variant val)
+                    function setVal(val) {
                         //                        if(objectName == ".vsWarning_pulseDelay"){
                         //                           console.log("//------------")
                         //                        }
@@ -323,7 +330,7 @@ Window {
                         if (textField.text === "") {
                             textField.text = "0"
                         }
-                        changedVal(parseFloat(textField.text, 10))
+                        setVal(parseFloat(textField.text, 10))
                     }
                     function startCountdown(sec) {
                         textFieldNow.value = reversed ? sec : 0
@@ -383,23 +390,22 @@ Window {
                     }
                     TextField {
                         id: textField
-                        onTextChanged: {
-                            textFieldNow.value = reversed ? text : "0"
-                            text = text.replace(',', '.')
-                        }
+                        width: parent.width * parent.ratio / (parent.timed ? 2 : 1)
                         height: 16
-                        width: parent.width * parent.ratio / (timed ? 2 : 1)
                         anchors.top: parent.top
                         anchors.topMargin: (rowSize - 16) / 2
+                        text: "0"
                         clip: true
                         padding: 1
-                        text: "0"
-                        //maximumLength: 5
+                        onTextChanged: {
+                            textFieldNow.value = parent.reversed ? text : "0"
+                            text = text.replace(',', '.')
+                        }
                         onEditingFinished: {
-                            parent.commit()
+                            parent.s_valChanged(parseFloat(text,10))
+                            textFieldNow.value = reversed ? text : 0
                         }
                         validator: RegExpValidator {
-                            //regExp: /([0-9]+)([.]?)([0-9]*)/
                             regExp:/(\d{1,10})([.,]\d{0,10})?$/
                         }
                         Keys.onPressed: {
@@ -541,7 +547,7 @@ Window {
                     //                            onClicked: {
                     //                                wind.s_resetAlarm()
                     //                                // root.addAlarm("test1", "test", false)
-                    //                                //root.addEngRow("test2").addPropertySetting("test3", "test3", 0).changeVal(123)
+                    //                                //root.addEngRow("test2").addPropertySetting("test3", "test3", 0).setVal(123)
                     ////                                wind.addEngRow("test2").addPropertySignal(
                     ////                                            "test3", "test3")
                     //                            }

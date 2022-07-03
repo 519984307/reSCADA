@@ -69,7 +69,7 @@ Item {
     signal valueChanged(variant Value)
 
     onValueRealChanged: {
-        //console.log( "onValueRealChanged1", valueReal )
+        //console.log( "onvalueRealChanged1", valueReal )
         if( setFromCore ){
             //toFicsed округляет до нужной мантиссы, Number убирает ненужные нулитипа 12.32000
             valueLable.text = valueReal

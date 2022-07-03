@@ -330,7 +330,7 @@ RectificationColumn0 {
         height: parent.pipeSteamThin
         anchors.left: parent.right
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: parent.height / 15
+        anchors.bottomMargin: parent.height / 25
         borderWidth: parent.pipePassBorderWidth
         anchors.leftMargin: 0
         nActiveColor: parent.pipeSteamColor

@@ -489,12 +489,21 @@ void SimaticDriver::writeTag(Tag *Tag, QVariant NewValue )
             break;
         case S7WLWord:
             //SetWordAt( data, 0, NewValue.toUInt() );//!NOTE не тестировано
-            if( Tag->type == TFloat )
-                SetRealAt( data, 0,  NewValue.toFloat() );
-            else if( Tag->type == TInt)
+            //            if( Tag->type == TFloat )
+            //                SetRealAt( data, 0,  NewValue.toFloat() );
+            //            else
+            if( Tag->type == TInt){
+                //!Защита от переполнения буфера data, т.к. размер зависит
+                //!от разрядности платформы компьютера
+                if(NewValue.toInt() > 32767  ) NewValue = 32767;
+                if(NewValue.toInt() < -32768 ) NewValue = -32768;
                 SetIntAt( data, 0,  NewValue.toInt() );
-            else if( Tag->type == TUInt)
+            }
+            else if( Tag->type == TUInt){
+                if(NewValue.toUInt() > 65535  ) NewValue = 65535;
+                if(NewValue.toUInt() < 0 ) NewValue = 0;
                 SetWordAt( data, 0,  NewValue.toUInt() );
+            }
             break;
         case S7WLInt:
             SetIntAt( data, 0,  NewValue.toInt() );
@@ -507,13 +516,21 @@ void SimaticDriver::writeTag(Tag *Tag, QVariant NewValue )
             SetWordAt( data, 0, NewValue.toUInt() );
             break;
         case S7WLDWord:
-            amt = 2;
+            //amt = 2;
             if( Tag->type == TFloat )
                 SetRealAt( data, 0,  NewValue.toFloat() );
-            else if( Tag->type == TInt)
+            else if( Tag->type == TInt){
+                //!Защита от переполнения буфера data, т.к. размер зависит
+                //!от разрядности платформы компьютера
+                if(NewValue.toInt() > 2147483647  ) NewValue = 2147483647;
+                if(NewValue.toInt() < -2147483648 ) NewValue = -2147483648;
                 SetDIntAt( data, 0,  NewValue.toInt() );
-            else if( Tag->type == TUInt)
+            }
+            else if( Tag->type == TUInt){
+                if(NewValue.toUInt() > 4294967295  ) NewValue = 4294967295;
+                if(NewValue.toUInt() < 0 ) NewValue = 0;
                 SetDWordAt( data, 0,  NewValue.toUInt() );
+            }
             break;
         case S7WLReal:
             SetRealAt( data, 0,  NewValue.toFloat() );

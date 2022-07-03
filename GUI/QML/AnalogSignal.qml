@@ -39,6 +39,7 @@ UnitItem {
         border.width: parent.borderCurrentWidth
         Text {
             id: valueLable
+            color: "white"
             text: "999.9"
             anchors.fill: parent
             font.pixelSize: 400

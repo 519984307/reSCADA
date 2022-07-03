@@ -2,22 +2,26 @@
 #include "group.h"
 #include "SCADAenums.h"
 //------------------------------------------------------------------------------
-Group::Group(int id,
-    int driverId,
-    QString name,
-    int delay,
-    int optimizerRangeInterval,
-    int optimizerRangeMax,
-    QString comment)
+Group::Group(int Id,
+    int DriverId,
+    QString Name,
+    int Delay,
+    int OptimizerRangeInterval,
+    int OptimizerRangeMax,
+    QString Comment):
+
+    delay(Delay),
+    id(Id),
+    optimRangeInterval(OptimizerRangeInterval),
+    optimRangeMax(OptimizerRangeMax),
+    comment(Comment),
+    driverId(DriverId)
 {
-    this->id = id;
-    this->setObjectName(name);
-    this->delay = delay;
-    this->lastUpdate = QDateTime::currentDateTime();
-    this->optimRangeMax = optimizerRangeMax;
-    this->optimRangeInterval = optimizerRangeInterval;
-    this->comment = comment;
-    this->driverId = driverId;
+    setObjectName(Name);
+    //Чтобы сразу после создания группа опосилась. Иначе будет сначала выжидать
+    //delay и только потом опросит. Группы с большой задержкой изза этого
+    //тупят сразу после загрузки.
+    lastUpdate = QDateTime::currentDateTime().addMSecs(-delay);
 }
 //------------------------------------------------------------------------------
 Group::~Group()

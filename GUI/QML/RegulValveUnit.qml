@@ -56,7 +56,7 @@ UnitPropItem {
         width: 90
         height: 25
         anchors.top: parent.bottom
-        anchors.topMargin: 1
+        anchors.topMargin: 0
         anchors.horizontalCenter: parent.horizontalCenter
         backgroundColor: parent.backgroundColor
         textInput.color: regVal.substanceColor
@@ -73,9 +73,15 @@ UnitPropItem {
         onS_less: s_closeLtl( Less )
         separCorrButtons: true
         confmOnEnter: parent.confmOnEnter
-//        onValueChanged:{
-//            mangWin.value  = Valve
-//        }
+        property int _prtOldZ: parent.z
+        //Component.onCompleted: _prtOldZ = parent.z
+        body.onVisibleChanged: {
+            if( body.visible ){
+                _prtOldZ = parent.z
+                parent.z = 100
+            }
+            else parent.z = _prtOldZ
+        }
     }
 
     MouseArea {

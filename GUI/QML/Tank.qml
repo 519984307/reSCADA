@@ -7,6 +7,7 @@ Item {
     height:200
 
     property alias levelText: levelDig
+    property color levelTextColor: "black"
     property int levelTextBottMarg: radius + seam2.height
     property int levelTextHorOffset: 0
     property alias mfuAlarmTopLevel: mfuAlarmTopLevel
@@ -197,6 +198,7 @@ Item {
         width:  parent.width* 0.85
         height: Math.max(parent.height* 0.1, parent.width* 0.3)
         visible: showLevel
+        color: levelDigColor
     }
     Rectangle {
         id: seam2
@@ -271,9 +273,7 @@ Item {
         valueFontSize.bold: false
         disappear: showAlarmLevel
         correctingButtons: true
-        onValueRealChanged: s_alarmTopLevelChanged(valueReal)
         limited: true
-        downLimit: 20
         mouseArea.onContainsMouseChanged:{
             s_enableMouseArea( !mainRect.visible )
         }
@@ -285,21 +285,19 @@ Item {
         width: 54
         height: 20
         objectName: "alarmBottomLevel"
-        backgroundColor: "#f03e3e"
+        backgroundColor: "#3e6ff0"
         tooltip: "Предельный нижний уровень"
         readOnly: false
-        visible: false//NOTE пока закрыл
+        visible: showAlarmLevel//NOTE пока закрыл
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottomMargin: 0
         valueFontSize.bold: false
-        disappear: false//NOTE пока закрыл
+        disappear: showAlarmLevel//NOTE пока закрыл
         correctingButtons: true
-        onValueRealChanged: s_alarmBottomLevelChanged(valueReal)
         limited: true
         upLimit: mfuAlarmTopLevel.valueReal
-        downLimit: 0
-                mouseArea.onContainsMouseChanged:{
+        mouseArea.onContainsMouseChanged:{
             s_enableMouseArea( !mainRect.visible )
         }
         onValueChanged:  s_alarmBottomLevelChanged( Value )

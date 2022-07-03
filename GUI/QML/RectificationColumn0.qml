@@ -1,7 +1,4 @@
 ﻿import QtQuick 2.12
-//import QtQuick.Window 2.12
-//import QtQuick.Controls 2.15
-//import LineComponent 1.0
 import "fap.js" as Fap
 
 UnitPropItem {
@@ -72,6 +69,22 @@ UnitPropItem {
         mainGradientColor: backgroundCurrentColor
         borderColor: borderCurrentColor
         borderWidth: borderCurrentWidth
+        function setLvlAlarm(Discr){
+            levelText.color = textAlarmColor
+        }
+        function setLvlAlarmReseted(){
+            levelText.color = levelTextColor
+        }
+//        Timer{
+//            id: blinc
+//            interval: Fap.blinkDelay
+//            running: false
+//            repeat: true
+//            onTriggered:{
+
+//            }
+//        }
+
     }
     AnalogSignalVar2 {
         id: tTop
@@ -193,20 +206,40 @@ UnitPropItem {
         Component.onCompleted: sbPrButt.checked = manOnOff
         confmOnEnter: true
     }
+
+    AnalogSignalVar2 {
+        id: tWater
+        objectName: "tWater"
+        y: -123
+        width:  indicWidth
+        height: indicHeigth
+        anchors.right: parent.left
+        shWidth: 5
+        //shHeight: 15
+        backgroundColor: indicColor
+        anchors.rightMargin: 0
+        colorShortName: "#008000"
+        tooltipText: "Температура отходящей воды"
+        postfix: "°c"
+        confmOnEnter: true
+        //        shLeft: false
+        //        shRight: false
+        //        shTop: true
+    }
     AnalogSignalVar2 {
         id: pBottom
         objectName:  "pBottom"
-        y: 195
         height: indicHeigth
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: tBottom.top
+        anchors.bottom: parent.bottom
+
         limitStep: 0.05
         shWidth: 5
         //shHeight: 15
         anchors.leftMargin: 0
         anchors.rightMargin: 0
-        anchors.bottomMargin: 4
+        anchors.bottomMargin: cube.height * cube.levelRatio + 15
         backgroundColor: indicColor
         colorShortName: "orange"
         //shortNameText: "P"
@@ -239,38 +272,20 @@ UnitPropItem {
         }
     }
     AnalogSignalVar2 {
-        id: tWater
-        objectName: "tWater"
-        y: -123
-        width:  indicWidth
-        height: indicHeigth
-        anchors.right: parent.left
-        shWidth: 5
-        //shHeight: 15
-        backgroundColor: indicColor
-        anchors.rightMargin: 0
-        colorShortName: "#008000"
-        tooltipText: "Температура отходящей воды"
-        postfix: "°c"
-        confmOnEnter: true
-//        shLeft: false
-//        shRight: false
-//        shTop: true
-    }
-    AnalogSignalVar2 {
         id: tBottom
         objectName:  "tBottom"
         y: 240
         height: indicHeigth
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: pBottom.top
+
         z: 5
         shWidth: 5
         //shHeight: 15
         anchors.leftMargin: 0
         anchors.rightMargin: 0
-        anchors.bottomMargin: cube.height * cube.levelRatio + 5
+        anchors.bottomMargin: 4
         backgroundColor: indicColor
         colorShortName: "green"
         postfix: "°c"

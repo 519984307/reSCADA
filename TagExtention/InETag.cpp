@@ -75,13 +75,15 @@ QVariant InETag::detectLevel() const
 void InETag::setDetectLevel(QVariant detectLevel)
 {
     //    Ob = sender();
-    _detectLevel = detectLevel.toDouble();
-    _logging(Prom::MessInfo, "уровень срабатывания изменён на -" + _detectLevel.toString(), false);
-    //    if(_DBName == ".QK")
-    //        qDebug()<<".QK";
-    //_detect = _Detect();
-    _checkVal();
-    emit s_delectLevelChanged(_detectLevel);
+    if( _detectLevel != detectLevel.toDouble() ){
+        _detectLevel = detectLevel.toDouble();
+        _logging(Prom::MessInfo, "уровень срабатывания изменён на -" + _detectLevel.toString(), false);
+        //    if(_DBName == ".QK")
+        //        qDebug()<<".QK";
+        //_detect = _Detect();
+        _checkVal();
+        emit s_delectLevelChanged(_detectLevel);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -432,12 +434,12 @@ void InETag::_customConnectToGUI(QObject *, QObject *engRow)
     tmpSgSt = qvariant_cast< QObject* >(ret);
     //получил указатель на главный раздел
     //-----подключил сигналы к значению и имитации
-    connect(tmpSgSt, SIGNAL(changedIm(bool)),               this,    SLOT(writeImit(bool)),           Qt::QueuedConnection);
-    connect(tmpSgSt, SIGNAL(changedImVal(QVariant)),        this,    SLOT(writeImitVal(QVariant)),    Qt::QueuedConnection);
-    connect(this,    SIGNAL(s_imitationChd(QVariant)),      tmpSgSt, SLOT(changeIm(QVariant)),        Qt::QueuedConnection);
-    connect(this,    SIGNAL(s_imitationValueChd(QVariant)), tmpSgSt, SLOT(changeImVal(QVariant)),     Qt::QueuedConnection);
-    connect(this,    SIGNAL(s_liveValueChd(QVariant)),      tmpSgSt, SLOT(changeVal(QVariant)),       Qt::QueuedConnection);
-    connect(this,    SIGNAL(s_qualityChd(QVariant)),        tmpSgSt, SLOT(changeConnected(QVariant)), Qt::QueuedConnection);
+    connect(tmpSgSt, SIGNAL(s_imChanged(bool)),               this,    SLOT(writeImit(bool)),           Qt::QueuedConnection);
+    connect(tmpSgSt, SIGNAL(s_imValChanged(QVariant)),        this,    SLOT(writeImitVal(QVariant)),    Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_imitationChd(QVariant)),      tmpSgSt, SLOT(setIm(QVariant)),        Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_imitationValueChd(QVariant)), tmpSgSt, SLOT(setImVal(QVariant)),     Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_liveValueChd(QVariant)),      tmpSgSt, SLOT(setVal(QVariant)),       Qt::QueuedConnection);
+    connect(this,    SIGNAL(s_qualityChd(QVariant)),        tmpSgSt, SLOT(setConnected(QVariant)), Qt::QueuedConnection);
     //-----подключил сигналы к значению и имитации
 
     //!добавляю уровень срабатывания
@@ -451,8 +453,8 @@ void InETag::_customConnectToGUI(QObject *, QObject *engRow)
         //tmpSgSt = guiItem->findChild<QObject*>(est->getDBName() + "_delay");
         tmpSgSt = qvariant_cast< QObject* >(ret);//получаю указатель на уровень срабатывания
         //подключаю сигналы к уровням срабатывания
-        connect(tmpSgSt, SIGNAL(changedVal(QVariant)),        this,    SLOT(setDetectLevel(QVariant)), Qt::QueuedConnection);
-        connect(this,    SIGNAL(s_delectLevelChanged(QVariant)), tmpSgSt, SLOT(changeVal(QVariant)),      Qt::QueuedConnection);
+        connect(tmpSgSt, SIGNAL(s_valChanged(QVariant)),        this,    SLOT(setDetectLevel(QVariant)), Qt::QueuedConnection);
+        connect(this,    SIGNAL(s_delectLevelChanged(QVariant)), tmpSgSt, SLOT(setVal(QVariant)),      Qt::QueuedConnection);
         //подключаю сигналы к уровням срабатывания
     }
 }
